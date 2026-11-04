@@ -1,12 +1,8 @@
-import {
-  useEffect,
-  useRef,
-  type ReactNode,
-  type RefObject,
-} from 'react'
+import { useRef, type ReactNode, type RefObject } from 'react'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { cn } from '@/utils/cn'
+import { useFocusTrap } from '@/hooks/useFocusTrap'
 
 export interface ModalProps {
   isOpen: boolean
@@ -21,9 +17,6 @@ export interface ModalProps {
   ariaDescribedBy?: string
 }
 
-const FOCUSABLE_SELECTOR =
-  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
-
 export function Modal({
   isOpen,
   onClose,
@@ -37,82 +30,15 @@ export function Modal({
   ariaDescribedBy,
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null)
-  const previousActiveElement = useRef<HTMLElement | null>(null)
 
-  // Manage body scroll lock and focus restore
-  useEffect(() => {
-    if (!isOpen) return
-
-    previousActiveElement.current = document.activeElement as HTMLElement
-    const originalOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-
-    // Focus management on open
-    const focusTimeout = setTimeout(() => {
-      if (initialFocusRef?.current) {
-        initialFocusRef.current.focus()
-      } else if (modalRef.current) {
-        const focusable = modalRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
-        if (focusable.length > 0) {
-          focusable[0].focus()
-        } else {
-          modalRef.current.focus()
-        }
-      }
-    }, 50)
-
-    return () => {
-      clearTimeout(focusTimeout)
-      document.body.style.overflow = originalOverflow
-      if (previousActiveElement.current && typeof previousActiveElement.current.focus === 'function') {
-        previousActiveElement.current.focus()
-      }
-    }
-  }, [isOpen, initialFocusRef])
-
-  // Key listener for Escape and Focus Trap
-  useEffect(() => {
-    if (!isOpen) return
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        event.preventDefault()
-        onClose()
-        return
-      }
-
-      if (event.key === 'Tab' && modalRef.current) {
-        const focusable = Array.from(
-          modalRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
-        ).filter((el) => el.offsetParent !== null)
-
-        if (focusable.length === 0) {
-          event.preventDefault()
-          return
-        }
-
-        const firstElement = focusable[0]
-        const lastElement = focusable[focusable.length - 1]
-
-        if (event.shiftKey) {
-          if (document.activeElement === firstElement || document.activeElement === modalRef.current) {
-            event.preventDefault()
-            lastElement.focus()
-          }
-        } else {
-          if (document.activeElement === lastElement) {
-            event.preventDefault()
-            firstElement.focus()
-          }
-        }
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyDown)
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [isOpen, onClose])
+  // Shared focus trap hook
+  useFocusTrap({
+    containerRef: modalRef,
+    isActive: isOpen,
+    onClose,
+    initialFocusRef,
+    lockScroll: true,
+  })
 
   if (!isOpen || typeof document === 'undefined') return null
 

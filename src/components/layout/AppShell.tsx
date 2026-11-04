@@ -5,6 +5,7 @@ import { Avatar, Badge, IconButton, Logo, ThemeToggle } from '@/components/ui'
 import { useAuth } from '@/context/AuthContext'
 import { getHomePath } from '@/utils/routes'
 import { getNavItemsForRole } from '@/components/layout/navConfig'
+import { getGreetingName } from '@/utils/names'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
 import { cn } from '@/utils/cn'
 
@@ -36,7 +37,7 @@ export function AppShell() {
 
   const navItems = getNavItemsForRole(user.role)
   const homePath = getHomePath(user.role)
-  const firstName = user.name.split(' ')[0]
+  const greetingName = getGreetingName(user.name)
 
   const handleLogout = () => {
     logout()
@@ -253,7 +254,7 @@ export function AppShell() {
             <div className="flex items-center gap-2.5">
               <Avatar name={user.name} size="sm" />
               <div className="hidden sm:flex flex-col text-left">
-                <span className="text-xs font-semibold text-fg">Hello, {firstName}</span>
+                <span className="text-xs font-semibold text-fg">Hello, {greetingName}</span>
                 <span className="text-[10px] text-muted capitalize leading-none">
                   {user.role}
                 </span>

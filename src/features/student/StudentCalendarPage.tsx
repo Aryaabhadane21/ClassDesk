@@ -3,19 +3,20 @@ import { PageHeader } from '@/components/layout/PageHeader'
 import { EmptyState } from '@/components/ui'
 import { useAuth } from '@/context/AuthContext'
 import { usePageTitle } from '@/hooks/usePageTitle'
+import { getGreetingName } from '@/utils/names'
 
 // placeholder, replaced in step 9
 export function StudentCalendarPage() {
   const { user } = useAuth()
   usePageTitle('Calendar')
 
-  const firstName = user?.name.split(' ')[0] || 'Student'
+  const greetingName = getGreetingName(user?.name)
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="Calendar"
-        description={`Hello, ${firstName}! Your monthly schedule and upcoming assignment deadlines.`}
+        description={`Hello, ${greetingName}! Your monthly schedule and upcoming assignment deadlines.`}
       />
 
       <EmptyState

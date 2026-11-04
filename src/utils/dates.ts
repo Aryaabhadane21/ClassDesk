@@ -24,6 +24,23 @@ export function formatDueDate(isoString: string): string {
 }
 
 /**
+ * Formats an ISO submission timestamp into a friendly localized string,
+ * e.g. "6 Nov, 11:30 PM".
+ */
+export function formatSubmissionDate(isoString: string): string {
+  const date = new Date(isoString)
+  if (isNaN(date.getTime())) return 'recently'
+
+  return new Intl.DateTimeFormat('en-US', {
+    day: 'numeric',
+    month: 'short',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  }).format(date)
+}
+
+/**
  * Computes due status and relative human-readable label relative to now.
  * Pure function: takes an optional now parameter for deterministic testing.
  */

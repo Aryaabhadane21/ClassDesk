@@ -39,6 +39,16 @@ export function AppShell() {
   const homePath = getHomePath(user.role)
   const greetingName = getGreetingName(user.name)
 
+  const isNavActive = (href: string, defaultActive: boolean) => {
+    if (href === '/admin') {
+      return location.pathname === '/admin' || location.pathname.startsWith('/admin/assignments')
+    }
+    if (href === '/student') {
+      return location.pathname === '/student' || location.pathname.startsWith('/student/assignments')
+    }
+    return defaultActive
+  }
+
   const handleLogout = () => {
     logout()
     navigate('/login', { replace: true })
@@ -77,33 +87,37 @@ export function AppShell() {
                   key={item.href}
                   to={item.href}
                   end={item.end}
-                  className={({ isActive }) =>
-                    cn(
+                  className={({ isActive }) => {
+                    const active = isNavActive(item.href, isActive)
+                    return cn(
                       'flex items-center gap-3 px-4 py-3 rounded-pill text-sm font-medium cursor-pointer',
                       'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2',
                       'motion-safe:transition-all motion-safe:duration-150',
-                      isActive
+                      active
                         ? 'bg-primary text-primary-fg shadow-card'
                         : 'text-muted hover:text-fg hover:bg-surface-2 border border-transparent hover:border-line',
                     )
-                  }
+                  }}
                 >
-                  {({ isActive }) => (
-                    <>
-                      <span
-                        className={cn(
-                          'w-7 h-7 rounded-pill flex items-center justify-center shrink-0 motion-safe:transition-colors',
-                          isActive
-                            ? 'bg-accent/20 text-accent'
-                            : 'bg-surface-2 text-muted group-hover:text-fg',
-                        )}
-                        aria-hidden="true"
-                      >
-                        <Icon className="w-4 h-4" />
-                      </span>
-                      <span>{item.label}</span>
-                    </>
-                  )}
+                  {({ isActive }) => {
+                    const active = isNavActive(item.href, isActive)
+                    return (
+                      <>
+                        <span
+                          className={cn(
+                            'w-7 h-7 rounded-pill flex items-center justify-center shrink-0 motion-safe:transition-colors',
+                            active
+                              ? 'bg-accent/20 text-accent'
+                              : 'bg-surface-2 text-muted group-hover:text-fg',
+                          )}
+                          aria-hidden="true"
+                        >
+                          <Icon className="w-4 h-4" />
+                        </span>
+                        <span>{item.label}</span>
+                      </>
+                    )
+                  }}
                 </NavLink>
               )
             })}
@@ -175,30 +189,34 @@ export function AppShell() {
                       to={item.href}
                       end={item.end}
                       onClick={() => setIsDrawerOpen(false)}
-                      className={({ isActive }) =>
-                        cn(
+                      className={({ isActive }) => {
+                        const active = isNavActive(item.href, isActive)
+                        return cn(
                           'flex items-center gap-3 px-4 py-3 rounded-pill text-sm font-medium cursor-pointer',
                           'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent',
-                          isActive
+                          active
                             ? 'bg-primary text-primary-fg shadow-card'
                             : 'text-muted hover:text-fg hover:bg-surface-2 border border-transparent hover:border-line',
                         )
-                      }
+                      }}
                     >
-                      {({ isActive }) => (
-                        <>
-                          <span
-                            className={cn(
-                              'w-7 h-7 rounded-pill flex items-center justify-center shrink-0',
-                              isActive ? 'bg-accent/20 text-accent' : 'bg-surface-2 text-muted',
-                            )}
-                            aria-hidden="true"
-                          >
-                            <Icon className="w-4 h-4" />
-                          </span>
-                          <span>{item.label}</span>
-                        </>
-                      )}
+                      {({ isActive }) => {
+                        const active = isNavActive(item.href, isActive)
+                        return (
+                          <>
+                            <span
+                              className={cn(
+                                'w-7 h-7 rounded-pill flex items-center justify-center shrink-0',
+                                active ? 'bg-accent/20 text-accent' : 'bg-surface-2 text-muted',
+                              )}
+                              aria-hidden="true"
+                            >
+                              <Icon className="w-4 h-4" />
+                            </span>
+                            <span>{item.label}</span>
+                          </>
+                        )
+                      }}
                     </NavLink>
                   )
                 })}

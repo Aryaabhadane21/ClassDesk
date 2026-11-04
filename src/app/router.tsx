@@ -10,6 +10,7 @@ import { LoginPage } from '@/features/auth/LoginPage'
 import { StudentDashboardPage } from '@/features/student/StudentDashboardPage'
 import { StudentCalendarPage } from '@/features/student/StudentCalendarPage'
 import { AdminAssignmentsPage } from '@/features/admin/AdminAssignmentsPage'
+import { AssignmentDetailPage } from '@/features/admin/AssignmentDetailPage'
 import { AdminCalendarPage } from '@/features/admin/AdminCalendarPage'
 import { NotFoundPage } from '@/features/common/NotFoundPage'
 import { UiGallery } from '@/features/dev/UiGallery'
@@ -58,6 +59,7 @@ export function AppRouter() {
           }
         >
           <Route index element={<AdminAssignmentsPage />} />
+          <Route path="assignments/:assignmentId" element={<AssignmentDetailPage />} />
           <Route path="calendar" element={<AdminCalendarPage />} />
         </Route>
 

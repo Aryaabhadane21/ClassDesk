@@ -1,6 +1,8 @@
-import { ExternalLink, Pencil, Trash2, Users } from 'lucide-react'
-import { Button, Card, GradientBlob, IconButton } from '@/components/ui'
+import { ExternalLink, ListChecks, Pencil, Trash2, Users } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Button, Card, GradientBlob, IconButton, ProgressBar } from '@/components/ui'
 import { DueLabel } from '@/components/assignments/DueLabel'
+import { getCompletion } from '@/utils/selectors'
 import type { AdminAssignment } from '@/types'
 import { cn } from '@/utils/cn'
 
@@ -20,6 +22,7 @@ export function AdminAssignmentCard({
   const titleId = `admin-asg-title-${assignment.id}`
   const cardId = `admin-assignment-card-${assignment.id}`
 
+  const completion = getCompletion(assignment)
   const isAllStudents = assignment.assignedTo.length >= 5
   const assignedText = isAllStudents
     ? 'Assigned to all students'
@@ -66,37 +69,64 @@ export function AdminAssignmentCard({
           </div>
 
           <div className="space-y-4">
-            {/* Divider, Due Date & Submission Count */}
-            <div className="pt-3 border-t border-line flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            {/* Divider & Due Date */}
+            <div className="pt-3 border-t border-line flex items-center justify-between gap-2">
               <DueLabel dueDate={assignment.dueDate} />
-              <span className="text-xs font-semibold text-fg">
-                {assignment.submittedCount} of {assignment.totalCount} submitted
-              </span>
             </div>
 
-            {/* STEP 11 SLOT: Per-student submission table and completion progress bar */}
+            {/* Class Completion Progress Bar */}
+            <div className="space-y-1.5">
+              {completion.total === 0 ? (
+                <p className="text-xs text-muted">No students assigned</p>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between text-xs font-medium">
+                    <span className="text-muted">
+                      {completion.submitted} of {completion.total} submitted
+                    </span>
+                    <span className="font-semibold text-fg">
+                      {completion.percent}%
+                    </span>
+                  </div>
+                  <ProgressBar
+                    value={completion.submitted}
+                    max={completion.total}
+                    tone={completion.percent === 100 ? 'success' : 'accent'}
+                    aria-label={`Submission progress for ${assignment.title}`}
+                  />
+                </>
+              )}
+            </div>
 
-            {/* 3. Footer Row: Drive link and Admin Actions */}
-            <div className="pt-3 border-t border-line flex items-center justify-between gap-3">
-              {/* Drive Link */}
-              <a
-                href={assignment.driveLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block shrink-0"
-              >
+            {/* 3. Footer Row: Actions */}
+            <div className="pt-3 border-t border-line flex items-center justify-between gap-2 flex-wrap">
+              <Link to={`/admin/assignments/${assignment.id}`}>
                 <Button
                   variant="secondary"
                   size="sm"
-                  rightIcon={<ExternalLink className="w-3.5 h-3.5" />}
-                  aria-label={`Open Drive link for ${assignment.title}`}
+                  leftIcon={<ListChecks className="w-3.5 h-3.5" />}
+                  aria-label={`View submissions for ${assignment.title}`}
                 >
-                  Open Drive link
+                  View submissions
                 </Button>
-              </a>
+              </Link>
 
-              {/* Action Buttons: Edit and Delete */}
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 ml-auto">
+                <a
+                  href={assignment.driveLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Open Drive link"
+                >
+                  <IconButton
+                    variant="secondary"
+                    size="sm"
+                    aria-label={`Open Drive link for ${assignment.title}`}
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-fg" />
+                  </IconButton>
+                </a>
+
                 <IconButton
                   variant="secondary"
                   size="sm"

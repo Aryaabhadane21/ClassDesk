@@ -68,8 +68,7 @@ export function Modal({
         aria-describedby={descId}
         className={cn(
           'relative w-full max-h-[90vh] overflow-y-auto bg-surface border border-line shadow-pop text-fg z-10',
-          'rounded-t-lg md:rounded-lg max-w-lg p-6 space-y-4',
-          'motion-safe:transition-transform motion-safe:duration-200',
+          'rounded-t-lg md:rounded-lg max-w-lg p-6 space-y-4 animate-modal-enter',
           className,
         )}
       >

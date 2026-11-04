@@ -124,7 +124,7 @@ function ToastItem({
       onBlur={() => setIsPaused(false)}
       className={cn(
         'pointer-events-auto flex items-start gap-3 w-full max-w-sm p-4 rounded-lg bg-surface border border-line shadow-pop',
-        'motion-safe:transition-all motion-safe:duration-200 text-left',
+        'animate-toast-enter text-left',
       )}
     >
       <div className="pt-0.5">{icons[toast.type]}</div>

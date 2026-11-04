@@ -179,9 +179,10 @@ export function AdminAssignmentCard({
                   <IconButton
                     variant="secondary"
                     size="sm"
-                    aria-label={`Open Drive link for ${assignment.title}`}
+                    aria-label={`Open Drive link for ${assignment.title} (opens in a new tab)`}
                   >
-                    <ExternalLink className="w-3.5 h-3.5 text-fg" />
+                    <ExternalLink className="w-3.5 h-3.5 text-fg" aria-hidden="true" />
+                    <span className="sr-only"> (opens in a new tab)</span>
                   </IconButton>
                 </a>
 

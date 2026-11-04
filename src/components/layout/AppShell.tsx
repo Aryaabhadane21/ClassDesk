@@ -82,7 +82,7 @@ export function AppShell() {
           </NavLink>
 
           {/* Navigation Pill Links */}
-          <nav className="space-y-2" aria-label="Main Navigation">
+          <nav className="space-y-2" aria-label="Main">
             {navItems.map((item) => {
               const Icon = item.icon
               return (
@@ -291,7 +291,7 @@ export function AppShell() {
         <main
           id="main-content"
           tabIndex={-1}
-          className="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 lg:p-8 focus:outline-none"
+          className="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 lg:p-8 focus:outline-none animate-page-enter"
         >
           <Outlet />
         </main>

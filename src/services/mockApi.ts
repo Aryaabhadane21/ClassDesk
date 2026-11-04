@@ -47,6 +47,26 @@ export const apiConfig: MockApiConfig = {
 }
 
 /**
+ * Configure API latency and failure rate (used by test harnesses and dev tools).
+ */
+export function setApiConfig(
+  config: Partial<{
+    latency: [number, number]
+    minLatencyMs: number
+    maxLatencyMs: number
+    failureRate: number
+  }>,
+): void {
+  if (config.latency) {
+    apiConfig.minLatencyMs = config.latency[0]
+    apiConfig.maxLatencyMs = config.latency[1]
+  }
+  if (typeof config.minLatencyMs === 'number') apiConfig.minLatencyMs = config.minLatencyMs
+  if (typeof config.maxLatencyMs === 'number') apiConfig.maxLatencyMs = config.maxLatencyMs
+  if (typeof config.failureRate === 'number') apiConfig.failureRate = config.failureRate
+}
+
+/**
  * Simulate network latency and optional failure
  */
 async function simulateNetwork(): Promise<void> {

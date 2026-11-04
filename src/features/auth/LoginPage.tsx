@@ -4,6 +4,7 @@ import {
   useState,
   type FormEvent,
 } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { AlertCircle, ChevronDown, Sparkles } from 'lucide-react'
 import {
   Avatar,
@@ -17,10 +18,12 @@ import {
 import { useAuth } from '@/context/AuthContext'
 import { ApiError } from '@/services/mockApi'
 import { DEMO_PASSWORD, SEED_USERS } from '@/data/seed'
+import { getHomePath } from '@/utils/routes'
 import type { User } from '@/types'
 
 export function LoginPage() {
   const { login } = useAuth()
+  const navigate = useNavigate()
 
   // Form input state
   const [email, setEmail] = useState('')
@@ -107,7 +110,8 @@ export function LoginPage() {
 
     try {
       setIsSubmitting(true)
-      await login(email, password)
+      const authenticatedUser = await login(email, password)
+      navigate(getHomePath(authenticatedUser.role), { replace: true })
     } catch (err) {
       if (!isMountedRef.current) return
       if (err instanceof ApiError) {

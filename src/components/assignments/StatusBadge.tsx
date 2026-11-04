@@ -13,7 +13,7 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
       <Badge
         tone="success"
         size="sm"
-        icon={<Check className="w-3 h-3 stroke-[2.5]" aria-hidden="true" />}
+        icon={<Check className="w-3 h-3 stroke-[2.5] animate-check-pop" aria-hidden="true" />}
         className={className}
       >
         Submitted

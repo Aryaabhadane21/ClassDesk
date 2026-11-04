@@ -128,10 +128,11 @@ export function StudentAssignmentCard({
                 <Button
                   variant="secondary"
                   size="sm"
-                  rightIcon={<ExternalLink className="w-3.5 h-3.5" />}
-                  aria-label={`Open Drive link for ${assignment.title}`}
+                  rightIcon={<ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />}
+                  aria-label={`Open Drive link for ${assignment.title} (opens in a new tab)`}
                 >
                   Open Drive link
+                  <span className="sr-only"> (opens in a new tab)</span>
                 </Button>
               </a>
 

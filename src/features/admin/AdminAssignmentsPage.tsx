@@ -256,16 +256,21 @@ export function AdminAssignmentsPage() {
               }
             />
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
-              {filteredAssignments.map((assignment) => (
-                <AdminAssignmentCard
-                  key={assignment.id}
-                  assignment={assignment}
-                  onEdit={handleOpenEdit}
-                  onDelete={handleOpenDelete}
-                />
-              ))}
-            </div>
+            <section aria-labelledby="admin-assignments-list-heading">
+              <h2 id="admin-assignments-list-heading" className="sr-only">
+                Course assignments list
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
+                {filteredAssignments.map((assignment) => (
+                  <AdminAssignmentCard
+                    key={assignment.id}
+                    assignment={assignment}
+                    onEdit={handleOpenEdit}
+                    onDelete={handleOpenDelete}
+                  />
+                ))}
+              </div>
+            </section>
           )}
         </div>
       )}

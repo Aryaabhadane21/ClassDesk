@@ -208,10 +208,11 @@ export function AssignmentDetailPage() {
                 <Button
                   variant="secondary"
                   size="md"
-                  rightIcon={<ExternalLink className="w-4 h-4" />}
-                  aria-label={`Open Drive folder for ${assignment.title}`}
+                  rightIcon={<ExternalLink className="w-4 h-4" aria-hidden="true" />}
+                  aria-label={`Open Drive folder for ${assignment.title} (opens in a new tab)`}
                 >
                   Open Drive link
+                  <span className="sr-only"> (opens in a new tab)</span>
                 </Button>
               </a>
 

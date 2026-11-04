@@ -18,14 +18,16 @@ export function formatRelativeTime(
   const diffMs = target.getTime() - now.getTime()
   const absDiff = Math.abs(diffMs)
 
-  const diffMins = Math.round(absDiff / (1000 * 60))
-  const diffHours = Math.round(absDiff / (1000 * 60 * 60))
-  const diffDays = Math.round(absDiff / (1000 * 60 * 60 * 24))
+  const diffSecs = Math.floor(absDiff / 1000)
+  const diffMins = Math.floor(absDiff / (1000 * 60))
+  const diffHours = Math.floor(absDiff / (1000 * 60 * 60))
+  const diffDays = Math.floor(absDiff / (1000 * 60 * 60 * 24))
 
   // Future dates (e.g. due soon)
   if (diffMs > 0) {
+    if (diffSecs < 60) return 'in less than a minute'
     if (diffMins < 60) {
-      return diffMins <= 1 ? 'in a minute' : `in ${diffMins} minutes`
+      return diffMins <= 1 ? 'in 1 minute' : `in ${diffMins} minutes`
     }
     if (diffHours < 24) {
       return diffHours === 1 ? 'in 1 hour' : `in ${diffHours} hours`
@@ -35,7 +37,7 @@ export function formatRelativeTime(
   }
 
   // Past dates
-  if (diffMins < 1) return 'just now'
+  if (diffSecs < 60) return 'just now'
   if (diffMins < 60) return `${diffMins}m ago`
   if (diffHours < 24) return `${diffHours}h ago`
   if (diffDays === 1) return 'yesterday'

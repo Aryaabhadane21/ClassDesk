@@ -1,6 +1,14 @@
 import { useState, useMemo } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { ArrowLeft, ExternalLink, Pencil, Trash2, Users } from 'lucide-react'
+import {
+  AlertTriangle,
+  ArrowLeft,
+  Clock,
+  ExternalLink,
+  Pencil,
+  Trash2,
+  Users,
+} from 'lucide-react'
 import { PageHeader } from '@/components/layout/PageHeader'
 import {
   Avatar,
@@ -22,7 +30,9 @@ import { useAuth } from '@/context/AuthContext'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { formatSubmissionDate } from '@/utils/dates'
 import { getCompletion, sortSubmissionsForReview } from '@/utils/selectors'
+import { getAdminUrgency } from '@/utils/dueStyles'
 import { mockApi } from '@/services/mockApi'
+import { cn } from '@/utils/cn'
 import type { AdminAssignment } from '@/types'
 
 export function AssignmentDetailPage() {
@@ -65,6 +75,18 @@ export function AssignmentDetailPage() {
 
   const completion = useMemo(
     () => (assignment ? getCompletion(assignment) : null),
+    [assignment],
+  )
+
+  const urgency = useMemo(
+    () =>
+      assignment
+        ? getAdminUrgency(
+            assignment.dueDate,
+            assignment.submittedCount,
+            assignment.totalCount,
+          )
+        : null,
     [assignment],
   )
 
@@ -216,7 +238,43 @@ export function AssignmentDetailPage() {
         />
 
         <div className="flex items-center gap-4 flex-wrap pt-1">
-          <DueLabel dueDate={assignment.dueDate} />
+          <div
+            className={cn(
+              'flex items-center gap-2',
+              urgency?.isUrgent && urgency.dueRowClasses,
+            )}
+          >
+            {urgency?.tone === 'danger' && (
+              <AlertTriangle
+                className="w-4 h-4 text-danger shrink-0"
+                aria-hidden="true"
+              />
+            )}
+            {urgency?.tone === 'warning' && (
+              <Clock
+                className="w-4 h-4 text-warning shrink-0"
+                aria-hidden="true"
+              />
+            )}
+            <DueLabel dueDate={assignment.dueDate} />
+          </div>
+
+          {urgency?.isUrgent && (
+            <Badge
+              tone={urgency.tone}
+              size="sm"
+              icon={
+                urgency.tone === 'danger' ? (
+                  <AlertTriangle className="w-3 h-3" />
+                ) : (
+                  <Clock className="w-3 h-3" />
+                )
+              }
+            >
+              {urgency.badgeLabel}
+            </Badge>
+          )}
+
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill bg-surface-2 border border-line text-xs font-medium text-fg">
             <Users className="w-3.5 h-3.5 text-muted" aria-hidden="true" />
             <span>

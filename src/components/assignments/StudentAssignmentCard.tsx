@@ -1,8 +1,9 @@
-import { Check, CheckCircle2, ExternalLink } from 'lucide-react'
+import { AlertTriangle, Check, CheckCircle2, Clock, ExternalLink } from 'lucide-react'
 import { Badge, Button, Card, GradientBlob } from '@/components/ui'
 import { DueLabel } from '@/components/assignments/DueLabel'
 import { StatusBadge } from '@/components/assignments/StatusBadge'
 import { formatSubmissionDate } from '@/utils/dates'
+import { getStudentUrgency } from '@/utils/dueStyles'
 import type { StudentAssignment } from '@/types'
 import { cn } from '@/utils/cn'
 
@@ -21,30 +22,52 @@ export function StudentAssignmentCard({
   const cardId = `assignment-card-${assignment.id}`
 
   const isSubmitted = assignment.status === 'submitted'
-  const isLate =
-    Boolean(isSubmitted &&
-    assignment.submittedAt &&
-    new Date(assignment.submittedAt).getTime() > new Date(assignment.dueDate).getTime())
+  const isLate = Boolean(
+    isSubmitted &&
+      assignment.submittedAt &&
+      new Date(assignment.submittedAt).getTime() >
+        new Date(assignment.dueDate).getTime(),
+  )
+
+  const urgency = getStudentUrgency(assignment.dueDate, assignment.status)
 
   return (
     <Card
       className={cn(
         'flex flex-col justify-between overflow-hidden text-left bg-surface border border-line shadow-card',
         'motion-safe:transition-all motion-safe:duration-200',
+        urgency.isUrgent && urgency.cardBorderClasses,
         className,
       )}
     >
       <article
         id={cardId}
         tabIndex={-1}
+        data-due-state={urgency.tone}
         aria-labelledby={titleId}
         className="flex flex-col h-full outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 rounded-lg"
       >
         {/* 1. Cover with GradientBlob and floating StatusBadge */}
         <div className="relative h-[120px] w-full overflow-hidden shrink-0 border-b border-line">
           <GradientBlob seed={assignment.id} variant="cover" className="h-full w-full" />
-          <div className="absolute top-3 right-3 z-10">
+          <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
             <StatusBadge status={assignment.status} className="shadow-sm backdrop-blur-xs" />
+            {urgency.isUrgent && (
+              <Badge
+                tone={urgency.tone}
+                size="sm"
+                icon={
+                  urgency.tone === 'danger' ? (
+                    <AlertTriangle className="w-3 h-3" />
+                  ) : (
+                    <Clock className="w-3 h-3" />
+                  )
+                }
+                className="shadow-sm backdrop-blur-xs"
+              >
+                {urgency.badgeLabel}
+              </Badge>
+            )}
           </div>
         </div>
 
@@ -64,9 +87,33 @@ export function StudentAssignmentCard({
           </div>
 
           <div className="space-y-4">
-            {/* Divider & Due Date Info */}
-            <div className="pt-3 border-t border-line">
-              <DueLabel dueDate={assignment.dueDate} />
+            {/* Divider & Due Date Info with urgency styling */}
+            <div
+              className={cn(
+                'pt-3 border-t border-line flex items-center justify-between gap-2',
+                urgency.isUrgent && urgency.dueRowClasses,
+              )}
+            >
+              <div className="flex items-center gap-2">
+                {urgency.tone === 'danger' && (
+                  <AlertTriangle
+                    className="w-4 h-4 text-danger shrink-0"
+                    aria-hidden="true"
+                  />
+                )}
+                {urgency.tone === 'warning' && (
+                  <Clock
+                    className="w-4 h-4 text-warning shrink-0"
+                    aria-hidden="true"
+                  />
+                )}
+                <DueLabel dueDate={assignment.dueDate} />
+              </div>
+              {urgency.isUrgent && (
+                <span className="text-[11px] font-semibold tracking-wide uppercase shrink-0">
+                  {urgency.badgeLabel}
+                </span>
+              )}
             </div>
 
             {/* 3. Footer Row */}
@@ -88,41 +135,44 @@ export function StudentAssignmentCard({
                 </Button>
               </a>
 
-              {/* Submission Action / Status Info */}
-              {!isSubmitted ? (
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                  <span className="text-xs text-muted font-normal">
-                    Did you submit this on Drive?
-                  </span>
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    leftIcon={<CheckCircle2 className="w-3.5 h-3.5 text-primary-fg" />}
-                    aria-label={`Mark ${assignment.title} as submitted`}
-                    onClick={(e) => onSubmitClick?.(assignment, e.currentTarget)}
-                  >
-                    Yes, I have submitted
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-xs font-medium text-success flex items-center gap-1.5">
-                    <Check className="w-3.5 h-3.5 stroke-[2.5]" aria-hidden="true" />
-                    <span>
-                      Submitted on{' '}
-                      {assignment.submittedAt
-                        ? formatSubmissionDate(assignment.submittedAt)
-                        : 'recently'}
+              {/* Submission Action State */}
+              <div>
+                {!isSubmitted ? (
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                    <span className="text-xs text-muted">
+                      Did you submit this on Drive?
                     </span>
-                  </span>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      leftIcon={<CheckCircle2 className="w-3.5 h-3.5" />}
+                      onClick={(e) => onSubmitClick?.(assignment, e.currentTarget)}
+                      aria-label={`Submit assignment ${assignment.title}`}
+                    >
+                      Yes, I have submitted
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-success">
+                      <Check className="w-4 h-4" />
+                      <span>
+                        Submitted{' '}
+                        {assignment.submittedAt
+                          ? formatSubmissionDate(assignment.submittedAt)
+                          : ''}
+                      </span>
+                    </span>
 
-                  {isLate && (
-                    <Badge tone="warning" size="sm">
-                      Submitted late
-                    </Badge>
-                  )}
-                </div>
-              )}
+                    {/* Late badge if submitted after due date */}
+                    {isLate && (
+                      <Badge tone="warning" size="sm">
+                        Submitted late
+                      </Badge>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

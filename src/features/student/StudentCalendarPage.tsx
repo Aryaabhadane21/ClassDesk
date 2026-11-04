@@ -124,7 +124,7 @@ export function StudentCalendarPage() {
                 return (
                   <span
                     className={cn(
-                      'text-[11px] leading-tight px-1.5 py-0.5 rounded-sm truncate block shadow-2xs',
+                      'text-[11px] leading-tight px-1.5 py-0.5 rounded-none truncate block shadow-2xs',
                       tone.chip,
                     )}
                     title={item.title}
@@ -137,7 +137,7 @@ export function StudentCalendarPage() {
                 const tone = getItemTone(item)
                 return (
                   <span
-                    className={cn('w-1.5 h-1.5 rounded-pill block', tone.dot)}
+                    className={cn('w-1.5 h-1.5 rounded-none block', tone.dot)}
                     aria-hidden="true"
                   />
                 )

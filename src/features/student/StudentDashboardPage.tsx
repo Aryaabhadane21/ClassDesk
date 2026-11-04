@@ -30,7 +30,7 @@ import { getGreetingName } from '@/utils/names'
 import type { StudentAssignment } from '@/types'
 
 const STUDENT_STATUS_OPTIONS = [
-  { label: 'All assignments', value: 'all' },
+  { label: 'All', value: 'all' },
   { label: 'To do', value: 'todo' },
   { label: 'Submitted', value: 'submitted' },
 ]
@@ -72,6 +72,19 @@ export function StudentDashboardPage() {
       isMountedRef.current = false
     }
   }, [])
+
+  // 3. Compute status counts based on current search & due filter
+  const filteredBySearchAndDue = useMemo(() => {
+    return assignments.filter((item) => {
+      return searchMatches(item, debouncedQuery) && matchesDueFilter(item.dueDate, filters.due)
+    })
+  }, [assignments, debouncedQuery, filters.due])
+
+  const statusCounts = useMemo(() => ({
+    all: filteredBySearchAndDue.length,
+    todo: filteredBySearchAndDue.filter((a) => a.status !== 'submitted').length,
+    submitted: filteredBySearchAndDue.filter((a) => a.status === 'submitted').length,
+  }), [filteredBySearchAndDue])
 
   // Partition, filter, and sort assignments
   const { todoAssignments, submittedAssignments, totalFiltered } = useMemo(() => {
@@ -117,7 +130,7 @@ export function StudentDashboardPage() {
     }
   }, [assignments, debouncedQuery, filters.due, filters.sort, filters.status])
 
-  // Step 1: Open confirmation dialog
+  // Open confirmation dialog
   const handleSubmitClick = (
     assignment: StudentAssignment,
     buttonEl: HTMLButtonElement,
@@ -136,7 +149,7 @@ export function StudentDashboardPage() {
     }, 50)
   }
 
-  // Step 2: Final confirmation execution
+  // Final confirmation execution
   const handleConfirmSubmit = async () => {
     if (!user || !pendingAssignment || isSubmitting) return
 
@@ -247,6 +260,7 @@ export function StudentDashboardPage() {
             statusValue={filters.status}
             onStatusChange={(val) => setFilter('status', val as StudentStatusFilter)}
             statusOptions={STUDENT_STATUS_OPTIONS}
+            statusCounts={statusCounts}
             statusLabel="Submission status"
             dueValue={filters.due}
             onDueChange={(due) => setFilter('due', due)}
@@ -289,6 +303,7 @@ export function StudentDashboardPage() {
                         key={assignment.id}
                         assignment={assignment}
                         onSubmitClick={handleSubmitClick}
+                        searchQuery={debouncedQuery}
                       />
                     ))}
                   </div>
@@ -312,6 +327,7 @@ export function StudentDashboardPage() {
                       <StudentAssignmentCard
                         key={assignment.id}
                         assignment={assignment}
+                        searchQuery={debouncedQuery}
                         className="motion-safe:animate-fade-in"
                       />
                     ))}
@@ -323,7 +339,7 @@ export function StudentDashboardPage() {
         </div>
       )}
 
-      {/* Shared Confirmation Dialog for Step 2 */}
+      {/* Submission Confirmation Dialog */}
       <SubmitConfirmation
         isOpen={Boolean(pendingAssignment)}
         assignment={pendingAssignment}

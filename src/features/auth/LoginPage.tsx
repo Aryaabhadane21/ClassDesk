@@ -5,24 +5,28 @@ import {
   type FormEvent,
 } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { AlertCircle, ChevronDown, Sparkles } from 'lucide-react'
+import { AlertCircle, ChevronDown, RotateCcw, Sparkles } from 'lucide-react'
 import {
   Avatar,
   Button,
+  ConfirmDialog,
   GradientBlob,
   Input,
   Logo,
   PasswordInput,
   ThemeToggle,
+  useToast,
 } from '@/components/ui'
 import { useAuth } from '@/context/AuthContext'
 import { ApiError } from '@/services/mockApi'
 import { DEMO_PASSWORD, SEED_USERS } from '@/data/seed'
+import { resetDemoData } from '@/services/storage'
 import { getHomePath } from '@/utils/routes'
 import type { User } from '@/types'
 
 export function LoginPage() {
   const { login } = useAuth()
+  const { success } = useToast()
   const navigate = useNavigate()
 
   // Form input state
@@ -34,6 +38,8 @@ export function LoginPage() {
   const [passwordError, setPasswordError] = useState<string | null>(null)
   const [serverError, setServerError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isResetDialogOpen, setIsResetDialogOpen] = useState(false)
+  const [heroImgFailed, setHeroImgFailed] = useState(false)
 
   // Refs for accessible focus management
   const emailInputRef = useRef<HTMLInputElement>(null)
@@ -54,7 +60,6 @@ export function LoginPage() {
     if (!trimmed) {
       return 'Email address is required'
     }
-    // Basic email format check
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(trimmed)) {
       return 'Please enter a valid institutional email'
@@ -134,10 +139,15 @@ export function LoginPage() {
     setPasswordError(null)
     setServerError(null)
 
-    // Focus the Sign in button as requested
     setTimeout(() => {
       submitButtonRef.current?.focus()
     }, 50)
+  }
+
+  const handleResetDemoData = () => {
+    resetDemoData()
+    setIsResetDialogOpen(false)
+    success('Demo data has been reset')
   }
 
   const professors = SEED_USERS.filter((u) => u.role === 'admin')
@@ -146,24 +156,33 @@ export function LoginPage() {
   return (
     <div className="min-h-screen bg-app text-fg flex flex-col lg:flex-row lg:h-screen lg:overflow-hidden">
       {/* ------------------------------------------------------------- */}
+      {/* MOBILE / TABLET BANNER (Below lg only, 200px full-width)       */}
+      {/* ------------------------------------------------------------- */}
+      <div className="lg:hidden w-full h-[200px] overflow-hidden border-b border-line relative shrink-0 bg-surface-2">
+        {!heroImgFailed ? (
+          <img
+            src="/images/login-hero.jpg"
+            alt=""
+            aria-hidden="true"
+            loading="eager"
+            decoding="async"
+            onError={() => setHeroImgFailed(true)}
+            className="w-full h-full object-cover object-[center_35%] scale-115 origin-top-left"
+          />
+        ) : (
+          <GradientBlob seed="mobile-login-hero" variant="hero" className="h-full w-full" />
+        )}
+      </div>
+
+      {/* ------------------------------------------------------------- */}
       {/* LEFT COLUMN: Form Side                                        */}
       {/* ------------------------------------------------------------- */}
-      <div className="flex-1 flex flex-col justify-between p-6 sm:p-10 lg:p-12 lg:overflow-y-auto">
+      <div className="flex-1 lg:w-1/2 flex flex-col justify-between p-6 sm:p-10 lg:p-12 lg:overflow-y-auto">
         {/* Top bar */}
         <header className="flex items-center justify-between w-full max-w-xl mx-auto">
           <Logo size="md" />
           <ThemeToggle />
         </header>
-
-        {/* Mobile Visual Banner (Below lg only, ~160px) */}
-        <div className="lg:hidden w-full max-w-[420px] mx-auto mt-6 rounded-xl overflow-hidden border border-line shadow-card relative h-40">
-          <GradientBlob seed="mobile-login-hero" variant="hero" className="h-full" />
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-14 h-14 rounded-lg bg-surface/90 backdrop-blur-md border border-line shadow-pop flex items-center justify-center">
-              <Logo size="md" showWordmark={false} />
-            </div>
-          </div>
-        </div>
 
         {/* Centered Form Area */}
         <main className="w-full max-w-[420px] mx-auto my-8 space-y-6">
@@ -207,7 +226,7 @@ export function LoginPage() {
             {serverError && (
               <div
                 role="alert"
-                className="flex items-start gap-2.5 p-3 rounded-lg bg-danger-soft/60 border border-danger/30 text-danger text-xs font-medium motion-safe:transition-all"
+                className="flex items-start gap-2.5 p-3 rounded-none bg-danger-soft/60 border border-danger/30 text-danger text-xs font-medium motion-safe:transition-all"
               >
                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
                 <span className="leading-relaxed">{serverError}</span>
@@ -233,12 +252,22 @@ export function LoginPage() {
           <div className="pt-6 border-t border-line text-left">
             <div className="hidden sm:block space-y-4">
               <div className="space-y-0.5">
-                <div className="flex items-center gap-1.5 text-xs font-semibold text-fg uppercase tracking-wider">
-                  <Sparkles className="w-3.5 h-3.5 text-accent" />
-                  <span>Demo accounts</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-fg uppercase tracking-wider">
+                    <Sparkles className="w-3.5 h-3.5 text-accent" />
+                    <span>Demo accounts</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsResetDialogOpen(true)}
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-muted hover:text-fg motion-safe:transition-colors focus:outline-none focus-visible:underline cursor-pointer"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />
+                    <span>Reset demo data</span>
+                  </button>
                 </div>
                 <p className="text-[11px] text-muted">
-                  Click an account to fill the form. Password for all: <code className="font-mono text-fg bg-surface-2 px-1 py-0.5 rounded-sm">demo1234</code>
+                  Click an account to fill the form. Password for all: <code className="font-mono text-fg bg-surface-2 px-1 py-0.5 rounded-none">demo1234</code>
                 </p>
               </div>
 
@@ -253,7 +282,7 @@ export function LoginPage() {
                       key={p.id}
                       type="button"
                       onClick={() => selectDemoAccount(p)}
-                      className="flex items-center gap-2.5 p-2 rounded-md bg-surface-2 border border-line text-left hover:border-accent/40 hover:bg-surface motion-safe:transition-all cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                      className="flex items-center gap-2.5 p-2 rounded-none bg-surface-2 border border-line text-left hover:border-accent/40 hover:bg-surface motion-safe:transition-all cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                     >
                       <Avatar name={p.name} size="sm" />
                       <div className="overflow-hidden">
@@ -278,7 +307,7 @@ export function LoginPage() {
                       key={s.id}
                       type="button"
                       onClick={() => selectDemoAccount(s)}
-                      className="flex items-center gap-2.5 p-2 rounded-md bg-surface-2 border border-line text-left hover:border-accent/40 hover:bg-surface motion-safe:transition-all cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                      className="flex items-center gap-2.5 p-2 rounded-none bg-surface-2 border border-line text-left hover:border-accent/40 hover:bg-surface motion-safe:transition-all cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                     >
                       <Avatar name={s.name} size="sm" />
                       <div className="overflow-hidden">
@@ -294,7 +323,7 @@ export function LoginPage() {
             </div>
 
             {/* Mobile Collapsible Details (<details>) */}
-            <details className="sm:hidden group rounded-lg bg-surface-2 border border-line p-3 cursor-pointer">
+            <details className="sm:hidden group rounded-none bg-surface-2 border border-line p-3 cursor-pointer">
               <summary className="flex items-center justify-between text-xs font-semibold text-fg select-none list-none">
                 <span className="flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 text-accent" />
@@ -305,7 +334,7 @@ export function LoginPage() {
 
               <div className="pt-3 space-y-3 mt-2 border-t border-line">
                 <p className="text-[11px] text-muted">
-                  Click an account to fill the form. Password for all: <code className="font-mono text-fg bg-surface px-1 py-0.5 rounded-sm">demo1234</code>
+                  Click an account to fill the form. Password for all: <code className="font-mono text-fg bg-surface px-1 py-0.5 rounded-none">demo1234</code>
                 </p>
 
                 <div className="space-y-2">
@@ -317,7 +346,7 @@ export function LoginPage() {
                       key={p.id}
                       type="button"
                       onClick={() => selectDemoAccount(p)}
-                      className="w-full flex items-center gap-2.5 p-2 rounded-md bg-surface border border-line text-left"
+                      className="w-full flex items-center gap-2.5 p-2 rounded-none bg-surface border border-line text-left"
                     >
                       <Avatar name={p.name} size="sm" />
                       <div className="overflow-hidden">
@@ -335,7 +364,7 @@ export function LoginPage() {
                       key={s.id}
                       type="button"
                       onClick={() => selectDemoAccount(s)}
-                      className="w-full flex items-center gap-2.5 p-2 rounded-md bg-surface border border-line text-left"
+                      className="w-full flex items-center gap-2.5 p-2 rounded-none bg-surface border border-line text-left"
                     >
                       <Avatar name={s.name} size="sm" />
                       <div className="overflow-hidden">
@@ -344,6 +373,18 @@ export function LoginPage() {
                       </div>
                     </button>
                   ))}
+                </div>
+
+                <div className="flex items-center justify-between pt-2 border-t border-line/60">
+                  <span className="text-[11px] text-muted">Restore initial state</span>
+                  <button
+                    type="button"
+                    onClick={() => setIsResetDialogOpen(true)}
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-muted hover:text-fg motion-safe:transition-colors focus:outline-none focus-visible:underline cursor-pointer"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />
+                    <span>Reset demo data</span>
+                  </button>
                 </div>
               </div>
             </details>
@@ -357,33 +398,45 @@ export function LoginPage() {
       </div>
 
       {/* ------------------------------------------------------------- */}
-      {/* RIGHT COLUMN: Visual Panel (lg and up)                        */}
+      {/* RIGHT COLUMN: Full-Bleed Hero Image (lg and up)               */}
       {/* ------------------------------------------------------------- */}
-      <div className="hidden lg:flex flex-1 p-4 lg:p-6 h-full items-center justify-center">
-        <div className="relative w-full h-full rounded-2xl border border-line shadow-card overflow-hidden flex flex-col justify-between p-10 bg-surface-2">
-          {/* Background Decorative Blob */}
-          <div className="absolute inset-0">
-            <GradientBlob seed="classdesk-desktop-cover" variant="hero" className="w-full h-full" />
-          </div>
+      <div className="hidden lg:block lg:w-1/2 relative h-full overflow-hidden border-l border-line bg-surface-2 select-none">
+        {!heroImgFailed ? (
+          <img
+            src="/images/login-hero.jpg"
+            alt=""
+            aria-hidden="true"
+            loading="eager"
+            decoding="async"
+            onError={() => setHeroImgFailed(true)}
+            className="w-full h-full object-cover scale-112 origin-top-left"
+          />
+        ) : (
+          <GradientBlob seed="classdesk-desktop-cover" variant="hero" className="w-full h-full" />
+        )}
 
-          {/* Centered White Rounded-Square Logo Tile */}
-          <div className="relative z-10 flex-1 flex flex-col items-center justify-center">
-            <div className="w-20 h-20 rounded-2xl bg-white shadow-pop flex items-center justify-center border border-black/5 motion-safe:transition-transform motion-safe:hover:scale-105 duration-300">
-              <Logo size="lg" showWordmark={false} />
-            </div>
-          </div>
-
-          {/* Tagline Box with Frosted Backdrop Panel */}
-          <div className="relative z-10 p-6 rounded-xl bg-surface/85 backdrop-blur-md border border-line shadow-card text-left space-y-1.5">
-            <h2 className="font-display text-2xl font-bold tracking-tight text-fg">
-              Every assignment, one clear view.
-            </h2>
-            <p className="font-body text-sm text-muted">
-              Students track what&apos;s due. Professors see who&apos;s done.
-            </p>
-          </div>
+        {/* Bottom-left sharp solid panel */}
+        <div className="absolute bottom-8 left-8 max-w-md p-6 bg-surface border border-line shadow-card text-left space-y-1.5 z-10 rounded-none">
+          <h2 className="font-display text-2xl font-bold tracking-tight text-fg">
+            Every assignment, one clear view.
+          </h2>
+          <p className="font-body text-sm text-muted">
+            Students track what&apos;s due. Professors see who&apos;s done.
+          </p>
         </div>
       </div>
+
+      {/* Reset Demo Data Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={isResetDialogOpen}
+        onConfirm={handleResetDemoData}
+        onCancel={() => setIsResetDialogOpen(false)}
+        title="Reset demo data?"
+        message="This restores the original sample users, assignments and submissions. Anything you created will be removed."
+        confirmLabel="Reset data"
+        cancelLabel="Cancel"
+        tone="default"
+      />
     </div>
   )
 }

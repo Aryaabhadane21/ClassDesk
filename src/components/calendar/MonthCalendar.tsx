@@ -172,7 +172,7 @@ export function MonthCalendar<T>({
   return (
     <div
       className={cn(
-        'w-full bg-surface border border-line rounded-lg shadow-card p-4 sm:p-6 space-y-4',
+        'w-full bg-surface border border-line rounded-none shadow-card p-4 sm:p-6 space-y-4',
         className,
       )}
     >
@@ -240,7 +240,7 @@ export function MonthCalendar<T>({
         </div>
 
         {/* 42-day cells grid */}
-        <div className="grid grid-cols-7 gap-px bg-line/40 rounded-md overflow-hidden border border-line">
+        <div className="grid grid-cols-7 gap-px bg-line/40 rounded-none overflow-hidden border border-line">
           {grid.map((cell) => {
             const isSelected = isSameDay(cell.date, selectedDate)
             const dayItems = itemsByDay.get(cell.key) || []
@@ -288,7 +288,7 @@ export function MonthCalendar<T>({
                 <div className="flex items-center justify-between w-full">
                   <span
                     className={cn(
-                      'font-display text-xs sm:text-sm font-semibold rounded-pill w-6 h-6 flex items-center justify-center shrink-0',
+                      'font-display text-xs sm:text-sm font-semibold rounded-none w-6 h-6 flex items-center justify-center shrink-0',
                       cell.isToday
                         ? 'bg-primary text-primary-fg font-bold shadow-xs'
                         : isSelected
@@ -310,7 +310,7 @@ export function MonthCalendar<T>({
                     </div>
                   ))}
                   {dayItems.length > 2 && (
-                    <span className="text-[10px] font-semibold text-muted px-1.5 py-0.5 rounded-sm bg-surface-2 self-start">
+                    <span className="text-[10px] font-semibold text-muted px-1.5 py-0.5 rounded-none bg-surface-2 self-start">
                       +{dayItems.length - 2} more
                     </span>
                   )}

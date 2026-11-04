@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react'
-import { AlertCircle, AlertTriangle } from 'lucide-react'
+import { AlertCircle, AlertTriangle, Check } from 'lucide-react'
 import {
   Avatar,
   Button,
@@ -96,7 +96,7 @@ export function AssignmentFormModal({
         {submitError && (
           <div
             role="alert"
-            className="flex items-start gap-2.5 p-3 rounded-md bg-danger-soft/60 border border-danger/40 text-danger text-xs font-medium"
+            className="flex items-start gap-2.5 p-3 rounded-none bg-danger-soft/60 border border-danger/40 text-danger text-xs font-medium"
           >
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
             <div className="flex-1 leading-relaxed">{submitError}</div>
@@ -178,12 +178,20 @@ export function AssignmentFormModal({
 
         {/* 5. Assign to Fieldset */}
         <fieldset className="space-y-3 pt-2 border-t border-line text-left">
-          <legend className="block text-xs font-semibold uppercase tracking-wider text-muted select-none">
+          <legend className="block text-xs font-semibold uppercase tracking-wider text-muted select-none mb-1">
             Assign to
           </legend>
 
-          <div className="flex items-center gap-6">
-            <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-fg">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <label
+              className={cn(
+                'relative flex items-center justify-between p-3 border cursor-pointer select-none motion-safe:transition-all',
+                values.assignMode === 'all'
+                  ? 'border-accent bg-accent-soft text-fg font-medium'
+                  : 'border-line bg-surface-2/40 text-muted hover:border-line hover:bg-surface-2',
+                'has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent has-[:focus-visible]:ring-offset-1',
+              )}
+            >
               <input
                 type="radio"
                 name="assignMode"
@@ -191,12 +199,25 @@ export function AssignmentFormModal({
                 checked={values.assignMode === 'all'}
                 onChange={() => setFieldValue('assignMode', 'all')}
                 disabled={isSubmitting}
-                className="w-4 h-4 text-accent accent-accent border-line focus:ring-accent"
+                className="sr-only"
               />
-              <span>All students ({students.length})</span>
+              <span className="text-sm font-medium text-fg">
+                All students ({students.length})
+              </span>
+              {values.assignMode === 'all' && (
+                <Check className="w-4 h-4 text-accent shrink-0" aria-hidden="true" />
+              )}
             </label>
 
-            <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-fg">
+            <label
+              className={cn(
+                'relative flex items-center justify-between p-3 border cursor-pointer select-none motion-safe:transition-all',
+                values.assignMode === 'selected'
+                  ? 'border-accent bg-accent-soft text-fg font-medium'
+                  : 'border-line bg-surface-2/40 text-muted hover:border-line hover:bg-surface-2',
+                'has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent has-[:focus-visible]:ring-offset-1',
+              )}
+            >
               <input
                 type="radio"
                 name="assignMode"
@@ -204,15 +225,18 @@ export function AssignmentFormModal({
                 checked={values.assignMode === 'selected'}
                 onChange={() => setFieldValue('assignMode', 'selected')}
                 disabled={isSubmitting}
-                className="w-4 h-4 text-accent accent-accent border-line focus:ring-accent"
+                className="sr-only"
               />
-              <span>Selected students</span>
+              <span className="text-sm font-medium text-fg">Selected students</span>
+              {values.assignMode === 'selected' && (
+                <Check className="w-4 h-4 text-accent shrink-0" aria-hidden="true" />
+              )}
             </label>
           </div>
 
           {/* Student Picker (when assignMode === 'selected') */}
           {values.assignMode === 'selected' && (
-            <div className="space-y-2 mt-2 p-3 rounded-lg bg-surface-2/40 border border-line">
+            <div className="space-y-2 mt-2 p-3 bg-surface-2/40 border border-line">
               <div className="flex items-center justify-between gap-2 pb-2 border-b border-line text-xs">
                 <span className="font-semibold text-fg">
                   {values.selectedStudentIds.length} of {students.length} selected
@@ -249,7 +273,7 @@ export function AssignmentFormModal({
                       key={student.id}
                       onClick={() => !isSubmitting && toggleStudent(student.id)}
                       className={cn(
-                        'flex items-center justify-between gap-3 p-2 rounded-md cursor-pointer motion-safe:transition-colors',
+                        'flex items-center justify-between gap-3 p-2 cursor-pointer motion-safe:transition-colors',
                         isChecked ? 'bg-surface-2/70' : 'hover:bg-surface-2/30',
                       )}
                     >
@@ -287,7 +311,7 @@ export function AssignmentFormModal({
 
           {/* Warning note if removing submitted students during edit */}
           {hasRemovedSubmittedStudents && (
-            <div className="flex items-start gap-2 p-2.5 rounded-md bg-warning-soft/60 border border-warning/30 text-warning text-xs font-medium">
+            <div className="flex items-start gap-2 p-2.5 rounded-none bg-warning-soft/60 border border-warning/30 text-warning text-xs font-medium">
               <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
               <span>
                 Removing a student also removes their submission record for this

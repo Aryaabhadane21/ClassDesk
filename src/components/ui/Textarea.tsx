@@ -54,7 +54,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
         aria-invalid={Boolean(error)}
         aria-describedby={describedBy || undefined}
         className={cn(
-          'w-full px-4 py-3 text-sm rounded-md bg-surface-2 border border-line text-fg placeholder:text-muted resize-y',
+          'w-full px-4 py-3 text-sm rounded-none bg-surface-2 border border-line text-fg placeholder:text-muted resize-y',
           'focus:outline-none focus:border-accent focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2',
           'motion-safe:transition-colors motion-safe:duration-150',
           error && 'border-danger focus:border-danger focus-visible:ring-danger',

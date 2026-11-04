@@ -36,7 +36,7 @@ export function SubmitConfirmation({
         error ? (
           <div
             role="alert"
-            className="flex items-start gap-2.5 p-3 rounded-lg bg-danger-soft/70 border border-danger/30 text-danger text-xs font-medium text-left"
+            className="flex items-start gap-2.5 p-3 rounded-none bg-danger-soft/70 border border-danger/30 text-danger text-xs font-medium text-left"
           >
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
             <span className="leading-relaxed">{error}</span>

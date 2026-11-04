@@ -43,8 +43,8 @@ describe('Integration: Admin Create Flow', () => {
     expect(await screen.findByText(/description is required/i)).toBeInTheDocument()
 
     // Fill valid data
-    const titleInput = screen.getByLabelText(/title/i)
-    const descInput = screen.getByLabelText(/description/i)
+    const titleInput = screen.getByLabelText(/^title/i)
+    const descInput = screen.getByLabelText(/^description/i)
     const driveInput = screen.getByLabelText(/drive submission folder link/i)
 
     await user.type(titleInput, 'Microservices Architecture Design')

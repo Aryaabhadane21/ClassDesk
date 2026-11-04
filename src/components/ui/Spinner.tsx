@@ -19,9 +19,9 @@ export function Spinner({
   ...props
 }: SpinnerProps) {
   const sizeMap: Record<SpinnerSize, string> = {
-    sm: 'w-4 h-4 border-2',
-    md: 'w-5 h-5 border-2',
-    lg: 'w-7 h-7 border-[3px]',
+    sm: 'w-3.5 h-3.5 border-2',
+    md: 'w-4.5 h-4.5 border-2',
+    lg: 'w-6 h-6 border-[2.5px]',
   }
 
   const toneMap: Record<SpinnerTone, string> = {
@@ -38,7 +38,7 @@ export function Spinner({
     >
       <span
         className={cn(
-          'rounded-full motion-safe:animate-spin',
+          'motion-safe:animate-spin rounded-none shrink-0',
           sizeMap[size],
           toneMap[tone],
         )}

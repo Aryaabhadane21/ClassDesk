@@ -1,5 +1,5 @@
 import { AlertTriangle, Check, CheckCircle2, Clock, ExternalLink } from 'lucide-react'
-import { Badge, Button, Card, GradientBlob } from '@/components/ui'
+import { Badge, Button, Card, GradientBlob, Highlight } from '@/components/ui'
 import { DueLabel } from '@/components/assignments/DueLabel'
 import { StatusBadge } from '@/components/assignments/StatusBadge'
 import { formatSubmissionDate } from '@/utils/dates'
@@ -10,12 +10,14 @@ import { cn } from '@/utils/cn'
 export interface StudentAssignmentCardProps {
   assignment: StudentAssignment
   onSubmitClick?: (assignment: StudentAssignment, buttonEl: HTMLButtonElement) => void
+  searchQuery?: string
   className?: string
 }
 
 export function StudentAssignmentCard({
   assignment,
   onSubmitClick,
+  searchQuery,
   className,
 }: StudentAssignmentCardProps) {
   const titleId = `asg-title-${assignment.id}`
@@ -34,7 +36,7 @@ export function StudentAssignmentCard({
   return (
     <Card
       className={cn(
-        'flex flex-col justify-between overflow-hidden text-left bg-surface border border-line shadow-card',
+        '@container flex flex-col justify-between overflow-hidden text-left bg-surface border border-line shadow-card rounded-none',
         'motion-safe:transition-all motion-safe:duration-200',
         urgency.isUrgent && urgency.cardBorderClasses,
         className,
@@ -45,13 +47,13 @@ export function StudentAssignmentCard({
         tabIndex={-1}
         data-due-state={urgency.tone}
         aria-labelledby={titleId}
-        className="flex flex-col h-full outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 rounded-lg"
+        className="flex flex-col h-full outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
       >
         {/* 1. Cover with GradientBlob and floating StatusBadge */}
         <div className="relative h-[120px] w-full overflow-hidden shrink-0 border-b border-line">
           <GradientBlob seed={assignment.id} variant="cover" className="h-full w-full" />
           <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
-            <StatusBadge status={assignment.status} className="shadow-sm backdrop-blur-xs" />
+            <StatusBadge status={assignment.status} className="shadow-xs backdrop-blur-xs" />
             {urgency.isUrgent && (
               <Badge
                 tone={urgency.tone}
@@ -63,7 +65,7 @@ export function StudentAssignmentCard({
                     <Clock className="w-3 h-3" />
                   )
                 }
-                className="shadow-sm backdrop-blur-xs"
+                className="shadow-xs backdrop-blur-xs"
               >
                 {urgency.badgeLabel}
               </Badge>
@@ -79,14 +81,14 @@ export function StudentAssignmentCard({
               className="font-display text-lg font-semibold text-fg tracking-tight line-clamp-2 leading-snug"
               title={assignment.title}
             >
-              {assignment.title}
+              <Highlight text={assignment.title} query={searchQuery} />
             </h3>
             <p className="font-body text-xs text-muted leading-relaxed line-clamp-3">
-              {assignment.description}
+              <Highlight text={assignment.description} query={searchQuery} />
             </p>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3.5 flex-1 flex flex-col justify-end">
             {/* Divider & Due Date Info with urgency styling */}
             <div
               className={cn(
@@ -116,64 +118,59 @@ export function StudentAssignmentCard({
               )}
             </div>
 
-            {/* 3. Footer Row */}
-            <div className="pt-3 border-t border-line flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              {/* Drive Resource Link */}
-              <a
-                href={assignment.driveLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block shrink-0"
+            {/* 3. Full-width Open Drive link row */}
+            <a
+              href={assignment.driveLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full"
+            >
+              <button
+                type="button"
+                className="w-full min-h-[44px] px-3.5 py-2.5 flex items-center justify-between gap-2 border border-line bg-surface-2 text-fg text-xs font-medium hover:bg-surface hover:border-line active:bg-surface-2 motion-safe:transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer"
+                aria-label={`Open Drive link for ${assignment.title} (opens in a new tab)`}
               >
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  rightIcon={<ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />}
-                  aria-label={`Open Drive link for ${assignment.title} (opens in a new tab)`}
-                >
-                  Open Drive link
-                  <span className="sr-only"> (opens in a new tab)</span>
-                </Button>
-              </a>
+                <span className="truncate whitespace-nowrap">Open Drive link</span>
+                <ExternalLink className="w-3.5 h-3.5 shrink-0 text-muted" aria-hidden="true" />
+                <span className="sr-only"> (opens in a new tab)</span>
+              </button>
+            </a>
 
-              {/* Submission Action State */}
-              <div>
-                {!isSubmitted ? (
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                    <span className="text-xs text-muted">
-                      Did you submit this on Drive?
+            {/* 4. Submission Footer Block (mt-auto) */}
+            <div className="mt-auto pt-3 border-t border-line">
+              {!isSubmitted ? (
+                <div className="space-y-2">
+                  <p className="text-xs text-muted">Did you submit this on Drive?</p>
+                  <Button
+                    variant="primary"
+                    size="md"
+                    leftIcon={<CheckCircle2 className="w-4 h-4 shrink-0" />}
+                    onClick={(e) => onSubmitClick?.(assignment, e.currentTarget)}
+                    aria-label={`Submit assignment ${assignment.title}`}
+                    className="w-full min-h-[44px] whitespace-nowrap justify-center"
+                  >
+                    Yes, I have submitted
+                  </Button>
+                </div>
+              ) : (
+                <div className="min-h-[44px] flex items-center justify-between gap-2 flex-wrap">
+                  <div className="inline-flex items-center gap-2 text-xs font-medium text-success">
+                    <Check className="w-4 h-4 shrink-0" aria-hidden="true" />
+                    <span>
+                      Submitted{' '}
+                      {assignment.submittedAt
+                        ? formatSubmissionDate(assignment.submittedAt)
+                        : ''}
                     </span>
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      leftIcon={<CheckCircle2 className="w-3.5 h-3.5" />}
-                      onClick={(e) => onSubmitClick?.(assignment, e.currentTarget)}
-                      aria-label={`Submit assignment ${assignment.title}`}
-                    >
-                      Yes, I have submitted
-                    </Button>
                   </div>
-                ) : (
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-success">
-                      <Check className="w-4 h-4" />
-                      <span>
-                        Submitted{' '}
-                        {assignment.submittedAt
-                          ? formatSubmissionDate(assignment.submittedAt)
-                          : ''}
-                      </span>
-                    </span>
 
-                    {/* Late badge if submitted after due date */}
-                    {isLate && (
-                      <Badge tone="warning" size="sm">
-                        Submitted late
-                      </Badge>
-                    )}
-                  </div>
-                )}
-              </div>
+                  {isLate && (
+                    <Badge tone="warning" size="sm">
+                      Submitted late
+                    </Badge>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

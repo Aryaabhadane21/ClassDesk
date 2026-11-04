@@ -24,7 +24,7 @@ export function DayAgenda<T>({
   return (
     <Card
       className={cn(
-        'p-5 sm:p-6 bg-surface border border-line rounded-lg shadow-card text-left space-y-4 h-fit',
+        'p-5 sm:p-6 bg-surface border border-line rounded-none shadow-card text-left space-y-4 h-fit',
         className,
       )}
     >

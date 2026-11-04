@@ -54,7 +54,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
       title={ariaLabel}
       disabled={disabled}
       className={cn(
-        'inline-flex items-center justify-center rounded-pill cursor-pointer select-none',
+        'inline-flex items-center justify-center rounded-none cursor-pointer select-none',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2',
         'motion-safe:transition-all motion-safe:duration-150',
         variantStyles[variant],

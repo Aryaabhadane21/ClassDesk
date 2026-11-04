@@ -8,7 +8,7 @@ import {
   Users,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { Badge, Button, Card, GradientBlob, IconButton, ProgressBar } from '@/components/ui'
+import { Badge, Button, Card, GradientBlob, Highlight, IconButton, ProgressBar } from '@/components/ui'
 import { DueLabel } from '@/components/assignments/DueLabel'
 import { getCompletion } from '@/utils/selectors'
 import { getAdminUrgency } from '@/utils/dueStyles'
@@ -19,6 +19,7 @@ export interface AdminAssignmentCardProps {
   assignment: AdminAssignment
   onEdit?: (assignment: AdminAssignment, buttonEl: HTMLButtonElement) => void
   onDelete?: (assignment: AdminAssignment, buttonEl: HTMLButtonElement) => void
+  searchQuery?: string
   className?: string
 }
 
@@ -26,6 +27,7 @@ export function AdminAssignmentCard({
   assignment,
   onEdit,
   onDelete,
+  searchQuery,
   className,
 }: AdminAssignmentCardProps) {
   const titleId = `admin-asg-title-${assignment.id}`
@@ -46,7 +48,7 @@ export function AdminAssignmentCard({
   return (
     <Card
       className={cn(
-        'flex flex-col justify-between overflow-hidden text-left bg-surface border border-line shadow-card',
+        '@container flex flex-col justify-between overflow-hidden text-left bg-surface border border-line shadow-card rounded-none',
         'motion-safe:transition-all motion-safe:duration-200',
         urgency.isUrgent && urgency.cardBorderClasses,
         className,
@@ -57,13 +59,13 @@ export function AdminAssignmentCard({
         tabIndex={-1}
         data-due-state={urgency.tone}
         aria-labelledby={titleId}
-        className="flex flex-col h-full outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 rounded-lg"
+        className="flex flex-col h-full outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
       >
         {/* 1. Cover with GradientBlob and floating Audience / Urgency Tag */}
         <div className="relative h-[120px] w-full overflow-hidden shrink-0 border-b border-line">
           <GradientBlob seed={assignment.id} variant="cover" className="h-full w-full" />
           <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 flex-wrap justify-end">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill bg-surface/90 backdrop-blur-xs border border-line text-fg text-xs font-medium shadow-sm">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-surface/90 backdrop-blur-xs border border-line text-fg text-xs font-medium shadow-xs">
               <Users className="w-3.5 h-3.5 text-muted" aria-hidden="true" />
               <span>{assignedText}</span>
             </span>
@@ -79,7 +81,7 @@ export function AdminAssignmentCard({
                     <Clock className="w-3 h-3" />
                   )
                 }
-                className="shadow-sm backdrop-blur-xs"
+                className="shadow-xs backdrop-blur-xs"
               >
                 {urgency.badgeLabel}
               </Badge>
@@ -95,14 +97,14 @@ export function AdminAssignmentCard({
               className="font-display text-lg font-semibold text-fg tracking-tight line-clamp-2 leading-snug"
               title={assignment.title}
             >
-              {assignment.title}
+              <Highlight text={assignment.title} query={searchQuery} />
             </h3>
             <p className="font-body text-xs text-muted leading-relaxed line-clamp-3">
-              {assignment.description}
+              <Highlight text={assignment.description} query={searchQuery} />
             </p>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3.5 flex-1 flex flex-col justify-end">
             {/* Divider & Due Date with urgency styling */}
             <div
               className={cn(
@@ -132,7 +134,25 @@ export function AdminAssignmentCard({
               )}
             </div>
 
-            {/* Class Completion Progress Bar */}
+            {/* 3. Full-width Open Drive link row */}
+            <a
+              href={assignment.driveLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full"
+            >
+              <button
+                type="button"
+                className="w-full min-h-[44px] px-3.5 py-2.5 flex items-center justify-between gap-2 border border-line bg-surface-2 text-fg text-xs font-medium hover:bg-surface hover:border-line active:bg-surface-2 motion-safe:transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer"
+                aria-label={`Open Drive link for ${assignment.title} (opens in a new tab)`}
+              >
+                <span className="truncate whitespace-nowrap">Open Drive link</span>
+                <ExternalLink className="w-3.5 h-3.5 shrink-0 text-muted" aria-hidden="true" />
+                <span className="sr-only"> (opens in a new tab)</span>
+              </button>
+            </a>
+
+            {/* 4. Class Completion Progress Bar */}
             <div className="space-y-1.5">
               {completion.total === 0 ? (
                 <p className="text-xs text-muted">No students assigned</p>
@@ -156,53 +176,39 @@ export function AdminAssignmentCard({
               )}
             </div>
 
-            {/* 3. Footer Row: Actions */}
-            <div className="pt-3 border-t border-line flex items-center justify-between gap-2 flex-wrap">
-              <Link to={`/admin/assignments/${assignment.id}`}>
+            {/* 5. Footer Row: Actions (mt-auto) */}
+            <div className="mt-auto pt-3 border-t border-line flex flex-col @sm:flex-row items-stretch @sm:items-center gap-2">
+              <Link to={`/admin/assignments/${assignment.id}`} className="flex-1 min-w-0">
                 <Button
-                  variant="secondary"
-                  size="sm"
-                  leftIcon={<ListChecks className="w-3.5 h-3.5" />}
+                  variant="primary"
+                  size="md"
+                  leftIcon={<ListChecks className="w-4 h-4 shrink-0" />}
                   aria-label={`View submissions for ${assignment.title}`}
+                  className="w-full min-h-[44px] whitespace-nowrap justify-center"
                 >
                   View submissions
                 </Button>
               </Link>
 
-              <div className="flex items-center gap-1.5 ml-auto">
-                <a
-                  href={assignment.driveLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="Open Drive link"
-                >
-                  <IconButton
-                    variant="secondary"
-                    size="sm"
-                    aria-label={`Open Drive link for ${assignment.title} (opens in a new tab)`}
-                  >
-                    <ExternalLink className="w-3.5 h-3.5 text-fg" aria-hidden="true" />
-                    <span className="sr-only"> (opens in a new tab)</span>
-                  </IconButton>
-                </a>
-
+              <div className="flex items-center justify-end gap-2 shrink-0">
                 <IconButton
                   variant="secondary"
-                  size="sm"
+                  size="md"
                   aria-label={`Edit ${assignment.title}`}
                   onClick={(e) => onEdit?.(assignment, e.currentTarget)}
+                  className="w-[44px] h-[44px] min-w-[44px] min-h-[44px] shrink-0"
                 >
-                  <Pencil className="w-3.5 h-3.5 text-fg" />
+                  <Pencil className="w-4 h-4 text-fg" />
                 </IconButton>
 
                 <IconButton
                   variant="secondary"
-                  size="sm"
+                  size="md"
                   aria-label={`Delete ${assignment.title}`}
                   onClick={(e) => onDelete?.(assignment, e.currentTarget)}
-                  className="hover:text-danger hover:border-danger/30 hover:bg-danger-soft/40"
+                  className="w-[44px] h-[44px] min-w-[44px] min-h-[44px] shrink-0 hover:text-danger hover:border-danger/30 hover:bg-danger-soft/40"
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
+                  <Trash2 className="w-4 h-4" />
                 </IconButton>
               </div>
             </div>

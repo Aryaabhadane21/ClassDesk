@@ -42,7 +42,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
           <label
             htmlFor={checkboxId}
             className={cn(
-              'w-5 h-5 rounded-sm border border-line bg-surface-2 flex items-center justify-center cursor-pointer',
+              'w-5 h-5 rounded-none border border-line bg-surface-2 flex items-center justify-center cursor-pointer',
               'peer-checked:bg-accent peer-checked:border-accent text-accent-fg',
               'peer-focus-visible:ring-2 peer-focus-visible:ring-accent peer-focus-visible:ring-offset-2',
               'motion-safe:transition-all motion-safe:duration-150',

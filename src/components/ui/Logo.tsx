@@ -15,17 +15,17 @@ export function Logo({
 }: LogoProps) {
   const sizeConfig = {
     sm: {
-      mark: 'w-7 h-7 rounded-sm',
+      mark: 'w-7 h-7 rounded-none',
       icon: 'w-4 h-4',
       text: 'text-lg',
     },
     md: {
-      mark: 'w-9 h-9 rounded-md',
+      mark: 'w-9 h-9 rounded-none',
       icon: 'w-5 h-5',
       text: 'text-xl',
     },
     lg: {
-      mark: 'w-11 h-11 rounded-lg',
+      mark: 'w-11 h-11 rounded-none',
       icon: 'w-6 h-6',
       text: 'text-2xl',
     },

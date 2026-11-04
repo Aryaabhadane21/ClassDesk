@@ -18,6 +18,9 @@ import { useAdminAssignments } from '@/features/admin/useAdminAssignments'
 import { useAssignmentFilters } from '@/hooks/useAssignmentFilters'
 import {
   applyAdminAssignmentFilters,
+  searchMatches,
+  matchesDueFilter,
+  matchesAdminCompletion,
   type AdminCompletionFilter,
   type SortOption,
 } from '@/utils/filters'
@@ -28,9 +31,9 @@ import { mockApi } from '@/services/mockApi'
 import type { AdminAssignment } from '@/types'
 
 const ADMIN_COMPLETION_OPTIONS = [
-  { label: 'All assignments', value: 'all' },
+  { label: 'All', value: 'all' },
   { label: 'Fully submitted', value: 'complete' },
-  { label: 'Pending submissions', value: 'incomplete' },
+  { label: 'Pending', value: 'incomplete' },
   { label: 'Nobody yet', value: 'nobody' },
 ]
 
@@ -74,6 +77,20 @@ export function AdminAssignmentsPage() {
     defaultSort: 'newest',
     validStatusValues: ['all', 'complete', 'incomplete', 'nobody'],
   })
+
+  // Compute dynamic status counts based on active search & due filter
+  const filteredBySearchAndDue = useMemo(() => {
+    return assignments.filter((item) => {
+      return searchMatches(item, debouncedQuery) && matchesDueFilter(item.dueDate, filters.due)
+    })
+  }, [assignments, debouncedQuery, filters.due])
+
+  const statusCounts = useMemo(() => ({
+    all: filteredBySearchAndDue.length,
+    complete: filteredBySearchAndDue.filter((a) => matchesAdminCompletion(a, 'complete')).length,
+    incomplete: filteredBySearchAndDue.filter((a) => matchesAdminCompletion(a, 'incomplete')).length,
+    nobody: filteredBySearchAndDue.filter((a) => matchesAdminCompletion(a, 'nobody')).length,
+  }), [filteredBySearchAndDue])
 
   // Filter & sort assignments
   const filteredAssignments = useMemo(
@@ -233,6 +250,7 @@ export function AdminAssignmentsPage() {
               setFilter('status', val as AdminCompletionFilter)
             }
             statusOptions={ADMIN_COMPLETION_OPTIONS}
+            statusCounts={statusCounts}
             statusLabel="Completion status"
             dueValue={filters.due}
             onDueChange={(due) => setFilter('due', due)}
@@ -267,6 +285,7 @@ export function AdminAssignmentsPage() {
                     assignment={assignment}
                     onEdit={handleOpenEdit}
                     onDelete={handleOpenDelete}
+                    searchQuery={debouncedQuery}
                   />
                 ))}
               </div>

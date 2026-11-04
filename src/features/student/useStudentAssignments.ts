@@ -56,7 +56,7 @@ export function useStudentAssignments() {
     fetchAssignments()
   }, [fetchAssignments])
 
-  // Allows in-place state modification for single assignments (used in step 9)
+  // Allows in-place state modification for single assignments
   const updateAssignment = useCallback((updated: StudentAssignment) => {
     setAssignments((prev) =>
       prev.map((item) => (item.id === updated.id ? updated : item)),

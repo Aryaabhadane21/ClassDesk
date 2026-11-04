@@ -187,7 +187,7 @@ export function AssignmentDetailPage() {
       <div>
         <Link
           to="/admin"
-          className="inline-flex items-center gap-2 text-xs font-semibold text-muted hover:text-fg motion-safe:transition-colors group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-sm"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-muted hover:text-fg motion-safe:transition-colors group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-none"
         >
           <ArrowLeft className="w-4 h-4 motion-safe:group-hover:-translate-x-0.5 transition-transform" />
           <span>Back to assignments</span>
@@ -276,7 +276,7 @@ export function AssignmentDetailPage() {
             </Badge>
           )}
 
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill bg-surface-2 border border-line text-xs font-medium text-fg">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-none bg-surface-2 border border-line text-xs font-medium text-fg">
             <Users className="w-3.5 h-3.5 text-muted" aria-hidden="true" />
             <span>
               {isAllStudents
@@ -293,7 +293,7 @@ export function AssignmentDetailPage() {
       </div>
 
       {/* 3. Summary Card */}
-      <Card className="p-6 bg-surface border border-line rounded-lg shadow-card space-y-4">
+      <Card className="p-6 bg-surface border border-line rounded-none shadow-card space-y-4">
         <div
           className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2"
           aria-live="polite"
@@ -316,14 +316,14 @@ export function AssignmentDetailPage() {
 
         {/* Stat Tiles */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-4 border-t border-line">
-          <div className="p-3.5 rounded-lg bg-surface-2/60 border border-line">
+          <div className="p-3.5 rounded-none bg-surface-2/60 border border-line">
             <p className="text-xs text-muted font-medium">Submitted</p>
             <p className="text-2xl font-bold text-fg mt-1">
               {completion.submitted}
             </p>
           </div>
 
-          <div className="p-3.5 rounded-lg bg-surface-2/60 border border-line">
+          <div className="p-3.5 rounded-none bg-surface-2/60 border border-line">
             <p className="text-xs text-muted font-medium">Not submitted</p>
             <p className="text-2xl font-bold text-fg mt-1">
               {completion.remaining}
@@ -331,7 +331,7 @@ export function AssignmentDetailPage() {
           </div>
 
           {completion.late > 0 && (
-            <div className="p-3.5 rounded-lg bg-warning-soft/60 border border-warning/30">
+            <div className="p-3.5 rounded-none bg-warning-soft/60 border border-warning/30">
               <p className="text-xs text-warning font-medium">Submitted late</p>
               <p className="text-2xl font-bold text-warning mt-1">
                 {completion.late}
@@ -360,7 +360,7 @@ export function AssignmentDetailPage() {
         ) : (
           <>
             {/* Desktop Table (md and up) */}
-            <div className="hidden md:block overflow-x-auto rounded-lg border border-line bg-surface shadow-xs">
+            <div className="hidden md:block overflow-x-auto rounded-none border border-line bg-surface shadow-xs">
               <table className="w-full text-left border-collapse">
                 <caption className="sr-only">
                   Student submission status for {assignment.title}
@@ -440,7 +440,7 @@ export function AssignmentDetailPage() {
                 return (
                   <Card
                     key={sub.studentId}
-                    className="p-4 bg-surface border border-line rounded-lg space-y-3"
+                    className="p-4 bg-surface border border-line rounded-none space-y-3"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3 min-w-0">

@@ -1,5 +1,6 @@
 {
   "name": "classdesk",
+  "description": "A responsive assignment and review dashboard for students and professors with zero backend.",
   "private": true,
   "version": "0.0.0",
   "type": "module",

@@ -79,4 +79,35 @@ describe('Integration: Login Flow', () => {
       expect(screen.getByText('Student Dashboard View')).toBeInTheDocument()
     })
   })
+
+  it('opens confirm dialog and resets demo data when requested', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<LoginPage />)
+
+    const resetButtons = screen.getAllByRole('button', { name: /reset demo data/i })
+    await user.click(resetButtons[0])
+
+    // Dialog appears with title and message
+    expect(screen.getByText('Reset demo data?')).toBeInTheDocument()
+    expect(
+      screen.getByText(/this restores the original sample users, assignments and submissions/i),
+    ).toBeInTheDocument()
+
+    // Cancel closes the dialog
+    const cancelBtn = screen.getByRole('button', { name: /cancel/i })
+    await user.click(cancelBtn)
+    await waitFor(() => {
+      expect(screen.queryByText('Reset demo data?')).not.toBeInTheDocument()
+    })
+
+    // Open again and confirm
+    await user.click(resetButtons[0])
+    const confirmBtn = screen.getByRole('button', { name: /reset data/i })
+    await user.click(confirmBtn)
+
+    await waitFor(() => {
+      expect(screen.queryByText('Reset demo data?')).not.toBeInTheDocument()
+      expect(screen.getByText(/demo data has been reset/i)).toBeInTheDocument()
+    })
+  })
 })

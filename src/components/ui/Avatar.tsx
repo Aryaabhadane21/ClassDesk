@@ -62,7 +62,7 @@ export function Avatar({
     <div
       aria-label={name}
       className={cn(
-        'relative inline-flex items-center justify-center rounded-pill overflow-hidden shrink-0 border select-none font-semibold',
+        'relative inline-flex items-center justify-center rounded-none overflow-hidden shrink-0 border select-none font-semibold',
         sizeStyles[size].box,
         tint,
         className,

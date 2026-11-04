@@ -51,7 +51,7 @@ export function SkeletonCard({ className }: { className?: string }) {
     <div
       aria-hidden="true"
       className={cn(
-        'p-5 rounded-lg border border-line bg-surface space-y-4 shadow-card',
+        'p-5 rounded-none border border-line bg-surface space-y-4 shadow-card',
         className,
       )}
     >

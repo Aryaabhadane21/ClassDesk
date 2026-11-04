@@ -24,6 +24,11 @@ export interface User {
 }
 
 /**
+ * Safe user representation omitting sensitive credentials
+ */
+export type SafeUser = Omit<User, 'password'>
+
+/**
  * Course assignment created by an admin and assigned to students
  */
 export interface Assignment {
@@ -45,6 +50,20 @@ export interface Assignment {
 }
 
 /**
+ * Form input payload for creating or updating an assignment
+ */
+export interface AssignmentInput {
+  title: string
+  description: string
+  /** ISO 8601 string or valid date string */
+  dueDate: string
+  /** Valid http or https URL */
+  driveLink: string
+  /** Either 'all' (expanded to all active students) or a specific non-empty list of student IDs */
+  assignedTo: 'all' | string[]
+}
+
+/**
  * Submission status options
  */
 export type SubmissionStatus = 'submitted' | 'not_submitted'
@@ -59,6 +78,30 @@ export interface Submission {
   status: SubmissionStatus
   /** ISO 8601 timestamp when submitted, or null if pending */
   submittedAt: string | null
+}
+
+/**
+ * Student view of an assignment joined with their personal submission status
+ */
+export type StudentAssignment = Assignment & {
+  status: SubmissionStatus
+  submittedAt: string | null
+}
+
+/**
+ * Submission joined with student profile information
+ */
+export type SubmissionWithStudent = Submission & {
+  student: SafeUser
+}
+
+/**
+ * Admin view of an assignment joined with all student submissions and aggregate counts
+ */
+export type AdminAssignment = Assignment & {
+  submissions: SubmissionWithStudent[]
+  submittedCount: number
+  totalCount: number
 }
 
 /**

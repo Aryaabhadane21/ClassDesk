@@ -102,3 +102,46 @@ export function getDueInfo(isoString: string, now: Date = new Date()): DueInfo {
   // 5. Upcoming (> 3 days out)
   return { state: 'upcoming', label: `Due in ${diffDays} days` }
 }
+
+/**
+ * Converts a Date object to a YYYY-MM-DDTHH:mm string in local time
+ * for <input type="datetime-local">.
+ */
+export function toDateTimeLocalString(date: Date): string {
+  const pad = (n: number) => n.toString().padStart(2, '0')
+  const YYYY = date.getFullYear()
+  const MM = pad(date.getMonth() + 1)
+  const DD = pad(date.getDate())
+  const hh = pad(date.getHours())
+  const mm = pad(date.getMinutes())
+  return `${YYYY}-${MM}-${DD}T${hh}:${mm}`
+}
+
+/**
+ * Default due date for new assignments: 7 days from now at 23:59 local time.
+ */
+export function getDefaultDueDateTimeLocal(): string {
+  const d = new Date()
+  d.setDate(d.getDate() + 7)
+  d.setHours(23, 59, 0, 0)
+  return toDateTimeLocalString(d)
+}
+
+/**
+ * Converts an ISO string into YYYY-MM-DDTHH:mm format in local time.
+ */
+export function isoToDateTimeLocal(isoString: string): string {
+  const d = new Date(isoString)
+  if (isNaN(d.getTime())) return ''
+  return toDateTimeLocalString(d)
+}
+
+/**
+ * Converts a local datetime-local string (YYYY-MM-DDTHH:mm) into an ISO string.
+ */
+export function dateTimeLocalToIso(localString: string): string {
+  const d = new Date(localString)
+  if (isNaN(d.getTime())) return ''
+  return d.toISOString()
+}
+

@@ -1,26 +1,24 @@
-import { useEffect, useState } from 'react'
-import type { Theme } from '@/types'
+import { useState } from 'react'
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
+import { useAuth } from '@/context/AuthContext'
+import { DEMO_PASSWORD } from '@/data/seed'
 
 // temporary, replaced in a later step
 export default function App() {
-  const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof window !== 'undefined') {
-      return document.documentElement.classList.contains('dark') ? 'dark' : 'light'
-    }
-    return 'light'
-  })
+  const { user, status, login, logout } = useAuth()
+  const [loginError, setLoginError] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  useEffect(() => {
-    const root = document.documentElement
-    if (theme === 'dark') {
-      root.classList.add('dark')
-    } else {
-      root.classList.remove('dark')
+  const handleDemoLogin = async (email: string) => {
+    try {
+      setLoginError(null)
+      setIsSubmitting(true)
+      await login(email, DEMO_PASSWORD)
+    } catch (err) {
+      setLoginError(err instanceof Error ? err.message : 'Login failed')
+    } finally {
+      setIsSubmitting(false)
     }
-  }, [theme])
-
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'))
   }
 
   return (
@@ -30,16 +28,10 @@ export default function App() {
         <section className="bg-surface rounded-lg p-8 border border-line shadow-card space-y-6">
           <div className="flex items-center justify-between">
             <span className="text-xs uppercase tracking-wider font-semibold text-muted">
-              Theme Token Preview
+              Theme Token &amp; Auth Preview
             </span>
-            {/* Temporary Theme Toggle Button */}
-            <button
-              type="button"
-              onClick={toggleTheme}
-              className="px-4 py-1.5 rounded-pill text-xs font-semibold border border-line bg-surface-2 text-fg hover:opacity-90 transition-opacity cursor-pointer"
-            >
-              Toggle theme: <span className="font-bold">{theme}</span>
-            </button>
+            {/* New ThemeToggle Component */}
+            <ThemeToggle />
           </div>
 
           <div>
@@ -50,6 +42,69 @@ export default function App() {
               An assignment and review dashboard for students and instructors.
               Experience seamless workflow management with clean design tokens.
             </p>
+          </div>
+
+          {/* Session Test Section */}
+          <div className="p-4 rounded-md bg-surface-2 border border-line space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xs uppercase tracking-wider font-semibold text-muted">
+                Session Test
+              </h2>
+              <span className="text-xs px-2 py-0.5 rounded-pill bg-app text-fg border border-line">
+                Status: <strong className="capitalize">{status}</strong>
+              </span>
+            </div>
+
+            {status === 'loading' ? (
+              <p className="text-sm text-muted animate-pulse">Restoring session...</p>
+            ) : status === 'authenticated' && user ? (
+              <div className="space-y-3">
+                <div className="text-sm space-y-1">
+                  <div className="text-fg font-medium">{user.name}</div>
+                  <div className="text-xs text-muted">{user.email}</div>
+                  <div className="text-xs">
+                    Role:{' '}
+                    <span className="font-semibold uppercase tracking-wider text-accent">
+                      {user.role}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={logout}
+                  className="px-4 py-1.5 rounded-pill text-xs font-medium bg-danger-soft text-danger hover:opacity-90 transition-opacity cursor-pointer"
+                >
+                  Sign out
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-xs text-muted">
+                  Not signed in. Click a demo account to test auth context &amp; session persistence:
+                </p>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <button
+                    type="button"
+                    disabled={isSubmitting}
+                    onClick={() => handleDemoLogin('meera.iyer@classdesk.edu')}
+                    className="px-3 py-1.5 rounded-pill text-xs font-medium bg-primary text-primary-fg hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50"
+                  >
+                    Sign in as Prof. Meera Iyer (admin)
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isSubmitting}
+                    onClick={() => handleDemoLogin('aarav.sharma@classdesk.edu')}
+                    className="px-3 py-1.5 rounded-pill text-xs font-medium bg-surface text-fg border border-line hover:bg-surface-2 transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    Sign in as Aarav Sharma (student)
+                  </button>
+                </div>
+                {loginError && (
+                  <p className="text-xs text-danger font-medium">{loginError}</p>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Badges preview */}

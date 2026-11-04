@@ -56,7 +56,7 @@ export function Badge({
   return (
     <span
       className={cn(
-        'inline-flex items-center font-medium rounded-none select-none shrink-0',
+        'inline-flex items-center font-medium rounded-pill select-none shrink-0',
         toneStyles[tone].bg,
         sizeStyles[size],
         className,
@@ -65,7 +65,7 @@ export function Badge({
     >
       {dot && (
         <span
-          className={cn('w-1.5 h-1.5 shrink-0', toneStyles[tone].dot)}
+          className={cn('w-1.5 h-1.5 rounded-pill shrink-0', toneStyles[tone].dot)}
           aria-hidden="true"
         />
       )}

@@ -191,7 +191,7 @@ export function Dropdown<T extends string = string>({
         onClick={() => setIsOpen((prev) => !prev)}
         onKeyDown={handleTriggerKeyDown}
         className={cn(
-          'w-full min-h-[44px] px-3.5 py-2.5 flex items-center justify-between gap-2.5 bg-surface border border-line text-fg text-xs font-medium cursor-pointer select-none',
+          'w-full min-h-[44px] px-4 py-2.5 rounded-pill flex items-center justify-between gap-2.5 bg-surface border border-line text-fg text-xs font-medium cursor-pointer select-none',
           'focus:outline-none focus:border-accent focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1',
           'hover:bg-surface-2 motion-safe:transition-all',
           isOpen && 'border-accent ring-1 ring-accent bg-surface-2',
@@ -216,7 +216,7 @@ export function Dropdown<T extends string = string>({
           tabIndex={0}
           onKeyDown={handleListboxKeyDown}
           className={cn(
-            'absolute z-40 mt-1 min-w-[200px] max-h-60 overflow-y-auto bg-surface border border-line shadow-pop text-fg text-xs outline-none py-1 animate-popover-enter',
+            'absolute z-40 mt-1 min-w-[200px] max-h-60 overflow-y-auto rounded-md bg-surface border border-line shadow-pop text-fg text-xs outline-none p-1 animate-popover-enter',
             align === 'right' ? 'right-0' : 'left-0',
           )}
         >
@@ -234,7 +234,7 @@ export function Dropdown<T extends string = string>({
                 onClick={() => selectOption(opt)}
                 onMouseEnter={() => setHighlightedIndex(idx)}
                 className={cn(
-                  'px-3.5 py-2.5 flex items-center justify-between gap-3 cursor-pointer select-none min-h-[38px] motion-safe:transition-colors',
+                  'px-3 py-2 rounded-sm flex items-center justify-between gap-3 cursor-pointer select-none min-h-[36px] motion-safe:transition-colors',
                   isHighlighted && 'bg-surface-2 text-fg',
                   isSelected ? 'font-semibold text-fg' : 'font-normal text-muted',
                   opt.disabled && 'opacity-40 cursor-not-allowed pointer-events-none',

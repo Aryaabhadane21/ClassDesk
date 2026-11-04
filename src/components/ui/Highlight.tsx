@@ -30,7 +30,7 @@ export const Highlight = memo(function Highlight({
         regex.test(part) ? (
           <mark
             key={i}
-            className="bg-accent-soft text-inherit font-inherit px-0.5 rounded-none"
+            className="bg-accent-soft text-inherit font-inherit px-0.5 rounded-sm"
           >
             {part}
           </mark>

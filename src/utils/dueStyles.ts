@@ -35,7 +35,7 @@ export function getStudentUrgency(
       badgeLabel: 'Overdue',
       helperText: 'Overdue assignment',
       dueRowClasses:
-        'bg-danger-soft/50 border border-danger/30 p-2.5 rounded-none text-danger',
+        'bg-danger-soft/50 border border-danger/30 p-2.5 rounded-md text-danger',
       cardBorderClasses: 'border-danger/40 ring-1 ring-danger/20',
     }
   }
@@ -47,7 +47,7 @@ export function getStudentUrgency(
       badgeLabel: 'Due soon',
       helperText: 'Deadline approaching',
       dueRowClasses:
-        'bg-warning-soft/50 border border-warning/30 p-2.5 rounded-none text-warning',
+        'bg-warning-soft/50 border border-warning/30 p-2.5 rounded-md text-warning',
       cardBorderClasses: 'border-warning/40 ring-1 ring-warning/20',
     }
   }
@@ -86,7 +86,7 @@ export function getAdminUrgency(
       badgeLabel: `Overdue, ${pendingCount} pending`,
       helperText: `Overdue, ${pendingCount} pending`,
       dueRowClasses:
-        'bg-danger-soft/50 border border-danger/30 p-2 rounded-none text-danger',
+        'bg-danger-soft/50 border border-danger/30 p-2 rounded-md text-danger',
       cardBorderClasses: 'border-danger/40 ring-1 ring-danger/20',
     }
   }
@@ -98,7 +98,7 @@ export function getAdminUrgency(
       badgeLabel: 'Due soon',
       helperText: 'Due soon',
       dueRowClasses:
-        'bg-warning-soft/50 border border-warning/30 p-2 rounded-none text-warning',
+        'bg-warning-soft/50 border border-warning/30 p-2 rounded-md text-warning',
       cardBorderClasses: 'border-warning/40 ring-1 ring-warning/20',
     }
   }

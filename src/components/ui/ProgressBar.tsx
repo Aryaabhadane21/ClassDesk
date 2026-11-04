@@ -50,11 +50,11 @@ export function ProgressBar({
         aria-valuemin={0}
         aria-valuemax={max}
         aria-label={label || 'Progress'}
-        className="w-full h-2 rounded-none bg-surface-2 border border-line overflow-hidden"
+        className="w-full h-2 rounded-pill bg-surface-2 border border-line overflow-hidden"
       >
         <div
           className={cn(
-            'h-full rounded-none motion-safe:transition-all motion-safe:duration-300',
+            'h-full rounded-pill motion-safe:transition-all motion-safe:duration-300',
             toneFill[tone],
           )}
           style={{ width: `${percentage}%` }}

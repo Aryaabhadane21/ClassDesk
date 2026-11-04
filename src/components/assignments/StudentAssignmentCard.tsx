@@ -36,7 +36,7 @@ export function StudentAssignmentCard({
   return (
     <Card
       className={cn(
-        '@container flex flex-col justify-between overflow-hidden text-left bg-surface border border-line shadow-card rounded-none',
+        '@container flex flex-col justify-between overflow-hidden text-left bg-surface border border-line shadow-card rounded-lg',
         'motion-safe:transition-all motion-safe:duration-200',
         urgency.isUrgent && urgency.cardBorderClasses,
         className,
@@ -127,7 +127,7 @@ export function StudentAssignmentCard({
             >
               <button
                 type="button"
-                className="w-full min-h-[44px] px-3.5 py-2.5 flex items-center justify-between gap-2 border border-line bg-surface-2 text-fg text-xs font-medium hover:bg-surface hover:border-line active:bg-surface-2 motion-safe:transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer"
+                className="w-full min-h-[44px] px-3.5 py-2.5 rounded-md flex items-center justify-between gap-2 border border-line bg-surface-2 text-fg text-xs font-medium hover:bg-surface hover:border-line active:bg-surface-2 motion-safe:transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer"
                 aria-label={`Open Drive link for ${assignment.title} (opens in a new tab)`}
               >
                 <span className="truncate whitespace-nowrap">Open Drive link</span>

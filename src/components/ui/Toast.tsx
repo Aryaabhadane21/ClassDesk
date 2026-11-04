@@ -123,7 +123,7 @@ function ToastItem({
       onFocus={() => setIsPaused(true)}
       onBlur={() => setIsPaused(false)}
       className={cn(
-        'pointer-events-auto flex items-start gap-3 w-full max-w-sm p-4 rounded-none bg-surface border border-line shadow-pop',
+        'pointer-events-auto flex items-start gap-3 w-full max-w-sm p-4 rounded-lg bg-surface border border-line shadow-pop',
         'animate-toast-enter text-left',
       )}
     >
@@ -140,7 +140,7 @@ function ToastItem({
         type="button"
         onClick={() => onDismiss(toast.id)}
         aria-label="Dismiss notification"
-        className="p-1 -mr-1 -mt-1 rounded-none text-muted hover:text-fg hover:bg-surface-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer motion-safe:transition-colors"
+        className="p-1 -mr-1 -mt-1 rounded-pill text-muted hover:text-fg hover:bg-surface-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer motion-safe:transition-colors"
       >
         <X className="w-3.5 h-3.5" aria-hidden="true" />
       </button>

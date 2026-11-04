@@ -13,8 +13,8 @@ export function NotFoundPage() {
 
   return (
     <div className="min-h-screen bg-app text-fg flex flex-col items-center justify-center p-6 text-center">
-      <div className="w-full max-w-md p-8 rounded-none bg-surface border border-line shadow-card space-y-5">
-        <div className="w-14 h-14 rounded-none bg-surface-2 border border-line text-muted flex items-center justify-center mx-auto">
+      <div className="w-full max-w-md p-8 rounded-lg bg-surface border border-line shadow-card space-y-5">
+        <div className="w-14 h-14 rounded-pill bg-surface-2 border border-line text-muted flex items-center justify-center mx-auto">
           <FileQuestion className="w-7 h-7 text-accent" />
         </div>
 

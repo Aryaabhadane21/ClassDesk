@@ -242,7 +242,7 @@ Data is isolated in `localStorage` under distinct keys:
 
 ## 10. Automated Testing
 
-The test suite contains **54 tests across 10 test suites** with 100% passing results:
+The test suite contains **63 tests across 13 test suites** with 100% passing results:
 
 ```bash
 npm run test:run
@@ -256,11 +256,14 @@ npm run test:run
   - `selectors.test.ts`: Completion ratios, percentage rounding, submission roster sorting.
   - `notifications.test.ts`: Derived notification calculation for both student and admin roles.
   - `mockApi.test.ts`: Full CRUD operations, error simulation, authentication checks.
+  - `dropdown.test.tsx`: WAI-ARIA listbox pattern, trigger toggling, keyboard navigation, selection.
+  - `highlight.test.tsx`: Safe text highlight escaping and matched snippet wrapping.
 - **Integration Tests:**
   - `login.test.tsx`: Form validation, invalid credentials banner, demo account auto-fill, reset demo data flow.
   - `studentSubmission.test.tsx`: Two-step submission confirmation flow and in-place progress update.
   - `adminCreate.test.tsx`: Assignment creation modal, required field validation, and roster list injection.
   - `routeGuard.test.tsx`: Role-based route protection, unauthorized redirects, and session restoration.
+  - `assignmentToolbar.test.tsx`: Search input, filter chips, keyboard shortcut, clear filters.
 
 ---
 

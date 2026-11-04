@@ -24,12 +24,12 @@ export function ErrorState({
     <div
       role="alert"
       className={cn(
-        'flex flex-col items-center justify-center p-8 text-center rounded-none border border-danger/30 bg-danger-soft/30 max-w-md mx-auto',
+        'flex flex-col items-center justify-center p-8 text-center rounded-lg border border-danger/30 bg-danger-soft/30 max-w-md mx-auto',
         className,
       )}
     >
       <div
-        className="w-12 h-12 rounded-none bg-danger-soft text-danger flex items-center justify-center mb-4"
+        className="w-12 h-12 rounded-pill bg-danger-soft text-danger flex items-center justify-center mb-4"
         aria-hidden="true"
       >
         {icon || <AlertCircle className="w-6 h-6" />}

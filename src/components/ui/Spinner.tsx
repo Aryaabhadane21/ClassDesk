@@ -38,7 +38,7 @@ export function Spinner({
     >
       <span
         className={cn(
-          'motion-safe:animate-spin rounded-none shrink-0',
+          'motion-safe:animate-spin rounded-full shrink-0',
           sizeMap[size],
           toneMap[tone],
         )}

@@ -125,7 +125,7 @@ export function NotificationPanel({
         className={cn(
           'fixed inset-x-3 top-16 z-50 md:absolute md:inset-auto md:right-0 md:top-full md:mt-2',
           'w-auto md:w-96 max-h-[75vh] flex flex-col',
-          'bg-surface border border-line rounded-none shadow-pop outline-none text-left',
+          'bg-surface border border-line rounded-lg shadow-pop outline-none text-left',
           'motion-safe:animate-fade-in',
         )}
       >
@@ -136,7 +136,7 @@ export function NotificationPanel({
               Notifications
             </h2>
             {unreadCount > 0 && (
-              <span className="px-1.5 py-0.5 rounded-none bg-accent/20 text-accent font-semibold text-[10px]">
+              <span className="px-1.5 py-0.5 rounded-pill bg-accent/20 text-accent font-semibold text-[10px]">
                 {unreadCount} new
               </span>
             )}
@@ -158,14 +158,14 @@ export function NotificationPanel({
           {status === 'loading' && notifications.length === 0 ? (
             <div className="p-4 space-y-3">
               <div className="flex items-start gap-3">
-                <Skeleton className="w-8 h-8 rounded-none shrink-0" />
+                <Skeleton className="w-8 h-8 rounded-pill shrink-0" />
                 <div className="space-y-1.5 flex-1">
                   <Skeleton className="h-4 w-3/4" rounded="sm" />
                   <Skeleton className="h-3 w-1/3" rounded="sm" />
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <Skeleton className="w-8 h-8 rounded-none shrink-0" />
+                <Skeleton className="w-8 h-8 rounded-pill shrink-0" />
                 <div className="space-y-1.5 flex-1">
                   <Skeleton className="h-4 w-5/6" rounded="sm" />
                   <Skeleton className="h-3 w-1/4" rounded="sm" />
@@ -188,7 +188,7 @@ export function NotificationPanel({
             </div>
           ) : notifications.length === 0 ? (
             <div className="p-8 text-center space-y-2">
-              <div className="inline-flex items-center justify-center w-10 h-10 rounded-none bg-surface-2 text-muted mb-1">
+              <div className="inline-flex items-center justify-center w-10 h-10 rounded-pill bg-surface-2 text-muted mb-1">
                 <Bell className="w-5 h-5" aria-hidden="true" />
               </div>
               <p className="text-sm font-semibold text-fg">You're all caught up</p>
@@ -215,7 +215,7 @@ export function NotificationPanel({
                   {/* Type Icon */}
                   <div
                     className={cn(
-                      'w-8 h-8 rounded-none flex items-center justify-center shrink-0 mt-0.5',
+                      'w-8 h-8 rounded-pill flex items-center justify-center shrink-0 mt-0.5',
                       tone.bg,
                     )}
                     aria-hidden="true"
@@ -241,7 +241,7 @@ export function NotificationPanel({
                   {/* Unread indicator dot */}
                   {!item.read && (
                     <span
-                      className="w-2 h-2 rounded-none bg-accent shrink-0 mt-1.5"
+                      className="w-2 h-2 rounded-pill bg-accent shrink-0 mt-1.5"
                       aria-label="Unread"
                     />
                   )}

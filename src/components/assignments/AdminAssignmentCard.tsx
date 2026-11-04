@@ -48,7 +48,7 @@ export function AdminAssignmentCard({
   return (
     <Card
       className={cn(
-        '@container flex flex-col justify-between overflow-hidden text-left bg-surface border border-line shadow-card rounded-none',
+        '@container flex flex-col justify-between overflow-hidden text-left bg-surface border border-line shadow-card rounded-lg',
         'motion-safe:transition-all motion-safe:duration-200',
         urgency.isUrgent && urgency.cardBorderClasses,
         className,
@@ -65,7 +65,7 @@ export function AdminAssignmentCard({
         <div className="relative h-[120px] w-full overflow-hidden shrink-0 border-b border-line">
           <GradientBlob seed={assignment.id} variant="cover" className="h-full w-full" />
           <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 flex-wrap justify-end">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-surface/90 backdrop-blur-xs border border-line text-fg text-xs font-medium shadow-xs">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill bg-surface/90 backdrop-blur-xs border border-line text-fg text-xs font-medium shadow-xs">
               <Users className="w-3.5 h-3.5 text-muted" aria-hidden="true" />
               <span>{assignedText}</span>
             </span>
@@ -143,7 +143,7 @@ export function AdminAssignmentCard({
             >
               <button
                 type="button"
-                className="w-full min-h-[44px] px-3.5 py-2.5 flex items-center justify-between gap-2 border border-line bg-surface-2 text-fg text-xs font-medium hover:bg-surface hover:border-line active:bg-surface-2 motion-safe:transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer"
+                className="w-full min-h-[44px] px-3.5 py-2.5 rounded-md flex items-center justify-between gap-2 border border-line bg-surface-2 text-fg text-xs font-medium hover:bg-surface hover:border-line active:bg-surface-2 motion-safe:transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer"
                 aria-label={`Open Drive link for ${assignment.title} (opens in a new tab)`}
               >
                 <span className="truncate whitespace-nowrap">Open Drive link</span>

@@ -226,7 +226,7 @@ export function LoginPage() {
             {serverError && (
               <div
                 role="alert"
-                className="flex items-start gap-2.5 p-3 rounded-none bg-danger-soft/60 border border-danger/30 text-danger text-xs font-medium motion-safe:transition-all"
+                className="flex items-start gap-2.5 p-3 rounded-md bg-danger-soft/60 border border-danger/30 text-danger text-xs font-medium motion-safe:transition-all"
               >
                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
                 <span className="leading-relaxed">{serverError}</span>
@@ -267,7 +267,7 @@ export function LoginPage() {
                   </button>
                 </div>
                 <p className="text-[11px] text-muted">
-                  Click an account to fill the form. Password for all: <code className="font-mono text-fg bg-surface-2 px-1 py-0.5 rounded-none">demo1234</code>
+                  Click an account to fill the form. Password for all: <code className="font-mono text-fg bg-surface-2 px-1 py-0.5 rounded-sm">demo1234</code>
                 </p>
               </div>
 
@@ -282,7 +282,7 @@ export function LoginPage() {
                       key={p.id}
                       type="button"
                       onClick={() => selectDemoAccount(p)}
-                      className="flex items-center gap-2.5 p-2 rounded-none bg-surface-2 border border-line text-left hover:border-accent/40 hover:bg-surface motion-safe:transition-all cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                      className="flex items-center gap-2.5 p-2 rounded-md bg-surface-2 border border-line text-left hover:border-accent/40 hover:bg-surface motion-safe:transition-all cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                     >
                       <Avatar name={p.name} size="sm" />
                       <div className="overflow-hidden">
@@ -307,7 +307,7 @@ export function LoginPage() {
                       key={s.id}
                       type="button"
                       onClick={() => selectDemoAccount(s)}
-                      className="flex items-center gap-2.5 p-2 rounded-none bg-surface-2 border border-line text-left hover:border-accent/40 hover:bg-surface motion-safe:transition-all cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                      className="flex items-center gap-2.5 p-2 rounded-md bg-surface-2 border border-line text-left hover:border-accent/40 hover:bg-surface motion-safe:transition-all cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                     >
                       <Avatar name={s.name} size="sm" />
                       <div className="overflow-hidden">
@@ -323,7 +323,7 @@ export function LoginPage() {
             </div>
 
             {/* Mobile Collapsible Details (<details>) */}
-            <details className="sm:hidden group rounded-none bg-surface-2 border border-line p-3 cursor-pointer">
+            <details className="sm:hidden group rounded-lg bg-surface-2 border border-line p-3 cursor-pointer">
               <summary className="flex items-center justify-between text-xs font-semibold text-fg select-none list-none">
                 <span className="flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 text-accent" />
@@ -334,7 +334,7 @@ export function LoginPage() {
 
               <div className="pt-3 space-y-3 mt-2 border-t border-line">
                 <p className="text-[11px] text-muted">
-                  Click an account to fill the form. Password for all: <code className="font-mono text-fg bg-surface px-1 py-0.5 rounded-none">demo1234</code>
+                  Click an account to fill the form. Password for all: <code className="font-mono text-fg bg-surface px-1 py-0.5 rounded-sm">demo1234</code>
                 </p>
 
                 <div className="space-y-2">
@@ -346,7 +346,7 @@ export function LoginPage() {
                       key={p.id}
                       type="button"
                       onClick={() => selectDemoAccount(p)}
-                      className="w-full flex items-center gap-2.5 p-2 rounded-none bg-surface border border-line text-left"
+                      className="w-full flex items-center gap-2.5 p-2 rounded-md bg-surface border border-line text-left"
                     >
                       <Avatar name={p.name} size="sm" />
                       <div className="overflow-hidden">
@@ -364,7 +364,7 @@ export function LoginPage() {
                       key={s.id}
                       type="button"
                       onClick={() => selectDemoAccount(s)}
-                      className="w-full flex items-center gap-2.5 p-2 rounded-none bg-surface border border-line text-left"
+                      className="w-full flex items-center gap-2.5 p-2 rounded-md bg-surface border border-line text-left"
                     >
                       <Avatar name={s.name} size="sm" />
                       <div className="overflow-hidden">
@@ -415,8 +415,8 @@ export function LoginPage() {
           <GradientBlob seed="classdesk-desktop-cover" variant="hero" className="w-full h-full" />
         )}
 
-        {/* Bottom-left sharp solid panel */}
-        <div className="absolute bottom-8 left-8 max-w-md p-6 bg-surface border border-line shadow-card text-left space-y-1.5 z-10 rounded-none">
+        {/* Bottom-left solid panel */}
+        <div className="absolute bottom-8 left-8 max-w-md p-6 bg-surface border border-line shadow-card text-left space-y-1.5 z-10 rounded-lg">
           <h2 className="font-display text-2xl font-bold tracking-tight text-fg">
             Every assignment, one clear view.
           </h2>

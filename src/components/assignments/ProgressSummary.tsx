@@ -37,7 +37,7 @@ export function ProgressSummary({
             </h2>
             <span
               className={cn(
-                'text-xs font-semibold px-2.5 py-0.5 rounded-none',
+                'text-xs font-semibold px-2.5 py-0.5 rounded-pill',
                 isComplete
                   ? 'bg-success-soft text-success'
                   : 'bg-surface-2 text-muted border border-line',

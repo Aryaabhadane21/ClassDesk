@@ -34,12 +34,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     if (this.state.hasError) {
       return (
         <div className="min-h-screen bg-app text-fg flex flex-col items-center justify-center p-6">
-          <div className="w-full max-w-md p-8 rounded-none bg-surface border border-line shadow-card text-center space-y-6">
+          <div className="w-full max-w-md p-8 rounded-lg bg-surface border border-line shadow-card text-center space-y-6">
             <div className="flex justify-center">
               <Logo size="md" />
             </div>
 
-            <div className="w-12 h-12 rounded-none bg-danger-soft text-danger mx-auto flex items-center justify-center">
+            <div className="w-12 h-12 rounded-pill bg-danger-soft text-danger mx-auto flex items-center justify-center">
               <AlertTriangle className="w-6 h-6" aria-hidden="true" />
             </div>
 
@@ -53,7 +53,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             </div>
 
             {this.state.error?.message && (
-              <div className="p-3 rounded-none bg-surface-2 border border-line text-left overflow-x-auto text-xs font-mono text-muted">
+              <div className="p-3 rounded-md bg-surface-2 border border-line text-left overflow-x-auto text-xs font-mono text-muted">
                 {this.state.error.message}
               </div>
             )}

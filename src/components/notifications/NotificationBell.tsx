@@ -32,7 +32,7 @@ export function NotificationBell() {
         aria-expanded={isOpen}
         aria-controls={panelId}
         className={cn(
-          'relative w-9 h-9 rounded-none flex items-center justify-center text-muted hover:text-fg hover:bg-surface-2',
+          'relative w-9 h-9 rounded-pill flex items-center justify-center text-muted hover:text-fg hover:bg-surface-2',
           'border border-transparent hover:border-line cursor-pointer',
           'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2',
           'motion-safe:transition-all motion-safe:duration-150',
@@ -43,7 +43,7 @@ export function NotificationBell() {
 
         {/* Unread count badge */}
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-none bg-accent text-accent-fg text-[10px] font-bold flex items-center justify-center shadow-xs">
+          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-pill bg-accent text-accent-fg text-[10px] font-bold flex items-center justify-center shadow-xs">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}

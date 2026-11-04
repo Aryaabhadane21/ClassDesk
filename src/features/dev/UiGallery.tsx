@@ -429,7 +429,7 @@ export function UiGallery() {
 
           {/* Skeletons Preview */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-            <div className="space-y-3 p-5 rounded-none border border-line bg-surface">
+            <div className="space-y-3 p-5 rounded-lg border border-line bg-surface">
               <span className="text-xs font-semibold text-muted uppercase tracking-wider">
                 Skeleton Blocks &amp; Text
               </span>
@@ -477,12 +477,12 @@ export function UiGallery() {
             </p>
           </div>
 
-          <div className="p-6 rounded-none bg-surface border border-line shadow-card space-y-4">
+          <div className="p-6 rounded-lg bg-surface border border-line shadow-card space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-xs uppercase tracking-wider font-semibold text-muted">
                 Active Session
               </span>
-              <span className="text-xs px-2.5 py-1 rounded-none bg-surface-2 text-fg border border-line">
+              <span className="text-xs px-2.5 py-1 rounded-pill bg-surface-2 text-fg border border-line">
                 Status: <strong className="capitalize">{status}</strong>
               </span>
             </div>
@@ -493,7 +493,7 @@ export function UiGallery() {
                 <p className="text-sm text-muted">Restoring session...</p>
               </div>
             ) : status === 'authenticated' && user ? (
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-none bg-surface-2 border border-line">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-lg bg-surface-2 border border-line">
                 <div className="flex items-center gap-3">
                   <Avatar name={user.name} size="md" />
                   <div>

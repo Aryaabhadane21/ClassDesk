@@ -62,7 +62,7 @@ export function AppShell() {
       {/* 1. Skip to Main Content Link for accessibility */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 px-4 py-2 rounded-none bg-primary text-primary-fg font-medium text-xs shadow-pop border border-line focus:outline-none focus:ring-2 focus:ring-accent"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 px-4 py-2 rounded-pill bg-primary text-primary-fg font-medium text-xs shadow-pop border border-line focus:outline-none focus:ring-2 focus:ring-accent"
       >
         Skip to main content
       </a>
@@ -75,7 +75,7 @@ export function AppShell() {
           {/* Logo brand */}
           <NavLink
             to={homePath}
-            className="inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-none"
+            className="inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-md"
             aria-label="ClassDesk Home"
           >
             <Logo size="md" />
@@ -93,7 +93,7 @@ export function AppShell() {
                   className={({ isActive }) => {
                     const active = isNavActive(item.href, isActive)
                     return cn(
-                      'flex items-center gap-3 px-4 py-3 rounded-none text-sm font-medium cursor-pointer',
+                      'flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium cursor-pointer',
                       'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2',
                       'motion-safe:transition-all motion-safe:duration-150',
                       active
@@ -108,7 +108,7 @@ export function AppShell() {
                       <>
                         <span
                           className={cn(
-                            'w-7 h-7 rounded-none flex items-center justify-center shrink-0 motion-safe:transition-colors',
+                            'w-7 h-7 rounded-md flex items-center justify-center shrink-0 motion-safe:transition-colors',
                             active
                               ? 'bg-accent/20 text-accent'
                               : 'bg-surface-2 text-muted group-hover:text-fg',
@@ -133,13 +133,13 @@ export function AppShell() {
             type="button"
             onClick={handleLogout}
             className={cn(
-              'w-full flex items-center gap-3 px-4 py-2.5 rounded-none text-sm font-medium text-muted hover:text-danger hover:bg-danger-soft/40 border border-transparent hover:border-danger/30 cursor-pointer',
+              'w-full flex items-center gap-3 px-4 py-2.5 rounded-md text-sm font-medium text-muted hover:text-danger hover:bg-danger-soft/40 border border-transparent hover:border-danger/30 cursor-pointer',
               'focus:outline-none focus-visible:ring-2 focus-visible:ring-danger',
               'motion-safe:transition-all motion-safe:duration-150',
             )}
           >
             <span
-              className="w-7 h-7 rounded-none bg-surface-2 flex items-center justify-center shrink-0"
+              className="w-7 h-7 rounded-md bg-surface-2 flex items-center justify-center shrink-0"
               aria-hidden="true"
             >
               <LogOut className="w-4 h-4" />
@@ -168,7 +168,7 @@ export function AppShell() {
             aria-modal="true"
             aria-label="Navigation drawer"
             tabIndex={-1}
-            className="relative w-[280px] max-w-[85vw] h-full bg-surface border-r border-line p-6 flex flex-col justify-between shadow-pop z-10 focus:outline-none"
+            className="relative w-[280px] max-w-[85vw] h-full bg-surface border-r border-line rounded-r-lg p-6 flex flex-col justify-between shadow-pop z-10 focus:outline-none"
           >
             <div className="space-y-6">
               <div className="flex items-center justify-between">
@@ -177,7 +177,7 @@ export function AppShell() {
                   type="button"
                   onClick={() => setIsDrawerOpen(false)}
                   aria-label="Close navigation"
-                  className="p-1 rounded-none text-muted hover:text-fg hover:bg-surface-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer"
+                  className="p-1 rounded-pill text-muted hover:text-fg hover:bg-surface-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -195,7 +195,7 @@ export function AppShell() {
                       className={({ isActive }) => {
                         const active = isNavActive(item.href, isActive)
                         return cn(
-                          'flex items-center gap-3 px-4 py-3 rounded-none text-sm font-medium cursor-pointer',
+                          'flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium cursor-pointer',
                           'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent',
                           active
                             ? 'bg-primary text-primary-fg shadow-card'
@@ -209,7 +209,7 @@ export function AppShell() {
                           <>
                             <span
                               className={cn(
-                                'w-7 h-7 rounded-none flex items-center justify-center shrink-0',
+                                'w-7 h-7 rounded-md flex items-center justify-center shrink-0',
                                 active ? 'bg-accent/20 text-accent' : 'bg-surface-2 text-muted',
                               )}
                               aria-hidden="true"
@@ -230,7 +230,7 @@ export function AppShell() {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-4 py-2.5 rounded-none text-sm font-medium text-muted hover:text-danger hover:bg-danger-soft/40 cursor-pointer"
+                className="w-full flex items-center gap-3 px-4 py-2.5 rounded-md text-sm font-medium text-muted hover:text-danger hover:bg-danger-soft/40 cursor-pointer"
               >
                 <LogOut className="w-4 h-4" />
                 <span>Log out</span>

@@ -20,12 +20,12 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-center p-8 text-center rounded-none border border-dashed border-line bg-surface/50 max-w-md mx-auto',
+        'flex flex-col items-center justify-center p-8 text-center rounded-lg border border-dashed border-line bg-surface/50 max-w-md mx-auto',
         className,
       )}
     >
       <div
-        className="w-12 h-12 rounded-none bg-surface-2 border border-line flex items-center justify-center text-muted mb-4"
+        className="w-12 h-12 rounded-pill bg-surface-2 border border-line flex items-center justify-center text-muted mb-4"
         aria-hidden="true"
       >
         {icon || <FolderOpen className="w-6 h-6" />}

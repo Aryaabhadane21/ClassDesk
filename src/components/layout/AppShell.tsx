@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { LogOut, Menu, X } from 'lucide-react'
 import { Avatar, Badge, IconButton, Logo, ThemeToggle } from '@/components/ui'
+import { NotificationBell } from '@/components/notifications'
+import { NotificationProvider } from '@/hooks/useNotifications'
 import { useAuth } from '@/context/AuthContext'
 import { getHomePath } from '@/utils/routes'
 import { getNavItemsForRole } from '@/components/layout/navConfig'
@@ -55,7 +57,8 @@ export function AppShell() {
   }
 
   return (
-    <div className="min-h-screen bg-app text-fg">
+    <NotificationProvider>
+      <div className="min-h-screen bg-app text-fg">
       {/* 1. Skip to Main Content Link for accessibility */}
       <a
         href="#main-content"
@@ -263,7 +266,7 @@ export function AppShell() {
 
           {/* Right Top Bar Area */}
           <div className="flex items-center gap-3 sm:gap-4">
-            {/* NOTIFICATIONS SLOT: Notification bell added in later step */}
+            <NotificationBell />
 
             <ThemeToggle />
 
@@ -294,5 +297,6 @@ export function AppShell() {
         </main>
       </div>
     </div>
+  </NotificationProvider>
   )
 }

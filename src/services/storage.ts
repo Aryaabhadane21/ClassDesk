@@ -81,5 +81,59 @@ export function resetDemoData(): void {
   writeJSON(STORAGE_KEYS.USERS, seed.users)
   writeJSON(STORAGE_KEYS.ASSIGNMENTS, seed.assignments)
   writeJSON(STORAGE_KEYS.SUBMISSIONS, seed.submissions)
-  writeJSON(STORAGE_KEYS.NOTIFICATION_READS, [])
+  writeJSON(STORAGE_KEYS.NOTIFICATION_READS, {})
 }
+
+export type NotificationReadMap = Record<string, string[]>
+
+/**
+ * Retrieves the list of read notification IDs for a user.
+ */
+export function getReadNotificationIds(userId: string): string[] {
+  const map = readJSON<NotificationReadMap>(STORAGE_KEYS.NOTIFICATION_READS, {})
+  return Array.isArray(map[userId]) ? map[userId] : []
+}
+
+/**
+ * Marks a notification as read for a user.
+ */
+export function markNotificationRead(userId: string, notificationId: string): void {
+  const map = readJSON<NotificationReadMap>(STORAGE_KEYS.NOTIFICATION_READS, {})
+  const current = Array.isArray(map[userId]) ? map[userId] : []
+  if (!current.includes(notificationId)) {
+    map[userId] = [...current, notificationId]
+    writeJSON(STORAGE_KEYS.NOTIFICATION_READS, map)
+  }
+}
+
+/**
+ * Marks multiple notifications as read for a user.
+ */
+export function markAllNotificationsRead(
+  userId: string,
+  notificationIds: string[],
+): void {
+  const map = readJSON<NotificationReadMap>(STORAGE_KEYS.NOTIFICATION_READS, {})
+  const current = Array.isArray(map[userId]) ? map[userId] : []
+  const merged = Array.from(new Set([...current, ...notificationIds]))
+  map[userId] = merged
+  writeJSON(STORAGE_KEYS.NOTIFICATION_READS, map)
+}
+
+/**
+ * Prunes read notification IDs that are no longer valid.
+ */
+export function pruneReadNotificationIds(
+  userId: string,
+  validNotificationIds: string[],
+): void {
+  const map = readJSON<NotificationReadMap>(STORAGE_KEYS.NOTIFICATION_READS, {})
+  const current = Array.isArray(map[userId]) ? map[userId] : []
+  const validSet = new Set(validNotificationIds)
+  const pruned = current.filter((id) => validSet.has(id))
+  if (pruned.length !== current.length) {
+    map[userId] = pruned
+    writeJSON(STORAGE_KEYS.NOTIFICATION_READS, map)
+  }
+}
+

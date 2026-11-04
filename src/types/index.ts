@@ -120,4 +120,5 @@ export interface AppNotification {
   /** ISO 8601 timestamp of notification creation */
   createdAt: string
   read: boolean
+  targetPath?: string
 }

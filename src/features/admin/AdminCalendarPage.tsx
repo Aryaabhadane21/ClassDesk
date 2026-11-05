@@ -7,6 +7,7 @@ import {
   Skeleton,
 } from '@/components/ui'
 import { DueLabel } from '@/components/assignments/DueLabel'
+import { AssignmentCover } from '@/components/assignments/AssignmentCover'
 import { DayAgenda, MonthCalendar } from '@/components/calendar'
 import { useAdminAssignments } from '@/features/admin/useAdminAssignments'
 import { usePageTitle } from '@/hooks/usePageTitle'
@@ -154,30 +155,37 @@ export function AdminCalendarPage() {
               selectedDate={selectedDate}
               items={selectedDayItems}
               renderItem={(item) => (
-                <div className="space-y-2.5">
-                  <div className="flex items-start justify-between gap-2">
-                    <h4 className="font-semibold text-sm text-fg leading-snug">
-                      {item.title}
-                    </h4>
-                    <span className="text-xs font-semibold text-fg shrink-0">
-                      {item.submittedCount} of {item.totalCount} submitted
-                    </span>
-                  </div>
+                <div className="flex items-start gap-3">
+                  <AssignmentCover
+                    seed={item.id}
+                    variant="thumbnail"
+                    className="w-12 h-12 rounded-md shrink-0 border border-line shadow-xs mt-0.5"
+                  />
+                  <div className="space-y-1.5 flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <h4 className="font-semibold text-sm text-fg leading-snug truncate">
+                        {item.title}
+                      </h4>
+                      <span className="text-xs font-semibold text-fg shrink-0 tabular-nums">
+                        {item.submittedCount} of {item.totalCount} submitted
+                      </span>
+                    </div>
 
-                  <p className="text-xs text-muted line-clamp-2 leading-relaxed">
-                    {item.description}
-                  </p>
+                    <p className="text-xs text-muted line-clamp-2 leading-relaxed">
+                      {item.description}
+                    </p>
 
-                  <div className="flex items-center justify-between pt-1 gap-2 flex-wrap">
-                    <DueLabel dueDate={item.dueDate} />
-                    <Link
-                      to={`/admin/assignments/${item.id}`}
-                      className="inline-block"
-                    >
-                      <Button variant="secondary" size="sm" className="text-xs h-7">
-                        View submissions
-                      </Button>
-                    </Link>
+                    <div className="flex items-center justify-between pt-1 gap-2 flex-wrap">
+                      <DueLabel dueDate={item.dueDate} />
+                      <Link
+                        to={`/admin/assignments/${item.id}`}
+                        className="inline-block"
+                      >
+                        <Button variant="secondary" size="sm" className="text-xs h-7">
+                          View submissions
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
                 </div>
               )}

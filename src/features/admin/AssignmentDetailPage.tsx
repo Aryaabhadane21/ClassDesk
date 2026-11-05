@@ -18,6 +18,7 @@ import {
   ConfirmDialog,
   EmptyState,
   ErrorState,
+  Eyebrow,
   ProgressBar,
   Skeleton,
   useToast,
@@ -318,14 +319,14 @@ export function AssignmentDetailPage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-4 border-t border-line">
           <div className="p-3.5 rounded-lg bg-surface-2/60 border border-line">
             <p className="text-xs text-muted font-medium">Submitted</p>
-            <p className="text-2xl font-bold text-fg mt-1">
+            <p className="text-2xl font-bold text-fg mt-1 tabular-nums">
               {completion.submitted}
             </p>
           </div>
 
           <div className="p-3.5 rounded-lg bg-surface-2/60 border border-line">
             <p className="text-xs text-muted font-medium">Not submitted</p>
-            <p className="text-2xl font-bold text-fg mt-1">
+            <p className="text-2xl font-bold text-fg mt-1 tabular-nums">
               {completion.remaining}
             </p>
           </div>
@@ -333,7 +334,7 @@ export function AssignmentDetailPage() {
           {completion.late > 0 && (
             <div className="p-3.5 rounded-lg bg-warning-soft/60 border border-warning/30">
               <p className="text-xs text-warning font-medium">Submitted late</p>
-              <p className="text-2xl font-bold text-warning mt-1">
+              <p className="text-2xl font-bold text-warning mt-1 tabular-nums">
                 {completion.late}
               </p>
             </div>
@@ -343,13 +344,16 @@ export function AssignmentDetailPage() {
 
       {/* 4. Student Status Section */}
       <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="font-display text-lg font-semibold text-fg tracking-tight">
-            Student status{' '}
-            <span className="text-muted text-sm font-normal">
-              ({sortedSubmissions.length})
-            </span>
-          </h2>
+        <div className="space-y-1">
+          <Eyebrow>STUDENT STATUS</Eyebrow>
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-lg font-semibold text-fg tracking-tight">
+              Student status{' '}
+              <span className="text-muted text-sm font-normal tabular-nums">
+                ({sortedSubmissions.length})
+              </span>
+            </h2>
+          </div>
         </div>
 
         {sortedSubmissions.length === 0 ? (

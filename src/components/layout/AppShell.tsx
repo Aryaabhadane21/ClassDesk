@@ -243,7 +243,15 @@ export function AppShell() {
       {/* ------------------------------------------------------------- */}
       {/* 4. MAIN LAYOUT AREA (Top bar + scrollable content)            */}
       {/* ------------------------------------------------------------- */}
-      <div className="lg:pl-[270px] flex flex-col min-h-screen">
+      <div className="lg:pl-[270px] flex flex-col min-h-screen relative overflow-x-hidden">
+        {/* Soft radial glow at top of content area */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute top-0 left-0 right-0 h-96 -z-10 overflow-hidden select-none"
+        >
+          <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-pill bg-peach/10 dark:bg-accent/8 blur-3xl pointer-events-none" />
+        </div>
+
         {/* Sticky Top Bar */}
         <header className="sticky top-0 z-20 bg-app/80 backdrop-blur-md border-b border-line px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
           <div className="flex items-center gap-3">

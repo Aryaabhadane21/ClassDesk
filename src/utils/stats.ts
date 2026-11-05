@@ -1,0 +1,90 @@
+import type { StudentAssignment, AdminAssignment } from '@/types'
+import { getDueInfo } from '@/utils/dates'
+import { getCompletion } from '@/utils/selectors'
+
+export interface StudentStats {
+  dueToday: number
+  overdue: number
+  submitted: number
+  completionPercent: number
+  total: number
+}
+
+export function getStudentStats(
+  assignments: StudentAssignment[],
+  now: Date = new Date(),
+): StudentStats {
+  const total = assignments.length
+  let dueToday = 0
+  let overdue = 0
+  let submitted = 0
+
+  for (const a of assignments) {
+    if (a.status === 'submitted') {
+      submitted++
+    } else {
+      const dueInfo = getDueInfo(a.dueDate, now)
+      if (dueInfo.state === 'overdue') {
+        overdue++
+      } else if (dueInfo.state === 'due_today') {
+        dueToday++
+      }
+    }
+  }
+
+  const completionPercent = total > 0 ? Math.round((submitted / total) * 100) : 0
+
+  return {
+    dueToday,
+    overdue,
+    submitted,
+    completionPercent,
+    total,
+  }
+}
+
+export interface AdminStats {
+  totalAssignments: number
+  averageCompletion: number
+  pendingSubmissions: number
+  overdueAssignments: number
+}
+
+export function getAdminStats(
+  assignments: AdminAssignment[],
+  now: Date = new Date(),
+): AdminStats {
+  const totalAssignments = assignments.length
+  if (totalAssignments === 0) {
+    return {
+      totalAssignments: 0,
+      averageCompletion: 0,
+      pendingSubmissions: 0,
+      overdueAssignments: 0,
+    }
+  }
+
+  let totalPercent = 0
+  let pendingSubmissions = 0
+  let overdueAssignments = 0
+
+  for (const a of assignments) {
+    const comp = getCompletion(a)
+    totalPercent += comp.percent
+    pendingSubmissions += comp.remaining
+
+    const dueInfo = getDueInfo(a.dueDate, now)
+    if (dueInfo.state === 'overdue' && comp.remaining > 0) {
+      overdueAssignments++
+    }
+  }
+
+  const averageCompletion = Math.round(totalPercent / totalAssignments)
+
+  return {
+    totalAssignments,
+    averageCompletion,
+    pendingSubmissions,
+    overdueAssignments,
+  }
+}

@@ -31,10 +31,12 @@
   --color-info-fg: var(--color-info-fg);
   --color-info-soft: var(--color-info-soft);
 
-  /* Warm Decorative Tints */
-  --color-tint-peach: var(--color-tint-peach);
+  /* Decorative Tints */
+  --color-peach: var(--peach);
+  --color-lilac: var(--lilac);
+  --color-tint-peach: var(--peach);
   --color-tint-amber: var(--color-tint-amber);
-  --color-tint-lilac: var(--color-tint-lilac);
+  --color-tint-lilac: var(--lilac);
 
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);
@@ -49,25 +51,27 @@
 }
 
 :root {
-  /* Colors */
-  --color-app: #F3F4F7;
-  --color-surface: #FFFFFF;
-  --color-surface-2: #ECEEF2;
-  --color-line: #E1E4EA;
-  --color-fg: #1B1F26;
-  --color-muted: #596172;
-  --color-primary: #1F2430;
+  /* Warm Cream Light Palette */
+  --color-app: #F7F0E6;
+  --color-surface: #FFFCF7;
+  --color-surface-2: #F1E7DA;
+  --color-line: #E6D9C6;
+  --color-fg: #231B2E;
+  --color-muted: #6F6478;
+  --color-primary: #2A1B4A;
   --color-primary-fg: #FFFFFF;
-  --color-accent: #5B4EF0;
+  --color-accent: #6B3FD4;
   --color-accent-fg: #FFFFFF;
-  --color-accent-soft: rgba(91, 78, 240, 0.1);
+  --color-accent-soft: #EADFFB;
+  --peach: #F4B896;
+  --lilac: #D9C3F0;
 
-  /* Status Colors (Light Theme: High contrast against light and soft backgrounds) */
-  --color-success: #15803D;
+  /* Retuned Status Colors (Light Theme: High contrast >= 4.5:1 against surfaces & soft backgrounds) */
+  --color-success: #166534;
   --color-success-fg: #FFFFFF;
-  --color-success-soft: #DCFCE7;
+  --color-success-soft: #DEF7EC;
 
-  --color-warning: #B45309;
+  --color-warning: #92400E;
   --color-warning-fg: #FFFFFF;
   --color-warning-soft: #FEF3C7;
 
@@ -77,12 +81,12 @@
 
   --color-info: #1D4ED8;
   --color-info-fg: #FFFFFF;
-  --color-info-soft: #DBEAFE;
+  --color-info-soft: #E1EFFE;
 
-  /* Warm Decorative Tints (GradientBlob / Covers) */
-  --color-tint-peach: #FDC5B7;
+  /* Decorative Tints (GradientBlob / Covers) */
+  --color-tint-peach: #F4B896;
   --color-tint-amber: #FDE68A;
-  --color-tint-lilac: #DDD6FE;
+  --color-tint-lilac: #D9C3F0;
 
   /* Radii */
   --radius-sm: 10px;
@@ -91,8 +95,8 @@
   --radius-pill: 9999px;
 
   /* Shadows */
-  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
-  --shadow-pop: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 1px 3px 0 rgba(42, 27, 74, 0.05), 0 1px 2px -1px rgba(42, 27, 74, 0.04);
+  --shadow-pop: 0 10px 25px -5px rgba(42, 27, 74, 0.09), 0 8px 10px -6px rgba(42, 27, 74, 0.04);
 
   /* Fonts */
   --font-display: "Fraunces", Georgia, serif;
@@ -100,20 +104,22 @@
 }
 
 .dark {
-  /* Colors */
-  --color-app: #0B0B0C;
-  --color-surface: #141416;
-  --color-surface-2: #1C1C1F;
-  --color-line: #2A2A2E;
-  --color-fg: #F5F5F6;
-  --color-muted: #9A9AA2;
-  --color-primary: #FFFFFF;
-  --color-primary-fg: #0B0B0C;
-  --color-accent: #6D61FF;
-  --color-accent-fg: #FFFFFF;
-  --color-accent-soft: rgba(109, 97, 255, 0.18);
+  /* Violet-Tinted Near Black Dark Palette */
+  --color-app: #0D0A14;
+  --color-surface: #17121F;
+  --color-surface-2: #1F1829;
+  --color-line: #2E2540;
+  --color-fg: #F6F0FA;
+  --color-muted: #A89CB8;
+  --color-primary: #F6F0FA;
+  --color-primary-fg: #0D0A14;
+  --color-accent: #A78BFA;
+  --color-accent-fg: #130B24;
+  --color-accent-soft: #2A2146;
+  --peach: #F4A77C;
+  --lilac: #8E7BC9;
 
-  /* Status Colors (Dark Theme: High contrast and vibrancy) */
+  /* Status Colors (Dark Theme: High contrast & vibrance) */
   --color-success: #4ADE80;
   --color-success-fg: #052E16;
   --color-success-soft: rgba(74, 222, 128, 0.16);
@@ -130,10 +136,10 @@
   --color-info-fg: #082F49;
   --color-info-soft: rgba(96, 165, 250, 0.16);
 
-  /* Warm Decorative Tints (Dark Mode subtle vibrancy) */
-  --color-tint-peach: rgba(253, 197, 183, 0.28);
+  /* Decorative Tints (Dark Mode subtle vibrance) */
+  --color-tint-peach: rgba(244, 167, 124, 0.28);
   --color-tint-amber: rgba(253, 230, 138, 0.28);
-  --color-tint-lilac: rgba(221, 214, 254, 0.28);
+  --color-tint-lilac: rgba(142, 123, 201, 0.28);
 
   /* Shadows */
   --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.3);

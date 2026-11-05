@@ -8,7 +8,8 @@ import {
   Users,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { Badge, Button, Card, GradientBlob, Highlight, IconButton, ProgressBar } from '@/components/ui'
+import { Badge, Button, Card, Highlight, IconButton, ProgressBar } from '@/components/ui'
+import { AssignmentCover } from '@/components/assignments/AssignmentCover'
 import { DueLabel } from '@/components/assignments/DueLabel'
 import { getCompletion } from '@/utils/selectors'
 import { getAdminUrgency } from '@/utils/dueStyles'
@@ -61,9 +62,9 @@ export function AdminAssignmentCard({
         aria-labelledby={titleId}
         className="flex flex-col h-full outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
       >
-        {/* 1. Cover with GradientBlob and floating Audience / Urgency Tag */}
+        {/* 1. Cover with AssignmentCover and floating Audience / Urgency Tag */}
         <div className="relative h-[120px] w-full overflow-hidden shrink-0 border-b border-line">
-          <GradientBlob seed={assignment.id} variant="cover" className="h-full w-full" />
+          <AssignmentCover seed={assignment.id} variant="cover" className="h-full w-full" />
           <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 flex-wrap justify-end">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill bg-surface/90 backdrop-blur-xs border border-line text-fg text-xs font-medium shadow-xs">
               <Users className="w-3.5 h-3.5 text-muted" aria-hidden="true" />
@@ -158,7 +159,7 @@ export function AdminAssignmentCard({
                 <p className="text-xs text-muted">No students assigned</p>
               ) : (
                 <>
-                  <div className="flex items-center justify-between text-xs font-medium">
+                  <div className="flex items-center justify-between text-xs font-medium tabular-nums">
                     <span className="text-muted">
                       {completion.submitted} of {completion.total} submitted
                     </span>

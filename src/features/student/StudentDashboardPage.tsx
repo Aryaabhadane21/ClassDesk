@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { AlertTriangle, Award, CheckCircle2, Clock } from 'lucide-react'
 import { PageHeader } from '@/components/layout/PageHeader'
 import {
   Badge,
   Button,
   EmptyState,
   ErrorState,
+  Eyebrow,
   Skeleton,
   SkeletonCard,
+  StatCard,
   useToast,
 } from '@/components/ui'
 import {
@@ -14,6 +17,7 @@ import {
   ProgressSummary,
   StudentAssignmentCard,
 } from '@/components/assignments'
+import { WeekStrip } from '@/components/assignments/WeekStrip'
 import { SubmitConfirmation } from '@/features/student/SubmitConfirmation'
 import { useAuth } from '@/context/AuthContext'
 import { useStudentAssignments } from '@/features/student/useStudentAssignments'
@@ -27,6 +31,7 @@ import {
 import { mockApi, ApiError } from '@/services/mockApi'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { getGreetingName } from '@/utils/names'
+import { getStudentStats } from '@/utils/stats'
 import type { StudentAssignment } from '@/types'
 
 const STUDENT_STATUS_OPTIONS = [
@@ -63,8 +68,11 @@ export function StudentDashboardPage() {
     useState<StudentAssignment | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [justSubmittedId, setJustSubmittedId] = useState<string | null>(null)
   const triggerButtonRef = useRef<HTMLButtonElement | null>(null)
   const isMountedRef = useRef(true)
+
+  const stats = useMemo(() => getStudentStats(assignments), [assignments])
 
   useEffect(() => {
     isMountedRef.current = true
@@ -167,6 +175,7 @@ export function StudentDashboardPage() {
       // In-place state update
       updateAssignment(updated)
       setPendingAssignment(null)
+      setJustSubmittedId(assignmentId)
       success(`Marked as submitted: ${assignmentTitle}`, 'Submission Confirmed')
 
       // If filter hides the submitted card (e.g. status === 'todo'), move focus to results count
@@ -207,6 +216,43 @@ export function StudentDashboardPage() {
         title="Your assignments"
         description={`Hello, ${greetingName}! Track your homework, deadlines, and completed deliverables.`}
       />
+
+      {/* Overview Stat Cards Row */}
+      <section aria-label="Course overview" className="space-y-3 text-left">
+        <Eyebrow>OVERVIEW</Eyebrow>
+        {status === 'loading' ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+            <Skeleton className="h-24 w-full" rounded="lg" />
+            <Skeleton className="h-24 w-full" rounded="lg" />
+            <Skeleton className="h-24 w-full" rounded="lg" />
+            <Skeleton className="h-24 w-full" rounded="lg" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+            <StatCard
+              label="Due today"
+              value={stats.dueToday}
+              icon={<Clock className="w-4 h-4" />}
+            />
+            <StatCard
+              label="Overdue"
+              value={stats.overdue}
+              icon={<AlertTriangle className="w-4 h-4" />}
+              tone={stats.overdue > 0 ? 'danger' : 'default'}
+            />
+            <StatCard
+              label="Submitted"
+              value={stats.submitted}
+              icon={<CheckCircle2 className="w-4 h-4" />}
+            />
+            <StatCard
+              label="Completion"
+              value={`${stats.completionPercent}%`}
+              icon={<Award className="w-4 h-4" />}
+            />
+          </div>
+        )}
+      </section>
 
       {/* 2. Loading State */}
       {status === 'loading' && (
@@ -253,6 +299,9 @@ export function StudentDashboardPage() {
           {/* Progress Summary Card: ALWAYS reflects the full set of assignments */}
           <ProgressSummary submitted={counts.submitted} total={counts.total} />
 
+          {/* This week horizontal strip */}
+          <WeekStrip assignments={assignments} />
+
           {/* Shared Toolbar between progress and groups */}
           <AssignmentToolbar
             searchQuery={searchQuery}
@@ -288,13 +337,16 @@ export function StudentDashboardPage() {
               {/* Group 1: To do (Not submitted) */}
               {todoAssignments.length > 0 && (
                 <section className="space-y-4 text-left">
-                  <div className="flex items-center gap-2.5">
-                    <h2 className="font-display text-xl font-bold tracking-tight text-fg">
-                      To do
-                    </h2>
-                    <Badge tone="neutral" size="sm">
-                      {todoAssignments.length}
-                    </Badge>
+                  <div className="space-y-1">
+                    <Eyebrow>TO DO</Eyebrow>
+                    <div className="flex items-center gap-2.5">
+                      <h2 className="font-display text-xl font-bold tracking-tight text-fg">
+                        To do
+                      </h2>
+                      <Badge tone="neutral" size="sm">
+                        {todoAssignments.length}
+                      </Badge>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
@@ -304,6 +356,8 @@ export function StudentDashboardPage() {
                         assignment={assignment}
                         onSubmitClick={handleSubmitClick}
                         searchQuery={debouncedQuery}
+                        isJustSubmitted={justSubmittedId === assignment.id}
+                        onBurstComplete={() => setJustSubmittedId(null)}
                       />
                     ))}
                   </div>
@@ -313,13 +367,16 @@ export function StudentDashboardPage() {
               {/* Group 2: Submitted */}
               {submittedAssignments.length > 0 && (
                 <section className="space-y-4 text-left">
-                  <div className="flex items-center gap-2.5">
-                    <h2 className="font-display text-xl font-bold tracking-tight text-fg">
-                      Submitted
-                    </h2>
-                    <Badge tone="success" size="sm">
-                      {submittedAssignments.length}
-                    </Badge>
+                  <div className="space-y-1">
+                    <Eyebrow>SUBMITTED</Eyebrow>
+                    <div className="flex items-center gap-2.5">
+                      <h2 className="font-display text-xl font-bold tracking-tight text-fg">
+                        Submitted
+                      </h2>
+                      <Badge tone="success" size="sm">
+                        {submittedAssignments.length}
+                      </Badge>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
@@ -329,6 +386,8 @@ export function StudentDashboardPage() {
                         assignment={assignment}
                         searchQuery={debouncedQuery}
                         className="motion-safe:animate-fade-in"
+                        isJustSubmitted={justSubmittedId === assignment.id}
+                        onBurstComplete={() => setJustSubmittedId(null)}
                       />
                     ))}
                   </div>

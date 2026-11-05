@@ -1,12 +1,22 @@
 import { useState, useRef, useMemo } from 'react'
-import { Plus, ClipboardList } from 'lucide-react'
+import {
+  AlertTriangle,
+  BookOpen,
+  ClipboardList,
+  Clock,
+  Plus,
+  TrendingUp,
+} from 'lucide-react'
 import { PageHeader } from '@/components/layout/PageHeader'
 import {
   Button,
   ConfirmDialog,
   EmptyState,
   ErrorState,
+  Eyebrow,
+  Skeleton,
   SkeletonCard,
+  StatCard,
   useToast,
 } from '@/components/ui'
 import {
@@ -27,6 +37,7 @@ import {
 import { useAuth } from '@/context/AuthContext'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { getGreetingName } from '@/utils/names'
+import { getAdminStats } from '@/utils/stats'
 import { mockApi } from '@/services/mockApi'
 import type { AdminAssignment } from '@/types'
 
@@ -63,6 +74,8 @@ export function AdminAssignmentsPage() {
     replaceAssignment,
     removeAssignment,
   } = useAdminAssignments()
+
+  const stats = useMemo(() => getAdminStats(assignments), [assignments])
 
   // Filter & Search URL hook
   const {
@@ -196,6 +209,43 @@ export function AdminAssignmentsPage() {
           </Button>
         }
       />
+
+      {/* Overview Stat Cards Row */}
+      <section aria-label="Course overview" className="space-y-3 text-left">
+        <Eyebrow>OVERVIEW</Eyebrow>
+        {status === 'loading' ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+            <Skeleton className="h-24 w-full" rounded="lg" />
+            <Skeleton className="h-24 w-full" rounded="lg" />
+            <Skeleton className="h-24 w-full" rounded="lg" />
+            <Skeleton className="h-24 w-full" rounded="lg" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+            <StatCard
+              label="Assignments"
+              value={stats.totalAssignments}
+              icon={<BookOpen className="w-4 h-4" />}
+            />
+            <StatCard
+              label="Avg. completion"
+              value={`${stats.averageCompletion}%`}
+              icon={<TrendingUp className="w-4 h-4" />}
+            />
+            <StatCard
+              label="Pending"
+              value={stats.pendingSubmissions}
+              icon={<Clock className="w-4 h-4" />}
+            />
+            <StatCard
+              label="Overdue"
+              value={stats.overdueAssignments}
+              icon={<AlertTriangle className="w-4 h-4" />}
+              tone={stats.overdueAssignments > 0 ? 'danger' : 'default'}
+            />
+          </div>
+        )}
+      </section>
 
       {/* 2. Loading State */}
       {status === 'loading' && (

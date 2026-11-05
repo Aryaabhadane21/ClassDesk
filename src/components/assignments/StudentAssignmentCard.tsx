@@ -1,5 +1,6 @@
 import { AlertTriangle, Check, CheckCircle2, Clock, ExternalLink } from 'lucide-react'
-import { Badge, Button, Card, GradientBlob, Highlight } from '@/components/ui'
+import { Badge, Button, Card, Highlight, SuccessBurst } from '@/components/ui'
+import { AssignmentCover } from '@/components/assignments/AssignmentCover'
 import { DueLabel } from '@/components/assignments/DueLabel'
 import { StatusBadge } from '@/components/assignments/StatusBadge'
 import { formatSubmissionDate } from '@/utils/dates'
@@ -12,6 +13,8 @@ export interface StudentAssignmentCardProps {
   onSubmitClick?: (assignment: StudentAssignment, buttonEl: HTMLButtonElement) => void
   searchQuery?: string
   className?: string
+  isJustSubmitted?: boolean
+  onBurstComplete?: () => void
 }
 
 export function StudentAssignmentCard({
@@ -19,6 +22,8 @@ export function StudentAssignmentCard({
   onSubmitClick,
   searchQuery,
   className,
+  isJustSubmitted = false,
+  onBurstComplete,
 }: StudentAssignmentCardProps) {
   const titleId = `asg-title-${assignment.id}`
   const cardId = `assignment-card-${assignment.id}`
@@ -36,12 +41,14 @@ export function StudentAssignmentCard({
   return (
     <Card
       className={cn(
-        '@container flex flex-col justify-between overflow-hidden text-left bg-surface border border-line shadow-card rounded-lg',
+        'relative @container flex flex-col justify-between overflow-hidden text-left bg-surface border border-line shadow-card rounded-lg',
         'motion-safe:transition-all motion-safe:duration-200',
         urgency.isUrgent && urgency.cardBorderClasses,
         className,
       )}
     >
+      <SuccessBurst active={isJustSubmitted} onComplete={onBurstComplete} />
+
       <article
         id={cardId}
         tabIndex={-1}
@@ -49,9 +56,9 @@ export function StudentAssignmentCard({
         aria-labelledby={titleId}
         className="flex flex-col h-full outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
       >
-        {/* 1. Cover with GradientBlob and floating StatusBadge */}
+        {/* 1. Cover with AssignmentCover and floating StatusBadge */}
         <div className="relative h-[120px] w-full overflow-hidden shrink-0 border-b border-line">
-          <GradientBlob seed={assignment.id} variant="cover" className="h-full w-full" />
+          <AssignmentCover seed={assignment.id} variant="cover" className="h-full w-full" />
           <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
             <StatusBadge status={assignment.status} className="shadow-xs backdrop-blur-xs" />
             {urgency.isUrgent && (
@@ -156,7 +163,7 @@ export function StudentAssignmentCard({
                 <div className="min-h-[44px] flex items-center justify-between gap-2 flex-wrap">
                   <div className="inline-flex items-center gap-2 text-xs font-medium text-success">
                     <Check className="w-4 h-4 shrink-0" aria-hidden="true" />
-                    <span>
+                    <span className="tabular-nums">
                       Submitted{' '}
                       {assignment.submittedAt
                         ? formatSubmissionDate(assignment.submittedAt)

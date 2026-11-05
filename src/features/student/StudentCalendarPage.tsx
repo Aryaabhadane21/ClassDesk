@@ -8,6 +8,7 @@ import {
 } from '@/components/ui'
 import { DueLabel } from '@/components/assignments/DueLabel'
 import { StatusBadge } from '@/components/assignments/StatusBadge'
+import { AssignmentCover } from '@/components/assignments/AssignmentCover'
 import { DayAgenda, MonthCalendar } from '@/components/calendar'
 import { useStudentAssignments } from '@/features/student/useStudentAssignments'
 import { usePageTitle } from '@/hooks/usePageTitle'
@@ -151,28 +152,35 @@ export function StudentCalendarPage() {
               selectedDate={selectedDate}
               items={selectedDayItems}
               renderItem={(item) => (
-                <div className="space-y-2.5">
-                  <div className="flex items-start justify-between gap-2">
-                    <h4 className="font-semibold text-sm text-fg leading-snug">
-                      {item.title}
-                    </h4>
-                    <StatusBadge status={item.status} className="shrink-0" />
-                  </div>
+                <div className="flex items-start gap-3">
+                  <AssignmentCover
+                    seed={item.id}
+                    variant="thumbnail"
+                    className="w-12 h-12 rounded-md shrink-0 border border-line shadow-xs mt-0.5"
+                  />
+                  <div className="space-y-1.5 flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <h4 className="font-semibold text-sm text-fg leading-snug truncate">
+                        {item.title}
+                      </h4>
+                      <StatusBadge status={item.status} className="shrink-0" />
+                    </div>
 
-                  <p className="text-xs text-muted line-clamp-2 leading-relaxed">
-                    {item.description}
-                  </p>
+                    <p className="text-xs text-muted line-clamp-2 leading-relaxed">
+                      {item.description}
+                    </p>
 
-                  <div className="flex items-center justify-between pt-1 gap-2 flex-wrap">
-                    <DueLabel dueDate={item.dueDate} />
-                    <Link
-                      to={`/student?q=${encodeURIComponent(item.title)}`}
-                      className="inline-block"
-                    >
-                      <Button variant="secondary" size="sm" className="text-xs h-7">
-                        View on dashboard
-                      </Button>
-                    </Link>
+                    <div className="flex items-center justify-between pt-1 gap-2 flex-wrap">
+                      <DueLabel dueDate={item.dueDate} />
+                      <Link
+                        to={`/student?q=${encodeURIComponent(item.title)}`}
+                        className="inline-block"
+                      >
+                        <Button variant="secondary" size="sm" className="text-xs h-7">
+                          View on dashboard
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
                 </div>
               )}

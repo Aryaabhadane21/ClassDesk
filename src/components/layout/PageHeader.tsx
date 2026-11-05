@@ -21,8 +21,8 @@ export function PageHeader({
         className,
       )}
     >
-      <div className="space-y-1">
-        <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-fg">
+      <div className="space-y-1.5">
+        <h1 className="font-display text-[clamp(2rem,4vw,3rem)] leading-[1.12] font-bold tracking-tight text-fg">
           {title}
         </h1>
         {description && (

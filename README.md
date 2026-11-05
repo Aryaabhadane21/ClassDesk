@@ -9,7 +9,7 @@ ClassDesk is a responsive Assignment and Review Dashboard designed for education
 ## 1. Live Demo & Demo Video
 
 - **Live Deployment:** https://classdesk-one.vercel.app/
-- **Walkthrough Video:** `VIDEO_URL_HERE`
+- **Walkthrough Video:** [`VIDEO_URL_HERE`](https://drive.google.com/file/d/12HDl8yr0V9zxEyMMWEwQTpSwxpfVWZoJ/view?usp=sharing)
 
 ---
 

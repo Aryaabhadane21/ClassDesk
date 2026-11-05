@@ -1,6 +1,6 @@
 # ClassDesk
 
-ClassDesk is a responsive Assignment and Review Dashboard designed for educational workflows with two distinct roles: Students and Reviewers/Professors. It was built for the Joineazy Frontend Intern Assignment (Task 1) as a zero-backend, client-side web application where data persistence, asynchronous operations, authentication sessions, and business rules are simulated locally in the browser with production-grade architectural rigor.
+ClassDesk is a responsive Assignment and Review Dashboard designed for educational workflows with two distinct roles: Students and Reviewers/Professors. It is built as a zero-backend, client-side web application where data persistence, asynchronous operations, authentication sessions, and business rules are simulated locally in the browser with production-grade architectural rigor.
 
 **Core Tech Stack:** React 19, TypeScript, Tailwind CSS v4, Lucide React, and Vitest with React Testing Library.
 
@@ -8,7 +8,7 @@ ClassDesk is a responsive Assignment and Review Dashboard designed for education
 
 ## 1. Live Demo & Demo Video
 
-- **Live Deployment:** [https://classdesk.vercel.app](https://classdesk.vercel.app) *(or replace with custom deployment URL)*
+- **Live Deployment:** https://classdesk-one.vercel.app/
 - **Walkthrough Video:** `VIDEO_URL_HERE`
 
 ---

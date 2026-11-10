@@ -89,7 +89,8 @@ For this application, client state is naturally divided between server-like pers
 # 1. Clone repository
 cd ClassDesk
 
-# 2. Install dependencies
+# 2. Navigate to frontend directory and install dependencies
+cd frontend
 npm install
 
 # 3. Start local development server
@@ -99,6 +100,9 @@ Open your browser at `http://localhost:5173`.
 
 ### Running Automated Tests
 ```bash
+# Navigate to frontend (if not already there)
+cd frontend
+
 # Run test suite once
 npm run test:run
 
@@ -108,6 +112,9 @@ npm test
 
 ### Production Build & Preview
 ```bash
+# Navigate to frontend (if not already there)
+cd frontend
+
 # Build optimized production bundle
 npm run build
 
@@ -127,51 +134,63 @@ When enabled, the mock API will intermittently reject API requests with random s
 ## 6. Folder Structure
 
 ```
-src/
-├── app/                  # Application bootstrap, routing, route guards, error boundary
-│   ├── AppProviders.tsx  # Top-level context providers (Theme, Auth, Toast)
-│   ├── ErrorBoundary.tsx # Top-level React error boundary with fallback view
-│   ├── guards.tsx        # Role-based route guard components (StudentGuard, AdminGuard)
-│   └── router.tsx        # Client-side route declarations and layout wrapping
-├── components/           # Reusable UI component library
-│   ├── assignments/      # Assignment cards, form modals, roster tables, progress bars
-│   ├── calendar/         # Month calendar, day agenda drawer, calendar navigation
-│   ├── layout/           # App shell, top bar, sidebar, mobile drawer, notification bell
-│   └── ui/               # Core design system primitives (Button, Input, Modal, Badge, etc.)
-├── context/              # Global React contexts
-│   ├── AuthContext.tsx   # User session, login, logout, mock token state
-│   └── ThemeContext.tsx  # Light/dark mode state and DOM class synchronization
-├── data/                 # Initial mock data and seeds
-│   └── seed.ts           # Deterministic generator for professors, students, assignments, submissions
-├── features/             # Feature-specific page components
-│   ├── admin/            # Admin assignments management and calendar views
-│   ├── auth/             # Login page and authentication forms
-│   ├── dev/              # Component design system gallery (DEV mode only)
-│   └── student/          # Student dashboard and personal calendar views
-├── services/             # Mock backend and persistence layer
-│   ├── mockApi.ts        # Simulated REST client with latency, validation, and error flags
-│   └── storage.ts        # Safe localStorage JSON wrapper with fallback memory cache
-├── styles/               # Styling configuration
-│   ├── animations.css    # Keyframe animations with prefers-reduced-motion protection
-│   ├── index.css         # Tailwind entry point and base layer
-│   └── tokens.css        # CSS custom properties for light and dark color themes
-├── tests/                # Automated tests
-│   ├── integration/      # End-to-end integration tests for critical workflows
-│   ├── renderWithProviders.tsx # Test wrapper configuring Router, Auth, and Theme
-│   ├── setup.ts          # Vitest environment setup and Jest-DOM matchers
-│   └── unit/             # Unit tests for pure logic (dates, filters, selectors, calendar)
-├── types/                # TypeScript interface definitions
-│   └── index.ts          # Core domain models (User, Assignment, Submission, API types)
-└── utils/                # Pure helper functions
-    ├── calendar.ts       # Monday-first month grid math and date grouping
-    ├── cn.ts             # Tailwind class merging utility (clsx + twMerge)
-    ├── dates.ts          # Date formatting and overdue/due-soon calculation
-    ├── dueStyles.ts      # Semantic styling tokens based on due status
-    ├── filters.ts        # Case-insensitive filtering, status matching, sorting
-    ├── names.ts          # Honorific and first-name greeting extraction
-    ├── notifications.ts  # Derived notification generation and sorting
-    ├── routes.ts         # Navigation route constants and role path resolvers
-    └── selectors.ts      # Assignment completion ratios and submission sorting
+frontend/
+├── index.html            # Single-page application HTML entry point
+├── package.json          # Frontend dependencies, scripts, and metadata
+├── vite.config.ts        # Vite plugins, path aliases (@ -> src), and Vitest configuration
+├── tsconfig.json         # TypeScript project configuration (references app and node configs)
+├── vercel.json           # Vercel Single-Page Application routing rewrite rules
+├── public/               # Static public assets
+└── src/
+    ├── app/                  # Application bootstrap, routing, route guards, error boundary
+    │   ├── AppProviders.tsx  # Top-level context providers (Theme, Auth, Toast)
+    │   ├── ErrorBoundary.tsx # Top-level React error boundary with fallback view
+    │   ├── guards.tsx        # Role-based route guard components (StudentGuard, AdminGuard)
+    │   └── router.tsx        # Client-side route declarations and layout wrapping
+    ├── assets/               # Curated assignment cover art and static images
+    ├── components/           # Reusable UI component library
+    │   ├── assignments/      # Assignment cards, form modals, roster tables, progress bars
+    │   ├── calendar/         # Month calendar, day agenda drawer, calendar navigation
+    │   ├── layout/           # App shell, top bar, sidebar, mobile drawer, notification bell
+    │   └── ui/               # Core design system primitives (Button, Input, Modal, Badge, etc.)
+    ├── context/              # Global React contexts
+    │   ├── AuthContext.tsx   # User session, login, logout, mock token state
+    │   └── ThemeContext.tsx  # Light/dark mode state and DOM class synchronization
+    ├── data/                 # Initial mock data and seeds
+    │   └── seed.ts           # Deterministic generator for professors, students, assignments, submissions
+    ├── features/             # Feature-specific page components
+    │   ├── admin/            # Admin assignments management and calendar views
+    │   ├── auth/             # Login page and authentication forms
+    │   ├── dev/              # Component design system gallery (DEV mode only)
+    │   └── student/          # Student dashboard and personal calendar views
+    ├── hooks/                # Custom React hooks (filters, notifications, title, focus trap)
+    ├── services/             # Mock backend and persistence layer
+    │   ├── mockApi.ts        # Simulated REST client with latency, validation, and error flags
+    │   └── storage.ts        # Safe localStorage JSON wrapper with fallback memory cache
+    ├── styles/               # Styling configuration
+    │   ├── animations.css    # Keyframe animations with prefers-reduced-motion protection
+    │   ├── index.css         # Tailwind entry point and base layer
+    │   └── tokens.css        # CSS custom properties for light and dark color themes
+    ├── tests/                # Automated tests
+    │   ├── integration/      # End-to-end integration tests for critical workflows
+    │   ├── renderWithProviders.tsx # Test wrapper configuring Router, Auth, and Theme
+    │   ├── setup.ts          # Vitest environment setup and Jest-DOM matchers
+    │   └── unit/             # Unit tests for pure logic (dates, filters, selectors, calendar)
+    ├── types/                # TypeScript interface definitions
+    │   └── index.ts          # Core domain models (User, Assignment, Submission, API types)
+    └── utils/                # Pure helper functions
+        ├── calendar.ts       # Monday-first month grid math and date grouping
+        ├── cn.ts             # Tailwind class merging utility (clsx + twMerge)
+        ├── cover.ts          # Deterministic cover image selection hash
+        ├── dates.ts          # Date formatting and overdue/due-soon calculation
+        ├── dueStyles.ts      # Semantic styling tokens based on due status
+        ├── filters.ts        # Case-insensitive filtering, status matching, sorting
+        ├── names.ts          # Honorific and first-name greeting extraction
+        ├── notifications.ts  # Derived notification generation and sorting
+        ├── routes.ts         # Navigation route constants and role path resolvers
+        ├── selectors.ts      # Assignment completion ratios and submission sorting
+        ├── stats.ts          # Pure stat calculations for overview widgets
+        └── week.ts           # Rolling 7-day week calculation for week strip
 ```
 
 ---
@@ -281,7 +300,7 @@ ClassDesk was developed to meet **WCAG 2.1 Level AA** standards:
 
 ClassDesk is configured for zero-configuration Single Page Application (SPA) deployment on **Vercel**.
 
-The repository includes `vercel.json` to handle client-side routing rewrites:
+The repository includes `frontend/vercel.json` to handle client-side routing rewrites:
 ```json
 {
   "rewrites": [
@@ -293,8 +312,9 @@ The repository includes `vercel.json` to handle client-side routing rewrites:
 To deploy your own copy:
 1. Push this repository to GitHub or GitLab.
 2. Import the repository into the [Vercel Dashboard](https://vercel.com).
-3. Set Framework Preset to **Vite**.
-4. Deploy.
+3. Set **Root Directory** to `frontend`.
+4. Set Framework Preset to **Vite**.
+5. Deploy.
 
 ---
 

@@ -1,18 +1,17 @@
-# Dependencies
+# Dependencies (at any depth)
 node_modules
 /.pnp
 .pnp.js
 
-# Production
+# Production / build outputs (at any depth)
 dist
 dist-ssr
+*.tsbuildinfo
 
-# Environment files
+# Environment files (at any depth)
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+!.env.example
 *.local
 
 # Editor directories and files

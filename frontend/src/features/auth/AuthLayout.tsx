@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react'
-import { Logo, ThemeToggle } from '@/components/ui'
+import { useState, type ReactNode } from 'react'
+import { GradientBlob, Logo, ThemeToggle } from '@/components/ui'
 
 export interface AuthLayoutProps {
   children: ReactNode
@@ -7,11 +7,32 @@ export interface AuthLayoutProps {
 
 /**
  * Shared split-screen layout for authentication pages (Login and Register).
- * Left column contains the form and branding; right column displays a solid brand-color panel.
+ * Left column contains the form and branding; right column displays the full-bleed hero image.
  */
 export function AuthLayout({ children }: AuthLayoutProps) {
+  const [heroImgFailed, setHeroImgFailed] = useState(false)
+
   return (
     <div className="min-h-screen bg-app text-fg flex flex-col lg:flex-row lg:h-screen lg:overflow-hidden">
+      {/* ------------------------------------------------------------- */}
+      {/* MOBILE / TABLET BANNER (Below lg only, 200px full-width)       */}
+      {/* ------------------------------------------------------------- */}
+      <div className="lg:hidden w-full h-[200px] overflow-hidden border-b border-line relative shrink-0 bg-surface-2">
+        {!heroImgFailed ? (
+          <img
+            src="/images/login-hero.jpg"
+            alt=""
+            aria-hidden="true"
+            loading="eager"
+            decoding="async"
+            onError={() => setHeroImgFailed(true)}
+            className="w-full h-full object-cover object-[center_35%] scale-115 origin-top-left"
+          />
+        ) : (
+          <GradientBlob seed="mobile-login-hero" variant="hero" className="h-full w-full" />
+        )}
+      </div>
+
       {/* ------------------------------------------------------------- */}
       {/* LEFT COLUMN: Form Side                                        */}
       {/* ------------------------------------------------------------- */}
@@ -23,21 +44,41 @@ export function AuthLayout({ children }: AuthLayoutProps) {
         </header>
 
         {/* Centered Main Form Area */}
-        <main className="w-full max-w-[420px] mx-auto my-6 sm:my-8 space-y-6">
+        <main className="w-full max-w-[420px] mx-auto my-8 space-y-6">
           {children}
         </main>
 
-        {/* Spacer to balance flex layout without footer tagline */}
-        <div className="shrink-0 h-4" aria-hidden="true" />
+        {/* Footer */}
+        <footer className="text-center text-xs text-muted shrink-0 pt-4">
+          ClassDesk &bull; Responsive Assignment &amp; Review Dashboard
+        </footer>
       </div>
 
       {/* ------------------------------------------------------------- */}
-      {/* RIGHT COLUMN: Solid Brand-Color Panel (lg and up)             */}
+      {/* RIGHT COLUMN: Full-Bleed Hero Image (lg and up)               */}
       {/* ------------------------------------------------------------- */}
-      <div className="hidden lg:flex lg:w-1/2 relative h-full flex-col justify-end p-12 lg:p-16 bg-primary text-primary-fg border-l border-line select-none">
-        <div className="max-w-md space-y-2">
-          <p className="font-display text-2xl lg:text-3xl font-medium tracking-tight text-white leading-snug">
+      <div className="hidden lg:block lg:w-1/2 relative h-full overflow-hidden border-l border-line bg-surface-2 select-none">
+        {!heroImgFailed ? (
+          <img
+            src="/images/login-hero.jpg"
+            alt=""
+            aria-hidden="true"
+            loading="eager"
+            decoding="async"
+            onError={() => setHeroImgFailed(true)}
+            className="w-full h-full object-cover scale-112 origin-top-left"
+          />
+        ) : (
+          <GradientBlob seed="classdesk-desktop-cover" variant="hero" className="w-full h-full" />
+        )}
+
+        {/* Bottom-left glass caption card */}
+        <div className="absolute bottom-8 left-8 max-w-md p-6 bg-surface/90 backdrop-blur-md border border-line shadow-card text-left space-y-1.5 z-10 rounded-lg">
+          <h2 className="font-display text-2xl font-bold tracking-tight text-fg">
             Every assignment, one clear view.
+          </h2>
+          <p className="font-body text-sm text-muted">
+            Students track what&apos;s due. Professors see who&apos;s done.
           </p>
         </div>
       </div>

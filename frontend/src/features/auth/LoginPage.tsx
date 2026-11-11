@@ -8,8 +8,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   AlertCircle,
   Clock,
-  Key,
   RotateCcw,
+  Sparkles,
   X,
 } from 'lucide-react'
 import {
@@ -272,7 +272,7 @@ export function LoginPage() {
         <div className="space-y-0.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5 text-xs font-semibold text-fg uppercase tracking-wider">
-              <Key className="w-3.5 h-3.5 text-accent" />
+              <Sparkles className="w-3.5 h-3.5 text-accent" />
               <span>Demo accounts</span>
             </div>
             <button

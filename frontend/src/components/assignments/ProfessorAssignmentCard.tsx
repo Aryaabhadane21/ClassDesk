@@ -11,6 +11,7 @@ import {
   Users,
 } from 'lucide-react'
 import { Badge, Button, Card, Highlight, IconButton, ProgressBar } from '@/components/ui'
+import { AssignmentCover } from '@/components/assignments/AssignmentCover'
 import { DueLabel } from '@/components/assignments/DueLabel'
 import { getAdminUrgency } from '@/utils/dueStyles'
 import { cn } from '@/utils/cn'
@@ -86,67 +87,58 @@ export function ProfessorAssignmentCard({
         aria-labelledby={titleId}
         className="flex flex-col h-full outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 rounded-lg"
       >
-        {/* Thin top colored border strip */}
-        <div
-          className={cn(
-            'h-1 w-full shrink-0',
-            urgency.tone === 'danger' && !isComplete
-              ? 'bg-danger'
-              : urgency.tone === 'warning' && !isComplete
-                ? 'bg-warning'
-                : isComplete
-                  ? 'bg-success'
-                  : 'bg-accent/40',
-          )}
-          aria-hidden="true"
-        />
+        {/* 1. Cover with AssignmentCover and type badge */}
+        <div className="relative h-[120px] w-full overflow-hidden shrink-0 border-b border-line bg-surface-2">
+          <AssignmentCover seed={assignment.id} variant="cover" className="h-full w-full" />
+          <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5">
+            <Badge
+              tone="neutral"
+              size="sm"
+              className="bg-surface/90 backdrop-blur-xs border border-line text-fg font-medium shadow-xs"
+              icon={
+                isGroup ? (
+                  <Users className="w-3 h-3 text-muted" aria-hidden="true" />
+                ) : (
+                  <User className="w-3 h-3 text-muted" aria-hidden="true" />
+                )
+              }
+            >
+              {isGroup ? 'Group' : 'Individual'}
+            </Badge>
+          </div>
+
+          <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
+            {isComplete ? (
+              <Badge
+                tone="success"
+                size="sm"
+                icon={<CheckCircle2 className="w-3 h-3" aria-hidden="true" />}
+                className="shadow-xs backdrop-blur-xs bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-200 dark:border-emerald-700 font-semibold"
+              >
+                Complete
+              </Badge>
+            ) : urgency.isUrgent ? (
+              <Badge
+                tone={urgency.tone}
+                size="sm"
+                icon={
+                  urgency.tone === 'danger' ? (
+                    <AlertTriangle className="w-3 h-3" aria-hidden="true" />
+                  ) : (
+                    <Clock className="w-3 h-3" aria-hidden="true" />
+                  )
+                }
+                className="shadow-xs backdrop-blur-xs"
+              >
+                {urgency.badgeLabel}
+              </Badge>
+            ) : null}
+          </div>
+        </div>
 
         {/* 2. Main Content Body */}
         <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-4">
-          <div className="space-y-3">
-            {/* Header row with Type & Status Badges */}
-            <div className="flex items-center justify-between gap-2">
-              <Badge
-                tone="neutral"
-                size="sm"
-                icon={
-                  isGroup ? (
-                    <Users className="w-3 h-3 text-muted" aria-hidden="true" />
-                  ) : (
-                    <User className="w-3 h-3 text-muted" aria-hidden="true" />
-                  )
-                }
-              >
-                {isGroup ? 'Group' : 'Individual'}
-              </Badge>
-
-              {isComplete ? (
-                <Badge
-                  tone="success"
-                  size="sm"
-                  icon={<CheckCircle2 className="w-3 h-3" aria-hidden="true" />}
-                  className="bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-200 dark:border-emerald-700 font-semibold"
-                >
-                  Complete
-                </Badge>
-              ) : urgency.isUrgent ? (
-                <Badge
-                  tone={urgency.tone}
-                  size="sm"
-                  icon={
-                    urgency.tone === 'danger' ? (
-                      <AlertTriangle className="w-3 h-3" aria-hidden="true" />
-                    ) : (
-                      <Clock className="w-3 h-3" aria-hidden="true" />
-                    )
-                  }
-                >
-                  {urgency.badgeLabel}
-                </Badge>
-              ) : null}
-            </div>
-
-            <div className="space-y-2">
+          <div className="space-y-2">
               {/* Title */}
               <h3
                 id={titleId}
@@ -160,7 +152,6 @@ export function ProfessorAssignmentCard({
                 <Highlight text={assignment.description} query={searchQuery} />
               </p>
             </div>
-          </div>
 
           <div className="space-y-3 pt-1">
             {/* Due Label with Urgency styling (never color alone: icon + text) */}

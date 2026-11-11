@@ -51,29 +51,27 @@
 }
 
 :root {
-  /* Warm Crisp Light Palette */
-  --color-app: #F7F5F0;
-  --color-surface: #FFFFFF;
-  --color-surface-2: #EFECE6;
-  --color-line: #E2DDD5;
-  --color-fg: #1C2426;
-  --color-muted: #64748B;
-
-  /* Primary & Accent: Deep Teal */
-  --color-primary: #0F766E;
+  /* Warm Cream Light Palette */
+  --color-app: #F7F0E6;
+  --color-surface: #FFFCF7;
+  --color-surface-2: #F1E7DA;
+  --color-line: #E6D9C6;
+  --color-fg: #231B2E;
+  --color-muted: #6F6478;
+  --color-primary: #2A1B4A;
   --color-primary-fg: #FFFFFF;
-  --color-accent: #0F766E;
+  --color-accent: #6B3FD4;
   --color-accent-fg: #FFFFFF;
-  --color-accent-soft: #CCFBF1;
-  --peach: #E6F4F1;
-  --lilac: #D1EBE8;
+  --color-accent-soft: #EADFFB;
+  --peach: #F4B896;
+  --lilac: #D9C3F0;
 
-  /* Status Colors (Light Theme: High contrast >= 4.5:1 against surfaces) */
-  --color-success: #15803D;
+  /* Retuned Status Colors (Light Theme: High contrast >= 4.5:1 against surfaces & soft backgrounds) */
+  --color-success: #166534;
   --color-success-fg: #FFFFFF;
-  --color-success-soft: #DCFCE7;
+  --color-success-soft: #DEF7EC;
 
-  --color-warning: #B45309;
+  --color-warning: #92400E;
   --color-warning-fg: #FFFFFF;
   --color-warning-soft: #FEF3C7;
 
@@ -81,24 +79,24 @@
   --color-danger-fg: #FFFFFF;
   --color-danger-soft: #FEE2E2;
 
-  --color-info: #0369A1;
+  --color-info: #1D4ED8;
   --color-info-fg: #FFFFFF;
-  --color-info-soft: #E0F2FE;
+  --color-info-soft: #E1EFFE;
 
-  /* Decorative Tints */
-  --color-tint-peach: #E6F4F1;
-  --color-tint-amber: #FEF3C7;
-  --color-tint-lilac: #D1EBE8;
+  /* Decorative Tints (GradientBlob / Covers) */
+  --color-tint-peach: #F4B896;
+  --color-tint-amber: #FDE68A;
+  --color-tint-lilac: #D9C3F0;
 
-  /* Radii Tokens: 6px small, 8px default, 10px large */
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 10px;
+  /* Radii */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
   --radius-pill: 9999px;
 
-  /* Shadows: Flat, clean border-first surfaces */
-  --shadow-card: none;
-  --shadow-pop: none;
+  /* Shadows */
+  --shadow-card: 0 1px 3px 0 rgba(42, 27, 74, 0.05), 0 1px 2px -1px rgba(42, 27, 74, 0.04);
+  --shadow-pop: 0 10px 25px -5px rgba(42, 27, 74, 0.09), 0 8px 10px -6px rgba(42, 27, 74, 0.04);
 
   /* Fonts */
   --font-display: "Fraunces", Georgia, serif;
@@ -106,48 +104,46 @@
 }
 
 .dark {
-  /* High-Contrast Deep Slate/Teal-Tinted Dark Palette */
-  --color-app: #0F1416;
-  --color-surface: #151D20;
-  --color-surface-2: #1E282C;
-  --color-line: #2C3A40;
-  --color-fg: #F1F5F9;
-  --color-muted: #94A3B8;
+  /* Violet-Tinted Near Black Dark Palette */
+  --color-app: #0D0A14;
+  --color-surface: #17121F;
+  --color-surface-2: #1F1829;
+  --color-line: #2E2540;
+  --color-fg: #F6F0FA;
+  --color-muted: #A89CB8;
+  --color-primary: #F6F0FA;
+  --color-primary-fg: #0D0A14;
+  --color-accent: #A78BFA;
+  --color-accent-fg: #130B24;
+  --color-accent-soft: #2A2146;
+  --peach: #F4A77C;
+  --lilac: #8E7BC9;
 
-  /* Primary & Accent: Luminous Deep Teal */
-  --color-primary: #2DD4BF;
-  --color-primary-fg: #042F2E;
-  --color-accent: #2DD4BF;
-  --color-accent-fg: #042F2E;
-  --color-accent-soft: rgba(45, 212, 191, 0.16);
-  --peach: #1A3438;
-  --lilac: #17383D;
-
-  /* Status Colors (Dark Theme: High contrast & solid visibility) */
+  /* Status Colors (Dark Theme: High contrast & vibrance) */
   --color-success: #4ADE80;
   --color-success-fg: #052E16;
-  --color-success-soft: rgba(74, 222, 128, 0.18);
+  --color-success-soft: rgba(74, 222, 128, 0.16);
 
   --color-warning: #FBBF24;
   --color-warning-fg: #451A03;
-  --color-warning-soft: rgba(251, 191, 36, 0.18);
+  --color-warning-soft: rgba(251, 191, 36, 0.16);
 
   --color-danger: #F87171;
   --color-danger-fg: #450A0A;
-  --color-danger-soft: rgba(248, 113, 113, 0.18);
+  --color-danger-soft: rgba(248, 113, 113, 0.16);
 
-  --color-info: #38BDF8;
+  --color-info: #60A5FA;
   --color-info-fg: #082F49;
-  --color-info-soft: rgba(56, 189, 248, 0.18);
+  --color-info-soft: rgba(96, 165, 250, 0.16);
 
-  /* Decorative Tints */
-  --color-tint-peach: rgba(45, 212, 191, 0.15);
-  --color-tint-amber: rgba(251, 191, 36, 0.15);
-  --color-tint-lilac: rgba(56, 189, 248, 0.15);
+  /* Decorative Tints (Dark Mode subtle vibrance) */
+  --color-tint-peach: rgba(244, 167, 124, 0.28);
+  --color-tint-amber: rgba(253, 230, 138, 0.28);
+  --color-tint-lilac: rgba(142, 123, 201, 0.28);
 
-  /* Shadows: Flat, clean border-first surfaces */
-  --shadow-card: none;
-  --shadow-pop: none;
+  /* Shadows */
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.3);
+  --shadow-pop: 0 12px 28px -4px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
 
   /* Fonts */
   --font-display: "Outfit", system-ui, sans-serif;
@@ -158,7 +154,7 @@ body {
   font-family: var(--font-body);
   color: var(--color-fg);
   background-color: var(--color-app);
-  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 @media (prefers-reduced-motion: reduce) {

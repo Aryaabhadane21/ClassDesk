@@ -7,6 +7,7 @@ import {
 } from '@/app/guards'
 import { AppShell } from '@/components/layout/AppShell'
 import { LoginPage } from '@/features/auth/LoginPage'
+import { RegisterPage } from '@/features/auth/RegisterPage'
 import { StudentDashboardPage } from '@/features/student/StudentDashboardPage'
 import { StudentCalendarPage } from '@/features/student/StudentCalendarPage'
 import { AdminAssignmentsPage } from '@/features/admin/AdminAssignmentsPage'
@@ -28,6 +29,16 @@ export function AppRouter() {
           element={
             <PublicOnlyRoute>
               <LoginPage />
+            </PublicOnlyRoute>
+          }
+        />
+
+        {/* Public Register Route */}
+        <Route
+          path="/register"
+          element={
+            <PublicOnlyRoute>
+              <RegisterPage />
             </PublicOnlyRoute>
           }
         />

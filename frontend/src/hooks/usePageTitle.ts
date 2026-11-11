@@ -6,7 +6,8 @@ import { useEffect } from 'react'
 export function usePageTitle(title?: string): void {
   useEffect(() => {
     if (title && title.trim()) {
-      document.title = `${title.trim()} · ClassDesk`
+      const trimmed = title.trim()
+      document.title = trimmed.endsWith('· ClassDesk') ? trimmed : `${trimmed} · ClassDesk`
     } else {
       document.title = 'ClassDesk'
     }

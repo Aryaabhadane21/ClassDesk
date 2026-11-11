@@ -13,7 +13,7 @@ describe('Integration: Login Flow', () => {
     const submitBtn = screen.getByRole('button', { name: /sign in/i })
     await user.click(submitBtn)
 
-    expect(screen.getByText(/email address is required/i)).toBeInTheDocument()
+    expect(screen.getByText(/email is required/i)).toBeInTheDocument()
 
     // Now type email and leave password empty
     const emailInput = screen.getByLabelText(/email address/i)
@@ -109,5 +109,55 @@ describe('Integration: Login Flow', () => {
       expect(screen.queryByText('Reset demo data?')).not.toBeInTheDocument()
       expect(screen.getByText(/demo data has been reset/i)).toBeInTheDocument()
     })
+  })
+
+  it('renders a link to the registration page', () => {
+    renderWithProviders(<LoginPage />)
+    const registerLink = screen.getByRole('link', { name: /create an account/i })
+    expect(registerLink).toBeInTheDocument()
+    expect(registerLink).toHaveAttribute('href', '/register')
+  })
+
+  it('displays dismissible expired session notice and dismisses on click or typing', async () => {
+    const user = userEvent.setup()
+
+    // Expired token in storage triggers sessionNotice='expired' on mount
+    const { createToken, setStoredToken } = await import('@/services/auth/token')
+    const expiredToken = createToken(
+      { id: 'user-student-1', name: 'Aarav Sharma', email: 'aarav@classdesk.edu', role: 'student' },
+      Date.now() - 3600000 * 24,
+      -3600,
+    )
+    setStoredToken(expiredToken)
+
+    renderWithProviders(<LoginPage />)
+
+    // The expired banner should be displayed
+    const notice = await screen.findByRole('status')
+    expect(notice).toHaveTextContent(/your session expired\. please sign in again/i)
+
+    // Dismiss with X button
+    const dismissBtn = screen.getByRole('button', { name: /dismiss message/i })
+    await user.click(dismissBtn)
+
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+  })
+
+  it('clears session notice when user starts typing', async () => {
+    const user = userEvent.setup()
+
+    const { setStoredToken } = await import('@/services/auth/token')
+    setStoredToken('invalid.token.string')
+
+    renderWithProviders(<LoginPage />)
+
+    const notice = await screen.findByRole('status')
+    expect(notice).toHaveTextContent(/your session was not valid\. please sign in again/i)
+
+    // Typing in email clears notice
+    const emailInput = screen.getByLabelText(/email address/i)
+    await user.type(emailInput, 'a')
+
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
   })
 })

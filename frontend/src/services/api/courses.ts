@@ -9,6 +9,8 @@ import {
   simulateNetwork,
   toSafeUser,
 } from '@/services/api/core'
+import { CURRENT_SEMESTER } from '@/utils/constants'
+import { getDueInfo } from '@/utils/dates'
 import { validateCourse } from '@/utils/validation'
 import type {
   Course,
@@ -157,7 +159,7 @@ export async function createCourse(
 
   const rawName = input.name ? input.name.trim() : ''
   const rawDesc = input.description ? input.description.trim() : ''
-  const semester = input.semester?.trim() || 'Autumn 2026'
+  const semester = input.semester?.trim() || CURRENT_SEMESTER
 
   const existingCodes = new Set(courses.map((c) => c.joinCode))
   const joinCode = generateJoinCode(existingCodes)
@@ -236,22 +238,38 @@ export async function listStudentCourses(
       ? buildGroupDetail(studentGroup, usersMap)
       : null
 
-    // Compute acknowledgedCount: individual submitted + group acknowledged for student's group
+    // Compute completion, overdue, and dueSoon counts relative to current time
     let acknowledgedCount = 0
+    let overdueCount = 0
+    let dueSoonCount = 0
+    const now = new Date()
+
     for (const asg of courseAssignments) {
+      let isCompleted = false
       if (asg.submissionType === 'individual') {
         const sub = submissions.find(
           (s) => s.assignmentId === asg.id && s.studentId === studentId,
         )
         if (sub?.status === 'submitted') {
-          acknowledgedCount++
+          isCompleted = true
         }
       } else if (asg.submissionType === 'group' && studentGroup) {
         const ack = groupAcks.find(
           (ga) => ga.assignmentId === asg.id && ga.groupId === studentGroup.id,
         )
         if (ack) {
-          acknowledgedCount++
+          isCompleted = true
+        }
+      }
+
+      if (isCompleted) {
+        acknowledgedCount++
+      } else {
+        const dueInfo = getDueInfo(asg.dueDate, now)
+        if (dueInfo.state === 'overdue') {
+          overdueCount++
+        } else if (dueInfo.state === 'due_today' || dueInfo.state === 'due_soon') {
+          dueSoonCount++
         }
       }
     }
@@ -261,6 +279,8 @@ export async function listStudentCourses(
       professor,
       assignmentCount,
       acknowledgedCount,
+      overdueCount,
+      dueSoonCount,
       myGroup,
     }
   })
@@ -358,11 +378,11 @@ export async function joinCourseByCode(
   }
 
   // 1. Create enrollment
-  const now = new Date().toISOString()
+  const nowIso = new Date().toISOString()
   const newEnrollment: Enrollment = {
     courseId: matchedCourse.id,
     studentId,
-    enrolledAt: now,
+    enrolledAt: nowIso,
   }
   setEnrollments([...enrollments, newEnrollment])
 
@@ -373,7 +393,7 @@ export async function joinCourseByCode(
         return {
           ...asg,
           assignedTo: [...asg.assignedTo, studentId],
-          updatedAt: now,
+          updatedAt: nowIso,
         }
       }
     }
@@ -429,21 +449,37 @@ export async function joinCourseByCode(
   )
 
   let acknowledgedCount = 0
+  let overdueCount = 0
+  let dueSoonCount = 0
+  const nowDate = new Date()
   const allSubmissions = [...submissions, ...newSubmissions]
+
   for (const asg of courseAssignments) {
+    let isCompleted = false
     if (asg.submissionType === 'individual') {
       const sub = allSubmissions.find(
         (s) => s.assignmentId === asg.id && s.studentId === studentId,
       )
       if (sub?.status === 'submitted') {
-        acknowledgedCount++
+        isCompleted = true
       }
     } else if (asg.submissionType === 'group' && studentGroup) {
       const ack = groupAcks.find(
         (ga) => ga.assignmentId === asg.id && ga.groupId === studentGroup.id,
       )
       if (ack) {
-        acknowledgedCount++
+        isCompleted = true
+      }
+    }
+
+    if (isCompleted) {
+      acknowledgedCount++
+    } else {
+      const dueInfo = getDueInfo(asg.dueDate, nowDate)
+      if (dueInfo.state === 'overdue') {
+        overdueCount++
+      } else if (dueInfo.state === 'due_today' || dueInfo.state === 'due_soon') {
+        dueSoonCount++
       }
     }
   }
@@ -453,6 +489,8 @@ export async function joinCourseByCode(
     professor,
     assignmentCount: courseAssignments.length,
     acknowledgedCount,
+    overdueCount,
+    dueSoonCount,
     myGroup: studentGroup ? buildGroupDetail(studentGroup, usersMap) : null,
   }
 }

@@ -130,6 +130,34 @@ export function validateCourse(input: Partial<CourseInput>): CourseErrors {
 }
 
 /**
+ * Normalizes a raw join code input: trims, uppercases, and collapses spaces.
+ */
+export function normalizeJoinCode(code?: string): string {
+  if (!code) return ''
+  return code.trim().toUpperCase().replace(/\s+/g, '')
+}
+
+/**
+ * Validates a student course join code.
+ * Enforces:
+ * - Required
+ * - 4-16 characters after trimming (letters, digits, dashes only)
+ */
+export function validateJoinCode(code?: string): string | undefined {
+  const raw = code ? code.trim() : ''
+  if (!raw) {
+    return 'Enter the join code your professor gave you'
+  }
+
+  const normalized = normalizeJoinCode(raw)
+  if (normalized.length < 4 || normalized.length > 16 || !/^[A-Z0-9-]+$/.test(normalized)) {
+    return 'Join codes only contain letters, numbers and dashes'
+  }
+
+  return undefined
+}
+
+/**
  * Helper to determine if an errors map contains any field errors.
  */
 export function hasErrors(errors: Record<string, string | undefined>): boolean {

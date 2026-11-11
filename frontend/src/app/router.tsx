@@ -9,6 +9,8 @@ import { AppShell } from '@/components/layout/AppShell'
 import { LoginPage } from '@/features/auth/LoginPage'
 import { RegisterPage } from '@/features/auth/RegisterPage'
 import { StudentDashboardPage } from '@/features/student/StudentDashboardPage'
+import { StudentCoursePage } from '@/features/student/StudentCoursePage'
+import { StudentAssignmentsPage } from '@/features/student/StudentAssignmentsPage'
 import { StudentCalendarPage } from '@/features/student/StudentCalendarPage'
 import { ProfessorDashboardPage } from '@/features/admin/ProfessorDashboardPage'
 import { ProfessorCoursePage } from '@/features/admin/ProfessorCoursePage'
@@ -57,6 +59,9 @@ export function AppRouter() {
           }
         >
           <Route index element={<StudentDashboardPage />} />
+          <Route path="courses/:courseId" element={<StudentCoursePage />} />
+          {/* temporary, replaced by the course assignments page in step 10 */}
+          <Route path="legacy" element={<StudentAssignmentsPage />} />
           <Route path="calendar" element={<StudentCalendarPage />} />
         </Route>
 

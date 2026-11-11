@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { getStudentStats, getAdminStats, getProfessorCourseStats } from '@/utils/stats'
-import type { StudentAssignment, AdminAssignment, ProfessorCourse } from '@/types'
+import { getStudentStats, getAdminStats, getProfessorCourseStats, getStudentCourseStats } from '@/utils/stats'
+import type { StudentAssignment, AdminAssignment, ProfessorCourse, StudentCourse } from '@/types'
 
 describe('Unit: Stats Calculation Helpers', () => {
   const fixedNow = new Date(2026, 10, 5, 12, 0, 0)
@@ -185,6 +185,65 @@ describe('Unit: Stats Calculation Helpers', () => {
         studentCount: 9,
         assignmentCount: 5,
         groupCount: 3,
+      })
+    })
+  })
+
+  describe('getStudentCourseStats', () => {
+    it('returns zeroes for an empty list of student courses', () => {
+      const stats = getStudentCourseStats([])
+      expect(stats).toEqual({
+        courseCount: 0,
+        assignmentCount: 0,
+        completedCount: 0,
+        overdueCount: 0,
+      })
+    })
+
+    it('accurately sums metrics across multiple student courses', () => {
+      const mockStudentCourses: StudentCourse[] = [
+        {
+          id: 'c1',
+          code: 'WEB101',
+          name: 'Web Dev',
+          description: 'Frontend & backend',
+          semester: 'Autumn 2026',
+          professorId: 'p1',
+          professorName: 'Prof. Ada Lovelace',
+          joinCode: 'WEB-4K7P',
+          createdAt: new Date().toISOString(),
+          enrolledAt: new Date().toISOString(),
+          assignmentCount: 3,
+          acknowledgedCount: 2,
+          overdueCount: 1,
+          dueSoonCount: 0,
+          myGroup: { id: 'g1', name: 'Alpha', role: 'leader' },
+        },
+        {
+          id: 'c2',
+          code: 'HCI210',
+          name: 'HCI',
+          description: 'Design course',
+          semester: 'Autumn 2026',
+          professorId: 'p2',
+          professorName: 'Prof. Alan Turing',
+          joinCode: 'HCI-9M2X',
+          createdAt: new Date().toISOString(),
+          enrolledAt: new Date().toISOString(),
+          assignmentCount: 2,
+          acknowledgedCount: 2,
+          overdueCount: 0,
+          dueSoonCount: 1,
+          myGroup: null,
+        },
+      ]
+
+      const stats = getStudentCourseStats(mockStudentCourses)
+      expect(stats).toEqual({
+        courseCount: 2,
+        assignmentCount: 5,
+        completedCount: 4,
+        overdueCount: 1,
       })
     })
   })

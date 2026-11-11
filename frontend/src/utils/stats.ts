@@ -1,4 +1,4 @@
-import type { StudentAssignment, AdminAssignment, ProfessorCourse } from '@/types'
+import type { StudentAssignment, AdminAssignment, ProfessorCourse, StudentCourse } from '@/types'
 import { getDueInfo } from '@/utils/dates'
 import { getCompletion } from '@/utils/selectors'
 
@@ -105,5 +105,24 @@ export function getProfessorCourseStats(courses: ProfessorCourse[]): ProfessorCo
     studentCount: courses.reduce((acc, c) => acc + (c.studentCount || 0), 0),
     assignmentCount: courses.reduce((acc, c) => acc + (c.assignmentCount || 0), 0),
     groupCount: courses.reduce((acc, c) => acc + (c.groupCount || 0), 0),
+  }
+}
+
+export interface StudentCourseStats {
+  courseCount: number
+  assignmentCount: number
+  completedCount: number
+  overdueCount: number
+}
+
+/**
+ * Computes overview metrics across all courses enrolled by a student.
+ */
+export function getStudentCourseStats(courses: StudentCourse[]): StudentCourseStats {
+  return {
+    courseCount: courses.length,
+    assignmentCount: courses.reduce((acc, c) => acc + (c.assignmentCount || 0), 0),
+    completedCount: courses.reduce((acc, c) => acc + (c.acknowledgedCount || 0), 0),
+    overdueCount: courses.reduce((acc, c) => acc + (c.overdueCount || 0), 0),
   }
 }

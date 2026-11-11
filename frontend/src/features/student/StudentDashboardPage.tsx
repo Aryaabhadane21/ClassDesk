@@ -1,411 +1,270 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { AlertTriangle, Award, CheckCircle2, Clock } from 'lucide-react'
+import { useMemo, useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import {
+  AlertTriangle,
+  BookOpen,
+  CheckCircle2,
+  ClipboardList,
+  Plus,
+  Search,
+} from 'lucide-react'
 import { PageHeader } from '@/components/layout/PageHeader'
 import {
-  Badge,
   Button,
   EmptyState,
   ErrorState,
   Eyebrow,
+  SearchInput,
   Skeleton,
-  SkeletonCard,
   StatCard,
-  useToast,
 } from '@/components/ui'
 import {
-  AssignmentToolbar,
-  ProgressSummary,
-  StudentAssignmentCard,
-} from '@/components/assignments'
-import { WeekStrip } from '@/components/assignments/WeekStrip'
-import { SubmitConfirmation } from '@/features/student/SubmitConfirmation'
+  JoinCourseModal,
+  StudentCourseCard,
+} from '@/components/courses'
 import { useAuth } from '@/context/AuthContext'
-import { useStudentAssignments } from '@/features/student/useStudentAssignments'
-import { useAssignmentFilters } from '@/hooks/useAssignmentFilters'
-import {
-  matchesDueFilter,
-  searchMatches,
-  sortAssignments,
-  type StudentStatusFilter,
-} from '@/utils/filters'
-import { mockApi, ApiError } from '@/services/mockApi'
+import { useStudentCourses } from '@/features/student/useStudentCourses'
+import { useDebounce } from '@/hooks/useDebounce'
 import { usePageTitle } from '@/hooks/usePageTitle'
+import { CURRENT_SEMESTER } from '@/utils/constants'
 import { getGreetingName } from '@/utils/names'
-import { getStudentStats } from '@/utils/stats'
-import type { StudentAssignment } from '@/types'
-
-const STUDENT_STATUS_OPTIONS = [
-  { label: 'All', value: 'all' },
-  { label: 'To do', value: 'todo' },
-  { label: 'Submitted', value: 'submitted' },
-]
+import { getStudentCourseStats } from '@/utils/stats'
 
 export function StudentDashboardPage() {
+  usePageTitle('Courses · ClassDesk')
   const { user } = useAuth()
-  const { success, error: toastError } = useToast()
-  usePageTitle('Your Assignments')
+  const { courses, status, error, reload, addCourse } = useStudentCourses()
 
-  const greetingName = getGreetingName(user?.name)
-  const { assignments, status, error, reload, updateAssignment, counts } =
-    useStudentAssignments()
+  const [isJoinModalOpen, setIsJoinModalOpen] = useState(false)
 
-  // Filter & Search URL hook
-  const {
-    filters,
-    searchQuery,
-    setSearchQuery,
-    debouncedQuery,
-    setFilter,
-    clearFilters,
-    hasActiveFilters,
-  } = useAssignmentFilters<StudentStatusFilter>({
-    defaultSort: 'due_asc',
-    validStatusValues: ['all', 'todo', 'submitted'],
-  })
+  // URL search query synchronization
+  const [searchParams, setSearchParams] = useSearchParams()
+  const urlQuery = searchParams.get('q') || ''
+  const [searchQuery, setSearchQuery] = useState(urlQuery)
+  const debouncedQuery = useDebounce(searchQuery, 250)
 
-  // Two-step submission confirmation flow state
-  const [pendingAssignment, setPendingAssignment] =
-    useState<StudentAssignment | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitError, setSubmitError] = useState<string | null>(null)
-  const [justSubmittedId, setJustSubmittedId] = useState<string | null>(null)
-  const triggerButtonRef = useRef<HTMLButtonElement | null>(null)
-  const isMountedRef = useRef(true)
-
-  const stats = useMemo(() => getStudentStats(assignments), [assignments])
-
+  // Sync debounced search to URL search param
   useEffect(() => {
-    isMountedRef.current = true
-    return () => {
-      isMountedRef.current = false
-    }
-  }, [])
-
-  // 3. Compute status counts based on current search & due filter
-  const filteredBySearchAndDue = useMemo(() => {
-    return assignments.filter((item) => {
-      return searchMatches(item, debouncedQuery) && matchesDueFilter(item.dueDate, filters.due)
-    })
-  }, [assignments, debouncedQuery, filters.due])
-
-  const statusCounts = useMemo(() => ({
-    all: filteredBySearchAndDue.length,
-    todo: filteredBySearchAndDue.filter((a) => a.status !== 'submitted').length,
-    submitted: filteredBySearchAndDue.filter((a) => a.status === 'submitted').length,
-  }), [filteredBySearchAndDue])
-
-  // Partition, filter, and sort assignments
-  const { todoAssignments, submittedAssignments, totalFiltered } = useMemo(() => {
-    // 1. Filter "To do"
-    let todo: StudentAssignment[] = []
-    if (filters.status !== 'submitted') {
-      todo = assignments.filter((a) => {
-        if (a.status === 'submitted') return false
-        if (!searchMatches(a, debouncedQuery)) return false
-        if (!matchesDueFilter(a.dueDate, filters.due)) return false
-        return true
-      })
-      // Sorting inside todo
-      todo = sortAssignments(todo, filters.sort)
-    }
-
-    // 2. Filter "Submitted"
-    let submitted: StudentAssignment[] = []
-    if (filters.status !== 'todo') {
-      submitted = assignments.filter((a) => {
-        if (a.status !== 'submitted') return false
-        if (!searchMatches(a, debouncedQuery)) return false
-        if (!matchesDueFilter(a.dueDate, filters.due)) return false
-        return true
-      })
-
-      // If user chose non-default sort, apply it; otherwise keep recency order
-      if (filters.sort !== 'due_asc') {
-        submitted = sortAssignments(submitted, filters.sort)
-      } else {
-        submitted.sort((a, b) => {
-          const timeA = new Date(a.submittedAt || a.updatedAt).getTime()
-          const timeB = new Date(b.submittedAt || b.updatedAt).getTime()
-          return timeB - timeA // Most recently submitted first
-        })
-      }
-    }
-
-    return {
-      todoAssignments: todo,
-      submittedAssignments: submitted,
-      totalFiltered: todo.length + submitted.length,
-    }
-  }, [assignments, debouncedQuery, filters.due, filters.sort, filters.status])
-
-  // Open confirmation dialog
-  const handleSubmitClick = (
-    assignment: StudentAssignment,
-    buttonEl: HTMLButtonElement,
-  ) => {
-    triggerButtonRef.current = buttonEl
-    setPendingAssignment(assignment)
-    setSubmitError(null)
-  }
-
-  // Cancel flow: Close and return focus to trigger button
-  const handleCancelSubmit = () => {
-    setPendingAssignment(null)
-    setSubmitError(null)
-    setTimeout(() => {
-      triggerButtonRef.current?.focus()
-    }, 50)
-  }
-
-  // Final confirmation execution
-  const handleConfirmSubmit = async () => {
-    if (!user || !pendingAssignment || isSubmitting) return
-
-    const assignmentId = pendingAssignment.id
-    const assignmentTitle = pendingAssignment.title
-
-    setIsSubmitting(true)
-    setSubmitError(null)
-
-    try {
-      const updated = await mockApi.markSubmitted(user.id, assignmentId)
-
-      if (!isMountedRef.current) return
-
-      // In-place state update
-      updateAssignment(updated)
-      setPendingAssignment(null)
-      setJustSubmittedId(assignmentId)
-      success(`Marked as submitted: ${assignmentTitle}`, 'Submission Confirmed')
-
-      // If filter hides the submitted card (e.g. status === 'todo'), move focus to results count
-      setTimeout(() => {
-        const cardEl = document.getElementById(`assignment-card-${assignmentId}`)
-        if (cardEl && document.body.contains(cardEl)) {
-          cardEl.focus()
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev)
+        if (debouncedQuery.trim()) {
+          next.set('q', debouncedQuery.trim())
         } else {
-          const resultsCountEl = document.getElementById(
-            'assignment-results-count',
-          )
-          resultsCountEl?.focus()
+          next.delete('q')
         }
-      }, 100)
-    } catch (err) {
-      if (!isMountedRef.current) return
+        return next
+      },
+      { replace: true },
+    )
+  }, [debouncedQuery, setSearchParams])
 
-      const errorMsg =
-        err instanceof Error
-          ? err.message
-          : 'Failed to mark assignment as submitted.'
-      setSubmitError(errorMsg)
-
-      if (err instanceof ApiError && err.code !== 'VALIDATION') {
-        toastError(errorMsg, 'Submission Failed')
-      }
-    } finally {
-      if (isMountedRef.current) {
-        setIsSubmitting(false)
-      }
+  // Sync state if URL changes externally (e.g. browser history navigation)
+  useEffect(() => {
+    const q = searchParams.get('q') || ''
+    if (q !== searchQuery && q !== debouncedQuery) {
+      setSearchQuery(q)
     }
-  }
+  }, [searchParams]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Filter courses by name, code, description, or professor name (case-insensitive)
+  const filteredCourses = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase()
+    if (!q) return courses
+    return courses.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.code.toLowerCase().includes(q) ||
+        c.description.toLowerCase().includes(q) ||
+        c.professor.name.toLowerCase().includes(q),
+    )
+  }, [courses, searchQuery])
+
+  // Overview metrics across all enrolled courses (never affected by search)
+  const stats = useMemo(() => getStudentCourseStats(courses), [courses])
+
+  const greeting = user?.name ? getGreetingName(user.name) : 'there'
+  const headerDescription = `Courses you're enrolled in for ${CURRENT_SEMESTER}. Welcome back, ${greeting}.`
 
   return (
     <div className="space-y-8">
-      {/* 1. Page Header */}
+      {/* Page Header */}
       <PageHeader
-        title="Your assignments"
-        description={`Hello, ${greetingName}! Track your homework, deadlines, and completed deliverables.`}
+        title="Your courses"
+        description={headerDescription}
+        actions={
+          <Button
+            type="button"
+            variant="primary"
+            leftIcon={<Plus className="w-4 h-4" />}
+            onClick={() => setIsJoinModalOpen(true)}
+          >
+            Join a course
+          </Button>
+        }
       />
 
-      {/* Overview Stat Cards Row */}
-      <section aria-label="Course overview" className="space-y-3 text-left">
-        <Eyebrow>OVERVIEW</Eyebrow>
+      {/* ------------------------------------------------------------- */}
+      {/* 1. OVERVIEW METRICS ROW                                       */}
+      {/* ------------------------------------------------------------- */}
+      <section aria-labelledby="student-courses-overview" className="space-y-3">
+        <Eyebrow id="student-courses-overview">Overview</Eyebrow>
+
         {status === 'loading' ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-            <Skeleton className="h-24 w-full" rounded="lg" />
-            <Skeleton className="h-24 w-full" rounded="lg" />
-            <Skeleton className="h-24 w-full" rounded="lg" />
-            <Skeleton className="h-24 w-full" rounded="lg" />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" aria-busy="true">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="p-4 sm:p-5 flex items-center gap-3.5 bg-surface border border-line rounded-lg"
+              >
+                <Skeleton className="w-10 h-10 sm:w-11 sm:h-11 rounded-pill shrink-0" />
+                <div className="space-y-2 flex-1 min-w-0">
+                  <Skeleton className="h-7 w-12" />
+                  <Skeleton className="h-3.5 w-24" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <StatCard
-              label="Due today"
-              value={stats.dueToday}
-              icon={<Clock className="w-4 h-4" />}
+              label="Courses"
+              value={stats.courseCount}
+              icon={<BookOpen className="w-5 h-5" />}
+            />
+            <StatCard
+              label="Assignments"
+              value={stats.assignmentCount}
+              icon={<ClipboardList className="w-5 h-5" />}
+            />
+            <StatCard
+              label="Completed"
+              value={stats.completedCount}
+              icon={<CheckCircle2 className="w-5 h-5" />}
             />
             <StatCard
               label="Overdue"
-              value={stats.overdue}
-              icon={<AlertTriangle className="w-4 h-4" />}
-              tone={stats.overdue > 0 ? 'danger' : 'default'}
-            />
-            <StatCard
-              label="Submitted"
-              value={stats.submitted}
-              icon={<CheckCircle2 className="w-4 h-4" />}
-            />
-            <StatCard
-              label="Completion"
-              value={`${stats.completionPercent}%`}
-              icon={<Award className="w-4 h-4" />}
+              value={stats.overdueCount}
+              icon={<AlertTriangle className="w-5 h-5" />}
+              tone={stats.overdueCount > 0 ? 'danger' : 'default'}
             />
           </div>
         )}
       </section>
 
-      {/* 2. Loading State */}
-      {status === 'loading' && (
-        <div className="space-y-8 animate-fade-in" aria-busy="true">
-          <Skeleton className="h-32 w-full" rounded="lg" />
-          <div className="space-y-4">
-            <Skeleton className="h-10 w-full" rounded="pill" />
-            <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
-              <SkeletonCard />
-              <SkeletonCard />
-              <SkeletonCard />
-              <SkeletonCard />
-            </div>
-          </div>
-        </div>
-      )}
+      {/* ------------------------------------------------------------- */}
+      {/* 2. COURSES SECTION & SEARCH TOOLBAR                           */}
+      {/* ------------------------------------------------------------- */}
+      <section aria-labelledby="student-courses-list" className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <Eyebrow id="student-courses-list">Your Courses</Eyebrow>
 
-      {/* 3. Error State */}
-      {status === 'error' && (
-        <ErrorState
-          title="Could not load assignments"
-          message={
-            error || 'An unexpected error occurred while loading your assignments.'
-          }
-          onRetry={reload}
-          retryLabel="Try again"
-        />
-      )}
-
-      {/* 4. Total Empty State (Zero assignments from seed/api) */}
-      {status === 'success' && assignments.length === 0 && (
-        <div className="space-y-6">
-          <ProgressSummary submitted={0} total={0} />
-          <EmptyState
-            title="No assignments yet"
-            description="You have not been assigned any course deliverables yet. Check back soon for new assignments."
-          />
-        </div>
-      )}
-
-      {/* 5. Success Content */}
-      {status === 'success' && assignments.length > 0 && (
-        <div className="space-y-8">
-          {/* Progress Summary Card: ALWAYS reflects the full set of assignments */}
-          <ProgressSummary submitted={counts.submitted} total={counts.total} />
-
-          {/* This week horizontal strip */}
-          <WeekStrip assignments={assignments} />
-
-          {/* Shared Toolbar between progress and groups */}
-          <AssignmentToolbar
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            statusValue={filters.status}
-            onStatusChange={(val) => setFilter('status', val as StudentStatusFilter)}
-            statusOptions={STUDENT_STATUS_OPTIONS}
-            statusCounts={statusCounts}
-            statusLabel="Submission status"
-            dueValue={filters.due}
-            onDueChange={(due) => setFilter('due', due)}
-            sortValue={filters.sort}
-            onSortChange={(sort) => setFilter('sort', sort)}
-            hasActiveFilters={hasActiveFilters}
-            onClearFilters={clearFilters}
-            resultCount={totalFiltered}
-            totalCount={assignments.length}
-          />
-
-          {/* Filter Empty State (no matches after filtering) */}
-          {totalFiltered === 0 ? (
-            <EmptyState
-              title="No matching assignments"
-              description="No assignments match your search query and filters. Try clearing some filters to see more assignments."
-              action={
-                <Button variant="secondary" size="md" onClick={clearFilters}>
-                  Clear filters
-                </Button>
-              }
-            />
-          ) : (
-            <div className="space-y-10">
-              {/* Group 1: To do (Not submitted) */}
-              {todoAssignments.length > 0 && (
-                <section className="space-y-4 text-left">
-                  <div className="space-y-1">
-                    <Eyebrow>TO DO</Eyebrow>
-                    <div className="flex items-center gap-2.5">
-                      <h2 className="font-display text-xl font-bold tracking-tight text-fg">
-                        To do
-                      </h2>
-                      <Badge tone="neutral" size="sm">
-                        {todoAssignments.length}
-                      </Badge>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
-                    {todoAssignments.map((assignment) => (
-                      <StudentAssignmentCard
-                        key={assignment.id}
-                        assignment={assignment}
-                        onSubmitClick={handleSubmitClick}
-                        searchQuery={debouncedQuery}
-                        isJustSubmitted={justSubmittedId === assignment.id}
-                        onBurstComplete={() => setJustSubmittedId(null)}
-                      />
-                    ))}
-                  </div>
-                </section>
-              )}
-
-              {/* Group 2: Submitted */}
-              {submittedAssignments.length > 0 && (
-                <section className="space-y-4 text-left">
-                  <div className="space-y-1">
-                    <Eyebrow>SUBMITTED</Eyebrow>
-                    <div className="flex items-center gap-2.5">
-                      <h2 className="font-display text-xl font-bold tracking-tight text-fg">
-                        Submitted
-                      </h2>
-                      <Badge tone="success" size="sm">
-                        {submittedAssignments.length}
-                      </Badge>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
-                    {submittedAssignments.map((assignment) => (
-                      <StudentAssignmentCard
-                        key={assignment.id}
-                        assignment={assignment}
-                        searchQuery={debouncedQuery}
-                        className="motion-safe:animate-fade-in"
-                        isJustSubmitted={justSubmittedId === assignment.id}
-                        onBurstComplete={() => setJustSubmittedId(null)}
-                      />
-                    ))}
-                  </div>
-                </section>
-              )}
-            </div>
+          {/* Polite live region for filtered count */}
+          {status === 'success' && courses.length > 0 && (
+            <p aria-live="polite" className="text-xs text-muted tabular-nums">
+              Showing {filteredCourses.length} of {courses.length}{' '}
+              {courses.length === 1 ? 'course' : 'courses'}
+            </p>
           )}
         </div>
-      )}
 
-      {/* Submission Confirmation Dialog */}
-      <SubmitConfirmation
-        isOpen={Boolean(pendingAssignment)}
-        assignment={pendingAssignment}
-        loading={isSubmitting}
-        error={submitError}
-        onConfirm={handleConfirmSubmit}
-        onCancel={handleCancelSubmit}
+        {/* Search input (visible if student has courses or is searching) */}
+        {(courses.length > 0 || searchQuery) && (
+          <SearchInput
+            id="student-course-search"
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search by course name, code, description or professor..."
+            ariaLabel="Search by course name, code, description or professor"
+          />
+        )}
+
+        {/* Loading State: Skeletons */}
+        {status === 'loading' && (
+          <div
+            className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6"
+            aria-label="Loading courses"
+            aria-busy="true"
+          >
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="rounded-lg border border-line bg-surface overflow-hidden flex flex-col justify-between"
+              >
+                <Skeleton className="h-36 w-full rounded-none" />
+                <div className="p-5 space-y-3">
+                  <Skeleton className="h-6 w-3/4" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-2/3" />
+                  <div className="pt-4 border-t border-line flex items-center justify-between">
+                    <Skeleton className="h-6 w-24 rounded-pill" />
+                    <Skeleton className="h-5 w-20" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Error State */}
+        {status === 'error' && (
+          <ErrorState
+            title="Failed to load courses"
+            message={error || 'We encountered an error loading your enrolled courses. Please try again.'}
+            onRetry={reload}
+          />
+        )}
+
+        {/* Empty State: Student not enrolled in any courses */}
+        {status === 'success' && courses.length === 0 && !searchQuery && (
+          <EmptyState
+            title="You're not enrolled in any course yet"
+            description="Ask your professor for a join code, then join the course here."
+            action={
+              <Button
+                type="button"
+                variant="primary"
+                onClick={() => setIsJoinModalOpen(true)}
+              >
+                Join your first course
+              </Button>
+            }
+          />
+        )}
+
+        {/* Empty State: Search yielded no matches */}
+        {status === 'success' && courses.length > 0 && filteredCourses.length === 0 && (
+          <EmptyState
+            icon={<Search className="w-8 h-8 text-muted" />}
+            title="No matching courses"
+            description={`No courses match your search "${searchQuery}". Try a different keyword.`}
+            action={
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setSearchQuery('')}
+              >
+                Clear search
+              </Button>
+            }
+          />
+        )}
+
+        {/* Course Cards Grid */}
+        {status === 'success' && filteredCourses.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
+            {filteredCourses.map((course) => (
+              <StudentCourseCard key={course.id} course={course} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Join Course Modal */}
+      <JoinCourseModal
+        isOpen={isJoinModalOpen}
+        onClose={() => setIsJoinModalOpen(false)}
+        onCourseJoined={addCourse}
       />
     </div>
   )

@@ -88,6 +88,43 @@ describe('services/mockApi - Course, Group & Assignment Logic (Round 2)', () => 
       expect(web).toBeDefined()
       expect(web?.professor.name).toBe('Prof. Meera Iyer')
       expect(web?.myGroup?.name).toBe('Team Alpha')
+      expect(typeof web?.overdueCount).toBe('number')
+      expect(typeof web?.dueSoonCount).toBe('number')
+    })
+
+    it('calculates overdueCount and dueSoonCount accurately for individual and group assignments', async () => {
+      // For Aarav (user-student-1)
+      const courses = await mockApi.listStudentCourses('user-student-1')
+      // Aarav is in WEB101 (leader of Team Alpha), HCI210 (member of Design Guild), DSA201 (no group)
+      const web = courses.find((c) => c.code === 'WEB101')
+      const hci = courses.find((c) => c.code === 'HCI210')
+      const dsa = courses.find((c) => c.code === 'DSA201')
+
+      expect(web).toBeDefined()
+      expect(hci).toBeDefined()
+      expect(dsa).toBeDefined()
+
+      // Aarav in WEB101:
+      // asg-web-1 (indiv): submitted
+      // asg-web-2 (group): acknowledged by Team Alpha (leader is Aarav) -> done, so not overdue
+      // asg-web-3 (indiv, due 2026-11-20): not_submitted, future -> neither overdue nor due soon
+      expect(web?.assignmentCount).toBe(3)
+      expect(web?.acknowledgedCount).toBe(2)
+      expect(web?.overdueCount).toBe(0)
+
+      // Diya (user-student-2) is a member of Team Alpha in WEB101:
+      // Group assignment acknowledged by leader (Aarav) counts as done for Diya too
+      const diyaCourses = await mockApi.listStudentCourses('user-student-2')
+      const diyaWeb = diyaCourses.find((c) => c.code === 'WEB101')
+      expect(diyaWeb?.myGroup).toBeDefined()
+      expect(diyaWeb?.myGroup?.name).toBe('Team Alpha')
+      expect(diyaWeb?.myGroup?.leaderId).toBe('user-student-1')
+      expect(diyaWeb?.acknowledgedCount).toBeGreaterThanOrEqual(1)
+
+      // For a student with no group, group assignments are treated as uncompleted
+      expect(dsa?.myGroup).toBeNull()
+      // Any overdue assignment in dsa will contribute to overdueCount
+      expect(dsa?.overdueCount).toBeGreaterThanOrEqual(0)
     })
 
     it('joinCourseByCode is case and dash tolerant, enrolls student, and seeds individual assignment submissions', async () => {

@@ -4,6 +4,11 @@
 export const SCHEMA_VERSION = 2
 
 /**
+ * Current active semester for ClassDesk.
+ */
+export const CURRENT_SEMESTER = 'Autumn 2026'
+
+/**
  * LocalStorage keys for client-side state persistence in ClassDesk.
  * All keys are namespaced with the "classdesk:" prefix.
  */

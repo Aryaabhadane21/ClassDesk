@@ -103,6 +103,8 @@ export type StudentCourse = Course & {
   professor: SafeUser
   assignmentCount: number
   acknowledgedCount: number
+  overdueCount: number
+  dueSoonCount: number
   myGroup: GroupDetail | null
 }
 

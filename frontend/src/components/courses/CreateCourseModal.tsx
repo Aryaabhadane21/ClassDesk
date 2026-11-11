@@ -16,6 +16,7 @@ import {
 import { JoinCodeChip } from '@/components/courses/JoinCodeChip'
 import { useAuth } from '@/context/AuthContext'
 import { ApiError, mockApi } from '@/services/mockApi'
+import { CURRENT_SEMESTER } from '@/utils/constants'
 import {
   hasErrors,
   validateCourse,
@@ -42,7 +43,7 @@ export function CreateCourseModal({
   const [code, setCode] = useState('')
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
-  const [semester, setSemester] = useState('Autumn 2026')
+  const [semester, setSemester] = useState(CURRENT_SEMESTER)
 
   const [touched, setTouched] = useState<Record<string, boolean>>({})
   const [errors, setErrors] = useState<CourseErrors>({})
@@ -62,7 +63,7 @@ export function CreateCourseModal({
       setCode('')
       setName('')
       setDescription('')
-      setSemester('Autumn 2026')
+      setSemester(CURRENT_SEMESTER)
       setErrors({})
       setTouched({})
       setGeneralError(null)

@@ -51,7 +51,11 @@ export function AppShell() {
       )
     }
     if (href === '/student') {
-      return location.pathname === '/student' || location.pathname.startsWith('/student/assignments')
+      return (
+        location.pathname === '/student' ||
+        location.pathname.startsWith('/student/courses') ||
+        location.pathname.startsWith('/student/assignments')
+      )
     }
     return defaultActive
   }

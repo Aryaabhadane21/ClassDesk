@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { renderWithProviders } from '@/tests/renderWithProviders'
-import { StudentDashboardPage } from '@/features/student/StudentDashboardPage'
+import { StudentAssignmentsPage } from '@/features/student/StudentAssignmentsPage'
 import { STORAGE_KEYS } from '@/utils/constants'
 import { createToken } from '@/services/auth/token'
 
@@ -19,8 +19,8 @@ describe('Integration: Student Submission Flow', () => {
     })
     window.localStorage.setItem(STORAGE_KEYS.TOKEN, token)
 
-    renderWithProviders(<StudentDashboardPage />, {
-      initialEntries: ['/student'],
+    renderWithProviders(<StudentAssignmentsPage />, {
+      initialEntries: ['/student/legacy'],
     })
 
     // Wait for assignments to load

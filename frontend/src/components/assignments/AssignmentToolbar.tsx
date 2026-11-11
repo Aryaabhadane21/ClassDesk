@@ -1,10 +1,9 @@
 import {
-  useEffect,
   useRef,
   type KeyboardEvent,
 } from 'react'
-import { Search, X } from 'lucide-react'
-import { Button, Dropdown, type DropdownOption } from '@/components/ui'
+import { X } from 'lucide-react'
+import { Button, Dropdown, SearchInput, type DropdownOption } from '@/components/ui'
 import type { DueFilter, SortOption } from '@/utils/filters'
 import { cn } from '@/utils/cn'
 
@@ -67,34 +66,7 @@ export function AssignmentToolbar({
   totalCount,
   className,
 }: AssignmentToolbarProps) {
-  const searchInputRef = useRef<HTMLInputElement>(null)
   const segmentRefs = useRef<Map<string, HTMLButtonElement>>(new Map())
-
-  // Global "/" key listener to focus search box when not typing in an input
-  useEffect(() => {
-    const handleGlobalKeyDown = (e: globalThis.KeyboardEvent) => {
-      if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey) {
-        const activeEl = document.activeElement as HTMLElement | null
-        const isEditable =
-          activeEl &&
-          (activeEl.tagName === 'INPUT' ||
-            activeEl.tagName === 'TEXTAREA' ||
-            activeEl.tagName === 'SELECT' ||
-            activeEl.isContentEditable)
-
-        if (!isEditable) {
-          e.preventDefault()
-          searchInputRef.current?.focus()
-          searchInputRef.current?.select()
-        }
-      }
-    }
-
-    window.addEventListener('keydown', handleGlobalKeyDown)
-    return () => {
-      window.removeEventListener('keydown', handleGlobalKeyDown)
-    }
-  }, [])
 
   // Keyboard navigation for segmented control (ArrowLeft / ArrowRight / Home / End)
   const handleSegmentKeyDown = (
@@ -140,63 +112,13 @@ export function AssignmentToolbar({
       {/* ------------------------------------------------------------- */}
       {/* ROW 1: Full-width 44px Search Box                             */}
       {/* ------------------------------------------------------------- */}
-      <div className="w-full">
-        <label htmlFor="assignment-search" className="sr-only">
-          Search by title or description
-        </label>
-        <div className="relative flex items-center w-full">
-          <span
-            className="absolute left-3.5 text-muted pointer-events-none flex items-center justify-center"
-            aria-hidden="true"
-          >
-            <Search className="w-4 h-4" />
-          </span>
-
-          <input
-            ref={searchInputRef}
-            id="assignment-search"
-            type="search"
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Escape') {
-                onSearchChange('')
-              }
-            }}
-            placeholder="Search by title or description"
-            aria-label="Search by title or description"
-            className={cn(
-              'w-full h-[44px] min-h-[44px] pl-10 pr-12 rounded-pill bg-surface border border-line text-fg text-xs font-body',
-              'placeholder:text-muted focus:outline-none focus:border-accent focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1',
-              'motion-safe:transition-all',
-            )}
-          />
-
-          {/* Right edge: Clear (X) button when query has text, otherwise "/" key hint on desktop */}
-          {searchQuery ? (
-            <button
-              type="button"
-              onClick={() => {
-                onSearchChange('')
-                searchInputRef.current?.focus()
-              }}
-              aria-label="Clear search"
-              className="absolute right-2.5 w-8 h-8 rounded-pill flex items-center justify-center text-muted hover:text-fg hover:bg-surface-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer motion-safe:transition-colors"
-            >
-              <X className="w-4 h-4" aria-hidden="true" />
-            </button>
-          ) : (
-            <div
-              className="absolute right-3 hidden sm:flex items-center pointer-events-none select-none"
-              aria-hidden="true"
-            >
-              <kbd className="inline-flex items-center justify-center h-5 min-w-[20px] px-1 text-[11px] font-mono text-muted bg-surface-2 border border-line rounded-sm">
-                /
-              </kbd>
-            </div>
-          )}
-        </div>
-      </div>
+      <SearchInput
+        id="assignment-search"
+        value={searchQuery}
+        onChange={onSearchChange}
+        placeholder="Search by title or description"
+        ariaLabel="Search by title or description"
+      />
 
       {/* ------------------------------------------------------------- */}
       {/* ROW 2: Segmented Control (Left) & Custom Dropdowns (Right)    */}

@@ -1,5 +1,5 @@
 import type { ElementType } from 'react'
-import { Calendar, ClipboardList } from 'lucide-react'
+import { BookOpen, Calendar, ClipboardList } from 'lucide-react'
 import type { Role } from '@/types'
 
 export interface NavItemConfig {
@@ -25,10 +25,9 @@ export const STUDENT_NAV_ITEMS: NavItemConfig[] = [
 
 export const ADMIN_NAV_ITEMS: NavItemConfig[] = [
   {
-    label: 'Assignments',
+    label: 'Courses',
     href: '/admin',
-    icon: ClipboardList,
-    end: true,
+    icon: BookOpen,
   },
   {
     label: 'Calendar',

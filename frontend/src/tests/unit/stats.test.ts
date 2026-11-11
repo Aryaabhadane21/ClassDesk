@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { getStudentStats, getAdminStats } from '@/utils/stats'
-import type { StudentAssignment, AdminAssignment } from '@/types'
+import { getStudentStats, getAdminStats, getProfessorCourseStats } from '@/utils/stats'
+import type { StudentAssignment, AdminAssignment, ProfessorCourse } from '@/types'
 
 describe('Unit: Stats Calculation Helpers', () => {
   const fixedNow = new Date(2026, 10, 5, 12, 0, 0)
@@ -135,6 +135,57 @@ describe('Unit: Stats Calculation Helpers', () => {
       expect(stats.averageCompletion).toBe(75)
       expect(stats.pendingSubmissions).toBe(1)
       expect(stats.overdueAssignments).toBe(1)
+    })
+  })
+
+  describe('getProfessorCourseStats', () => {
+    it('returns zeroes for an empty list of courses', () => {
+      const stats = getProfessorCourseStats([])
+      expect(stats).toEqual({
+        courseCount: 0,
+        studentCount: 0,
+        assignmentCount: 0,
+        groupCount: 0,
+      })
+    })
+
+    it('accurately sums metrics across multiple courses', () => {
+      const mockCourses: ProfessorCourse[] = [
+        {
+          id: 'c1',
+          code: 'WEB101',
+          name: 'Web Dev',
+          description: 'Frontend & backend',
+          semester: 'Autumn 2026',
+          professorId: 'p1',
+          joinCode: 'WEB-4K7P',
+          createdAt: new Date().toISOString(),
+          studentCount: 5,
+          assignmentCount: 3,
+          groupCount: 2,
+        },
+        {
+          id: 'c2',
+          code: 'HCI210',
+          name: 'HCI',
+          description: 'Human-Computer Interaction',
+          semester: 'Autumn 2026',
+          professorId: 'p1',
+          joinCode: 'HCI-9M2X',
+          createdAt: new Date().toISOString(),
+          studentCount: 4,
+          assignmentCount: 2,
+          groupCount: 1,
+        },
+      ]
+
+      const stats = getProfessorCourseStats(mockCourses)
+      expect(stats).toEqual({
+        courseCount: 2,
+        studentCount: 9,
+        assignmentCount: 5,
+        groupCount: 3,
+      })
     })
   })
 })

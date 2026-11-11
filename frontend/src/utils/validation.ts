@@ -1,7 +1,8 @@
-import type { LoginInput, RegisterInput } from '@/types'
+import type { CourseInput, LoginInput, RegisterInput } from '@/types'
 
 export type LoginErrors = Partial<Record<keyof LoginInput, string>>
 export type RegisterErrors = Partial<Record<keyof RegisterInput, string>>
+export type CourseErrors = Partial<Record<'code' | 'name' | 'description' | 'semester', string>>
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -79,6 +80,50 @@ export function validateRegister(input: Partial<RegisterInput>): RegisterErrors 
   // Role: must be 'student' or 'admin'
   if (input.role !== 'student' && input.role !== 'admin') {
     errors.role = 'Choose a role'
+  }
+
+  return errors
+}
+
+/**
+ * Pure validation for course creation/editing.
+ * Enforces:
+ * - code: 3-12 characters (letters, digits, dashes)
+ * - name: 3-80 characters
+ * - description: required, at most 300 characters
+ * - semester: required (defaults to 'Autumn 2026')
+ */
+export function validateCourse(input: Partial<CourseInput>): CourseErrors {
+  const errors: CourseErrors = {}
+
+  // Course Code: required, 3-12 chars, letters, digits, dash
+  const rawCode = input.code ? input.code.trim() : ''
+  if (!rawCode) {
+    errors.code = 'Course code is required'
+  } else if (rawCode.length < 3 || rawCode.length > 12 || !/^[A-Za-z0-9-]+$/.test(rawCode)) {
+    errors.code = 'Course code must be 3-12 letters, digits or dashes'
+  }
+
+  // Course Name: required, 3-80 chars
+  const rawName = input.name ? input.name.trim() : ''
+  if (!rawName) {
+    errors.name = 'Course name is required'
+  } else if (rawName.length < 3 || rawName.length > 80) {
+    errors.name = 'Course name must be between 3 and 80 characters'
+  }
+
+  // Description: required, max 300 chars
+  const rawDesc = input.description ? input.description.trim() : ''
+  if (!rawDesc) {
+    errors.description = 'Description is required'
+  } else if (rawDesc.length > 300) {
+    errors.description = 'Description must not exceed 300 characters'
+  }
+
+  // Semester: required (default "Autumn 2026")
+  const rawSemester = input.semester !== undefined ? input.semester.trim() : 'Autumn 2026'
+  if (!rawSemester) {
+    errors.semester = 'Semester is required'
   }
 
   return errors

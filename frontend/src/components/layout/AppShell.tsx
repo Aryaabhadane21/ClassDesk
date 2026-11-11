@@ -44,7 +44,11 @@ export function AppShell() {
 
   const isNavActive = (href: string, defaultActive: boolean) => {
     if (href === '/admin') {
-      return location.pathname === '/admin' || location.pathname.startsWith('/admin/assignments')
+      return (
+        location.pathname === '/admin' ||
+        location.pathname.startsWith('/admin/courses') ||
+        location.pathname.startsWith('/admin/assignments')
+      )
     }
     if (href === '/student') {
       return location.pathname === '/student' || location.pathname.startsWith('/student/assignments')

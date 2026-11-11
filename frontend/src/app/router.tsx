@@ -10,6 +10,8 @@ import { LoginPage } from '@/features/auth/LoginPage'
 import { RegisterPage } from '@/features/auth/RegisterPage'
 import { StudentDashboardPage } from '@/features/student/StudentDashboardPage'
 import { StudentCalendarPage } from '@/features/student/StudentCalendarPage'
+import { ProfessorDashboardPage } from '@/features/admin/ProfessorDashboardPage'
+import { ProfessorCoursePage } from '@/features/admin/ProfessorCoursePage'
 import { AdminAssignmentsPage } from '@/features/admin/AdminAssignmentsPage'
 import { AssignmentDetailPage } from '@/features/admin/AssignmentDetailPage'
 import { AdminCalendarPage } from '@/features/admin/AdminCalendarPage'
@@ -69,7 +71,10 @@ export function AppRouter() {
             </RequireAuth>
           }
         >
-          <Route index element={<AdminAssignmentsPage />} />
+          <Route index element={<ProfessorDashboardPage />} />
+          <Route path="courses/:courseId" element={<ProfessorCoursePage />} />
+          {/* temporary, replaced by the course assignments page in step 8 */}
+          <Route path="legacy" element={<AdminAssignmentsPage />} />
           <Route path="assignments/:assignmentId" element={<AssignmentDetailPage />} />
           <Route path="calendar" element={<AdminCalendarPage />} />
         </Route>

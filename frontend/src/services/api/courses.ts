@@ -9,6 +9,7 @@ import {
   simulateNetwork,
   toSafeUser,
 } from '@/services/api/core'
+import { validateCourse } from '@/utils/validation'
 import type {
   Course,
   CourseInput,
@@ -127,20 +128,21 @@ export async function createCourse(
   const professor = users.find((u) => u.id === professorId)
   assertRole(professor, 'admin', 'Professor')
 
-  const rawCode = input.code ? input.code.trim() : ''
-  if (!rawCode || rawCode.length < 3 || rawCode.length > 12) {
-    throw new ApiError(
-      'Course code must be between 3 and 12 characters',
-      'VALIDATION',
-    )
+  const validationErrors = validateCourse(input)
+  if (validationErrors.code) {
+    throw new ApiError(validationErrors.code, 'VALIDATION')
   }
-  if (!/^[A-Za-z0-9-]+$/.test(rawCode)) {
-    throw new ApiError(
-      'Course code can only contain letters, digits, and hyphens',
-      'VALIDATION',
-    )
+  if (validationErrors.name) {
+    throw new ApiError(validationErrors.name, 'VALIDATION')
+  }
+  if (validationErrors.description) {
+    throw new ApiError(validationErrors.description, 'VALIDATION')
+  }
+  if (validationErrors.semester) {
+    throw new ApiError(validationErrors.semester, 'VALIDATION')
   }
 
+  const rawCode = input.code ? input.code.trim() : ''
   const upperCode = rawCode.toUpperCase()
   const duplicate = courses.find(
     (c) =>
@@ -154,21 +156,7 @@ export async function createCourse(
   }
 
   const rawName = input.name ? input.name.trim() : ''
-  if (!rawName || rawName.length < 3 || rawName.length > 80) {
-    throw new ApiError(
-      'Course name must be between 3 and 80 characters',
-      'VALIDATION',
-    )
-  }
-
   const rawDesc = input.description ? input.description.trim() : ''
-  if (rawDesc.length > 300) {
-    throw new ApiError(
-      'Description must not exceed 300 characters',
-      'VALIDATION',
-    )
-  }
-
   const semester = input.semester?.trim() || 'Autumn 2026'
 
   const existingCodes = new Set(courses.map((c) => c.joinCode))

@@ -2,7 +2,7 @@ export interface AssignmentFormData {
   title: string
   description: string
   dueDate: string
-  driveLink: string
+  oneDriveLink: string
   assignMode: 'all' | 'selected'
   selectedStudentIds: string[]
 }
@@ -64,18 +64,18 @@ export function validateAssignmentForm(
     }
   }
 
-  // 4. Drive link validation (valid http/https URL)
-  const trimmedLink = data.driveLink.trim()
+  // 4. OneDrive link validation (valid http/https URL)
+  const trimmedLink = data.oneDriveLink.trim()
   if (!trimmedLink) {
-    errors.driveLink = 'Drive link is required'
+    errors.oneDriveLink = 'OneDrive link is required'
   } else {
     try {
       const url = new URL(trimmedLink)
       if (url.protocol !== 'http:' && url.protocol !== 'https:') {
-        errors.driveLink = 'Drive link must start with http:// or https://'
+        errors.oneDriveLink = 'OneDrive link must start with http:// or https://'
       }
     } catch {
-      errors.driveLink = 'Please enter a valid URL (e.g. https://drive.google.com/...)'
+      errors.oneDriveLink = 'Please enter a valid URL (e.g. https://1drv.ms/...)'
     }
   }
 

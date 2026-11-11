@@ -1,6 +1,14 @@
-import { STORAGE_KEYS } from '@/utils/constants'
+import { SCHEMA_VERSION, STORAGE_KEYS } from '@/utils/constants'
 import { generateSeedData } from '@/data/seed'
-import type { Assignment, Submission, User } from '@/types'
+import type {
+  Assignment,
+  Course,
+  Enrollment,
+  Group,
+  GroupAcknowledgement,
+  Submission,
+  User,
+} from '@/types'
 
 // In-memory fallback map if localStorage is unavailable, disabled, or throws quota limits
 const inMemoryStorage = new Map<string, string>()
@@ -51,38 +59,168 @@ export function writeJSON<T>(key: string, value: T): void {
 }
 
 /**
- * Seeds users, assignments, and submissions into localStorage only if not already present.
- * Never overwrites existing data.
+ * Safely remove an item from both localStorage and in-memory fallback.
  */
-export function ensureSeeded(): void {
-  const existingUsers = readJSON<User[] | null>(STORAGE_KEYS.USERS, null)
-  const existingAssignments = readJSON<Assignment[] | null>(STORAGE_KEYS.ASSIGNMENTS, null)
-  const existingSubmissions = readJSON<Submission[] | null>(STORAGE_KEYS.SUBMISSIONS, null)
-
-  if (!existingUsers || !existingAssignments || !existingSubmissions) {
-    const seed = generateSeedData()
-    if (!existingUsers) {
-      writeJSON(STORAGE_KEYS.USERS, seed.users)
+export function removeKey(key: string): void {
+  inMemoryStorage.delete(key)
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.removeItem(key)
     }
-    if (!existingAssignments) {
-      writeJSON(STORAGE_KEYS.ASSIGNMENTS, seed.assignments)
-    }
-    if (!existingSubmissions) {
-      writeJSON(STORAGE_KEYS.SUBMISSIONS, seed.submissions)
-    }
+  } catch {
+    // Ignore storage deletion errors
   }
 }
 
 /**
- * Clears existing assignment, submission, and notification data and reseeds fresh demo state.
+ * Seeds collections into storage and migrates if schemaVersion differs.
+ * If stored schemaVersion differs from SCHEMA_VERSION (2), clears all classdesk data keys
+ * (users, assignments, submissions, courses, enrollments, groups, groupAcks, session, notificationReads)
+ * while preserving the user's theme setting, then reseeds fresh demo data and sets the new version.
+ */
+export function ensureSeeded(): void {
+  const storedVersion = readJSON<number | null>(STORAGE_KEYS.SCHEMA_VERSION, null)
+
+  if (storedVersion !== SCHEMA_VERSION) {
+    // Version mismatch: clear all data keys except THEME
+    const keysToClear = [
+      STORAGE_KEYS.USERS,
+      STORAGE_KEYS.ASSIGNMENTS,
+      STORAGE_KEYS.SUBMISSIONS,
+      STORAGE_KEYS.COURSES,
+      STORAGE_KEYS.ENROLLMENTS,
+      STORAGE_KEYS.GROUPS,
+      STORAGE_KEYS.GROUP_ACKS,
+      STORAGE_KEYS.SESSION,
+      STORAGE_KEYS.NOTIFICATION_READS,
+    ]
+
+    for (const key of keysToClear) {
+      removeKey(key)
+    }
+
+    const seed = generateSeedData()
+    writeJSON(STORAGE_KEYS.USERS, seed.users)
+    writeJSON(STORAGE_KEYS.COURSES, seed.courses)
+    writeJSON(STORAGE_KEYS.ENROLLMENTS, seed.enrollments)
+    writeJSON(STORAGE_KEYS.GROUPS, seed.groups)
+    writeJSON(STORAGE_KEYS.GROUP_ACKS, seed.groupAcks)
+    writeJSON(STORAGE_KEYS.ASSIGNMENTS, seed.assignments)
+    writeJSON(STORAGE_KEYS.SUBMISSIONS, seed.submissions)
+    writeJSON(STORAGE_KEYS.NOTIFICATION_READS, {})
+    writeJSON(STORAGE_KEYS.SCHEMA_VERSION, SCHEMA_VERSION)
+    return
+  }
+
+  // Version matches, ensure each individual collection exists
+  const existingUsers = readJSON<User[] | null>(STORAGE_KEYS.USERS, null)
+  const existingAssignments = readJSON<Assignment[] | null>(STORAGE_KEYS.ASSIGNMENTS, null)
+  const existingSubmissions = readJSON<Submission[] | null>(STORAGE_KEYS.SUBMISSIONS, null)
+  const existingCourses = readJSON<Course[] | null>(STORAGE_KEYS.COURSES, null)
+  const existingEnrollments = readJSON<Enrollment[] | null>(STORAGE_KEYS.ENROLLMENTS, null)
+  const existingGroups = readJSON<Group[] | null>(STORAGE_KEYS.GROUPS, null)
+  const existingGroupAcks = readJSON<GroupAcknowledgement[] | null>(STORAGE_KEYS.GROUP_ACKS, null)
+
+  if (
+    !existingUsers ||
+    !existingAssignments ||
+    !existingSubmissions ||
+    !existingCourses ||
+    !existingEnrollments ||
+    !existingGroups ||
+    !existingGroupAcks
+  ) {
+    const seed = generateSeedData()
+    if (!existingUsers) writeJSON(STORAGE_KEYS.USERS, seed.users)
+    if (!existingCourses) writeJSON(STORAGE_KEYS.COURSES, seed.courses)
+    if (!existingEnrollments) writeJSON(STORAGE_KEYS.ENROLLMENTS, seed.enrollments)
+    if (!existingGroups) writeJSON(STORAGE_KEYS.GROUPS, seed.groups)
+    if (!existingGroupAcks) writeJSON(STORAGE_KEYS.GROUP_ACKS, seed.groupAcks)
+    if (!existingAssignments) writeJSON(STORAGE_KEYS.ASSIGNMENTS, seed.assignments)
+    if (!existingSubmissions) writeJSON(STORAGE_KEYS.SUBMISSIONS, seed.submissions)
+    writeJSON(STORAGE_KEYS.SCHEMA_VERSION, SCHEMA_VERSION)
+  }
+}
+
+/**
+ * Resets all demo data to pristine seed state while preserving active theme.
  */
 export function resetDemoData(): void {
   const seed = generateSeedData()
   writeJSON(STORAGE_KEYS.USERS, seed.users)
+  writeJSON(STORAGE_KEYS.COURSES, seed.courses)
+  writeJSON(STORAGE_KEYS.ENROLLMENTS, seed.enrollments)
+  writeJSON(STORAGE_KEYS.GROUPS, seed.groups)
+  writeJSON(STORAGE_KEYS.GROUP_ACKS, seed.groupAcks)
   writeJSON(STORAGE_KEYS.ASSIGNMENTS, seed.assignments)
   writeJSON(STORAGE_KEYS.SUBMISSIONS, seed.submissions)
   writeJSON(STORAGE_KEYS.NOTIFICATION_READS, {})
+  writeJSON(STORAGE_KEYS.SCHEMA_VERSION, SCHEMA_VERSION)
 }
+
+// ---------------------------------------------------------------------------
+// Typed Collection Read/Write Helpers
+// ---------------------------------------------------------------------------
+
+export function getUsers(): User[] {
+  return readJSON<User[]>(STORAGE_KEYS.USERS, [])
+}
+
+export function setUsers(users: User[]): void {
+  writeJSON(STORAGE_KEYS.USERS, users)
+}
+
+export function getCourses(): Course[] {
+  return readJSON<Course[]>(STORAGE_KEYS.COURSES, [])
+}
+
+export function setCourses(courses: Course[]): void {
+  writeJSON(STORAGE_KEYS.COURSES, courses)
+}
+
+export function getEnrollments(): Enrollment[] {
+  return readJSON<Enrollment[]>(STORAGE_KEYS.ENROLLMENTS, [])
+}
+
+export function setEnrollments(enrollments: Enrollment[]): void {
+  writeJSON(STORAGE_KEYS.ENROLLMENTS, enrollments)
+}
+
+export function getGroups(): Group[] {
+  return readJSON<Group[]>(STORAGE_KEYS.GROUPS, [])
+}
+
+export function setGroups(groups: Group[]): void {
+  writeJSON(STORAGE_KEYS.GROUPS, groups)
+}
+
+export function getGroupAcks(): GroupAcknowledgement[] {
+  return readJSON<GroupAcknowledgement[]>(STORAGE_KEYS.GROUP_ACKS, [])
+}
+
+export function setGroupAcks(acks: GroupAcknowledgement[]): void {
+  writeJSON(STORAGE_KEYS.GROUP_ACKS, acks)
+}
+
+export function getAssignments(): Assignment[] {
+  return readJSON<Assignment[]>(STORAGE_KEYS.ASSIGNMENTS, [])
+}
+
+export function setAssignments(assignments: Assignment[]): void {
+  writeJSON(STORAGE_KEYS.ASSIGNMENTS, assignments)
+}
+
+export function getSubmissions(): Submission[] {
+  return readJSON<Submission[]>(STORAGE_KEYS.SUBMISSIONS, [])
+}
+
+export function setSubmissions(submissions: Submission[]): void {
+  writeJSON(STORAGE_KEYS.SUBMISSIONS, submissions)
+}
+
+// ---------------------------------------------------------------------------
+// Notification Read Tracking Helpers
+// ---------------------------------------------------------------------------
 
 export type NotificationReadMap = Record<string, string[]>
 
@@ -136,4 +274,3 @@ export function pruneReadNotificationIds(
     writeJSON(STORAGE_KEYS.NOTIFICATION_READS, map)
   }
 }
-

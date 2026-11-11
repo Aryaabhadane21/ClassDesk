@@ -20,19 +20,23 @@ describe('Unit: Week Strip Helper (getWeekDays)', () => {
     const mockItems: StudentAssignment[] = [
       {
         id: '1',
+        courseId: 'course-web101',
+        submissionType: 'individual',
         title: 'Today Pending',
         description: '',
         dueDate: '2026-11-05T18:00:00', // Today
-        driveLink: '',
+        oneDriveLink: '',
         status: 'not_submitted',
         createdAt: '',
       },
       {
         id: '2',
+        courseId: 'course-web101',
+        submissionType: 'individual',
         title: 'Tomorrow Complete',
         description: '',
         dueDate: '2026-11-06T18:00:00', // Tomorrow
-        driveLink: '',
+        oneDriveLink: '',
         status: 'submitted',
         createdAt: '',
       },

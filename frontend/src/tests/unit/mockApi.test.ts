@@ -59,7 +59,7 @@ describe('services/mockApi', () => {
           title: 'ab',
           description: 'Valid description',
           dueDate: new Date(Date.now() + 86400000).toISOString(),
-          driveLink: 'https://drive.google.com/test',
+          oneDriveLink: 'https://1drv.ms/test',
           assignedTo: 'all',
         }),
       ).rejects.toThrow(ApiError)
@@ -69,7 +69,7 @@ describe('services/mockApi', () => {
         title: 'New Valid Assignment',
         description: 'Complete all steps and deliverables.',
         dueDate: new Date(Date.now() + 86400000 * 5).toISOString(),
-        driveLink: 'https://drive.google.com/folder',
+        oneDriveLink: 'https://1drv.ms/folder',
         assignedTo: 'all',
       })
 
@@ -83,7 +83,7 @@ describe('services/mockApi', () => {
         title: 'Project for Update',
         description: 'Initial description',
         dueDate: new Date(Date.now() + 86400000 * 5).toISOString(),
-        driveLink: 'https://drive.google.com/folder',
+        oneDriveLink: 'https://1drv.ms/folder',
         assignedTo: ['user-student-1', 'user-student-2'],
       })
 
@@ -95,7 +95,7 @@ describe('services/mockApi', () => {
         title: 'Project for Update (Modified)',
         description: 'Updated description',
         dueDate: created.dueDate,
-        driveLink: created.driveLink,
+        oneDriveLink: created.oneDriveLink,
         assignedTo: ['user-student-1', 'user-student-2', 'user-student-3'],
       })
 
@@ -111,7 +111,7 @@ describe('services/mockApi', () => {
         title: 'Project to Delete',
         description: 'Short-lived assignment',
         dueDate: new Date(Date.now() + 86400000 * 5).toISOString(),
-        driveLink: 'https://drive.google.com/folder',
+        oneDriveLink: 'https://1drv.ms/folder',
         assignedTo: 'all',
       })
 
@@ -136,7 +136,7 @@ describe('services/mockApi', () => {
           title: 'Hacked Title',
           description: 'Hacked',
           dueDate: arjunAsgs[0].dueDate,
-          driveLink: arjunAsgs[0].driveLink,
+          oneDriveLink: arjunAsgs[0].oneDriveLink,
           assignedTo: 'all',
         }),
       ).rejects.toThrow(ApiError)

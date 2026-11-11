@@ -4,10 +4,12 @@ import type {
   AdminAssignment,
   Assignment,
   AssignmentInput,
+  Course,
   Role,
   SafeUser,
   StudentAssignment,
   Submission,
+  SubmissionType,
   SubmissionWithStudent,
   User,
 } from '@/types'
@@ -140,12 +142,12 @@ function validateAssignmentInput(input: AssignmentInput, allStudentIds: string[]
   }
 
   try {
-    const parsed = new URL(input.driveLink)
+    const parsed = new URL(input.oneDriveLink)
     if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
       throw new Error()
     }
   } catch {
-    throw new ApiError('Drive link must be a valid http or https URL', 'VALIDATION')
+    throw new ApiError('OneDrive link must be a valid http or https URL', 'VALIDATION')
   }
 
   let assignedIds: string[] = []
@@ -225,8 +227,10 @@ export async function getStudentAssignments(studentId: string): Promise<StudentA
   const student = users.find((u) => u.id === studentId)
   assertRole(student, 'student', 'Student')
 
-  // Filter assignments assigned to this student
-  const studentAssignments = assignments.filter((a) => a.assignedTo.includes(studentId))
+  // temporary until the course screens in steps 6-12; group assignments appear there
+  const studentAssignments = assignments.filter(
+    (a) => a.assignedTo.includes(studentId) && a.submissionType === 'individual',
+  )
 
   return studentAssignments.map((assignment) => {
     const submission = submissions.find(
@@ -303,8 +307,10 @@ export async function getAdminAssignments(adminId: string): Promise<AdminAssignm
   const admin = users.find((u) => u.id === adminId)
   assertRole(admin, 'admin', 'Admin')
 
-  // Filter only assignments created by this admin
-  const adminAssignments = assignments.filter((a) => a.createdBy === adminId)
+  // temporary until the course screens in steps 6-12; group assignments appear there
+  const adminAssignments = assignments.filter(
+    (a) => a.createdBy === adminId && a.submissionType === 'individual',
+  )
   const studentsMap = new Map<string, SafeUser>()
   for (const u of users) {
     if (u.role === 'student') {
@@ -366,15 +372,36 @@ export async function createAssignment(
   const allStudentIds = users.filter((u) => u.role === 'student').map((u) => u.id)
   const targetStudentIds = validateAssignmentInput(input, allStudentIds)
 
+  const courses = readJSON<Course[]>(STORAGE_KEYS.COURSES, [])
+  const professorCourses = courses.filter((c) => c.professorId === adminId)
+
+  let courseId = input.courseId
+  if (!courseId) {
+    courseId = professorCourses[0]?.id || 'course-web101'
+  } else {
+    const course = professorCourses.find((c) => c.id === courseId)
+    if (!course) {
+      throw new ApiError('Course does not belong to this professor', 'VALIDATION')
+    }
+  }
+
+  const submissionType: SubmissionType = input.submissionType || 'individual'
+  if (submissionType !== 'individual' && submissionType !== 'group') {
+    throw new ApiError('Invalid submission type', 'VALIDATION')
+  }
+  // Do not add enrollment checks yet (temporary until course screens)
+
   const now = new Date().toISOString()
   const assignmentId = `asg-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`
 
   const newAssignment: Assignment = {
     id: assignmentId,
+    courseId,
+    submissionType,
     title: input.title.trim(),
     description: input.description.trim(),
     dueDate: new Date(input.dueDate).toISOString(),
-    driveLink: input.driveLink.trim(),
+    oneDriveLink: input.oneDriveLink.trim(),
     createdBy: adminId,
     assignedTo: targetStudentIds,
     createdAt: now,
@@ -472,13 +499,36 @@ export async function updateAssignment(
     })
   }
 
+  const courses = readJSON<Course[]>(STORAGE_KEYS.COURSES, [])
+  const professorCourses = courses.filter((c) => c.professorId === adminId)
+
+  let courseId = existingAssignment.courseId
+  if (input.courseId) {
+    const course = professorCourses.find((c) => c.id === input.courseId)
+    if (!course) {
+      throw new ApiError('Course does not belong to this professor', 'VALIDATION')
+    }
+    courseId = input.courseId
+  }
+
+  let submissionType: SubmissionType = existingAssignment.submissionType || 'individual'
+  if (input.submissionType) {
+    if (input.submissionType !== 'individual' && input.submissionType !== 'group') {
+      throw new ApiError('Invalid submission type', 'VALIDATION')
+    }
+    submissionType = input.submissionType
+  }
+  // Do not add enrollment checks yet (temporary until course screens)
+
   const now = new Date().toISOString()
   const updatedAssignment: Assignment = {
     ...existingAssignment,
+    courseId,
+    submissionType,
     title: input.title.trim(),
     description: input.description.trim(),
     dueDate: new Date(input.dueDate).toISOString(),
-    driveLink: input.driveLink.trim(),
+    oneDriveLink: input.oneDriveLink.trim(),
     assignedTo: targetStudentIds,
     updatedAt: now,
   }

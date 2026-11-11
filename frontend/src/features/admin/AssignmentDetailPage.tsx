@@ -202,7 +202,7 @@ export function AssignmentDetailPage() {
           actions={
             <div className="flex items-center gap-2 flex-wrap">
               <a
-                href={assignment.driveLink}
+                href={assignment.oneDriveLink}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -210,9 +210,9 @@ export function AssignmentDetailPage() {
                   variant="secondary"
                   size="md"
                   rightIcon={<ExternalLink className="w-4 h-4" aria-hidden="true" />}
-                  aria-label={`Open Drive folder for ${assignment.title} (opens in a new tab)`}
+                  aria-label={`Open OneDrive folder for ${assignment.title} (opens in a new tab)`}
                 >
-                  Open Drive link
+                  Open OneDrive link
                   <span className="sr-only"> (opens in a new tab)</span>
                 </Button>
               </a>

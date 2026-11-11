@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { roleLabel } from '@/utils/roles'
 import {
   Bell,
   Calendar,
@@ -500,7 +501,7 @@ export function UiGallery() {
                     <div className="text-sm font-semibold text-fg">{user.name}</div>
                     <div className="text-xs text-muted">{user.email}</div>
                     <div className="text-xs text-accent font-semibold mt-0.5 uppercase tracking-wider">
-                      Role: {user.role}
+                      Role: {roleLabel(user.role)}
                     </div>
                   </div>
                 </div>

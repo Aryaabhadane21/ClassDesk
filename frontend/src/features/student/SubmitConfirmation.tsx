@@ -26,7 +26,7 @@ export function SubmitConfirmation({
       isOpen={isOpen}
       tone="default"
       title="Confirm your submission"
-      message={`You're about to mark "${assignment.title}" as submitted. Your professor will see it as submitted right away. Please make sure your work is uploaded to the Drive link first.`}
+      message={`You're about to mark "${assignment.title}" as submitted. Your professor will see it as submitted right away. Please make sure your work is uploaded to the OneDrive link first.`}
       confirmLabel="Yes, confirm submission"
       cancelLabel="Not yet"
       loading={loading}

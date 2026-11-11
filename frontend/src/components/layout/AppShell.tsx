@@ -8,6 +8,7 @@ import { useAuth } from '@/context/AuthContext'
 import { getHomePath } from '@/utils/routes'
 import { getNavItemsForRole } from '@/components/layout/navConfig'
 import { getGreetingName } from '@/utils/names'
+import { roleLabel } from '@/utils/roles'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
 import { cn } from '@/utils/cn'
 
@@ -284,12 +285,12 @@ export function AppShell() {
               <Avatar name={user.name} size="sm" />
               <div className="hidden sm:flex flex-col text-left">
                 <span className="text-xs font-semibold text-fg">Hello, {greetingName}</span>
-                <span className="text-[10px] text-muted capitalize leading-none">
-                  {user.role}
+                <span className="text-[10px] text-muted leading-none">
+                  {roleLabel(user.role)}
                 </span>
               </div>
-              <Badge tone="accent" size="sm" className="hidden md:inline-flex capitalize">
-                {user.role}
+              <Badge tone="accent" size="sm" className="hidden md:inline-flex">
+                {roleLabel(user.role)}
               </Badge>
             </div>
           </div>

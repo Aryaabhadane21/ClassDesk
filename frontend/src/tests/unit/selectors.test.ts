@@ -6,10 +6,12 @@ describe('utils/selectors', () => {
   it('calculates completion metrics including late counting', () => {
     const asg: AdminAssignment = {
       id: 'asg-1',
+      courseId: 'course-web101',
+      submissionType: 'individual',
       title: 'Metrics Test',
       description: '',
       dueDate: '2026-11-05T12:00:00.000Z',
-      driveLink: '',
+      oneDriveLink: '',
       createdBy: '',
       createdAt: '',
       updatedAt: '',
@@ -67,10 +69,12 @@ describe('utils/selectors', () => {
   it('handles total = 0 gracefully', () => {
     const emptyAsg: AdminAssignment = {
       id: 'asg-empty',
+      courseId: 'course-web101',
+      submissionType: 'individual',
       title: 'Empty',
       description: '',
       dueDate: '2026-11-05T12:00:00.000Z',
-      driveLink: '',
+      oneDriveLink: '',
       createdBy: '',
       createdAt: '',
       updatedAt: '',

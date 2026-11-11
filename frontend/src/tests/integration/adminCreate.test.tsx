@@ -45,7 +45,7 @@ describe('Integration: Admin Create Flow', () => {
     // Fill valid data
     const titleInput = screen.getByLabelText(/^title/i)
     const descInput = screen.getByLabelText(/^description/i)
-    const driveInput = screen.getByLabelText(/drive submission folder link/i)
+    const driveInput = screen.getByLabelText(/onedrive submission folder link/i)
 
     await user.type(titleInput, 'Microservices Architecture Design')
     await user.type(
@@ -53,7 +53,7 @@ describe('Integration: Admin Create Flow', () => {
       'Design modular microservices using Docker and gRPC protocols.',
     )
     await user.clear(driveInput)
-    await user.type(driveInput, 'https://drive.google.com/drive/folders/microservices')
+    await user.type(driveInput, 'https://1drv.ms/f/s!microservices')
 
     // Submit valid form
     await user.click(createBtn)

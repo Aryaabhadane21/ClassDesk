@@ -32,7 +32,7 @@ export function useAssignmentForm({
         title: initialAssignment.title,
         description: initialAssignment.description,
         dueDate: isoToDateTimeLocal(initialAssignment.dueDate),
-        driveLink: initialAssignment.driveLink,
+        oneDriveLink: initialAssignment.oneDriveLink,
         assignMode: isAll ? 'all' : 'selected',
         selectedStudentIds: isAll
           ? students.map((s) => s.id)
@@ -44,7 +44,7 @@ export function useAssignmentForm({
       title: '',
       description: '',
       dueDate: getDefaultDueDateTimeLocal(),
-      driveLink: '',
+      oneDriveLink: '',
       assignMode: 'all',
       selectedStudentIds: students.map((s) => s.id),
     }
@@ -172,7 +172,7 @@ export function useAssignmentForm({
         title: true,
         description: true,
         dueDate: true,
-        driveLink: true,
+        oneDriveLink: true,
         assignedTo: true,
       })
 
@@ -200,7 +200,7 @@ export function useAssignmentForm({
           title: values.title.trim(),
           description: values.description.trim(),
           dueDate: dateTimeLocalToIso(values.dueDate),
-          driveLink: values.driveLink.trim(),
+          oneDriveLink: values.oneDriveLink.trim(),
           assignedTo: assignedToPayload,
         }
 

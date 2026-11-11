@@ -9,6 +9,62 @@ export type Role = 'student' | 'admin'
 export type Theme = 'light' | 'dark'
 
 /**
+ * Assignment submission format
+ */
+export type SubmissionType = 'individual' | 'group'
+
+/**
+ * Course offering
+ */
+export interface Course {
+  id: string
+  code: string // e.g. "WEB101"
+  name: string
+  description: string
+  semester: string // e.g. "Autumn 2026"
+  professorId: string
+  joinCode: string // unique, uppercase, readable e.g. "WEB-4K7P"
+  createdAt: string
+}
+
+/**
+ * Student course enrollment
+ */
+export interface Enrollment {
+  courseId: string
+  studentId: string
+  enrolledAt: string
+}
+
+/**
+ * Student group within a course
+ */
+export interface Group {
+  id: string
+  courseId: string
+  name: string
+  leaderId: string
+  memberIds: string[] // Leader is always included in memberIds
+  createdAt: string
+}
+
+/**
+ * Group acknowledgement record for group assignments.
+ * Model note:
+ * - Individual assignments use the existing Submission records (one per student,
+ *   with submittedAt as the acknowledgement timestamp).
+ * - Group assignments use GroupAcknowledgement records (one per group, made by the leader)
+ *   and have NO per-student Submission records.
+ */
+export interface GroupAcknowledgement {
+  id: string
+  assignmentId: string
+  groupId: string
+  leaderId: string
+  acknowledgedAt: string
+}
+
+/**
  * User account model
  */
 export interface User {
@@ -33,12 +89,14 @@ export type SafeUser = Omit<User, 'password'>
  */
 export interface Assignment {
   id: string
+  courseId: string
+  submissionType: SubmissionType
   title: string
   description: string
   /** ISO 8601 date string for the assignment deadline */
   dueDate: string
-  /** Link to shared Google Drive / submission resources */
-  driveLink: string
+  /** Link to shared Microsoft OneDrive / submission resources */
+  oneDriveLink: string
   /** Admin user ID who created the assignment */
   createdBy: string
   /** Array of student user IDs assigned to this task */
@@ -53,12 +111,14 @@ export interface Assignment {
  * Form input payload for creating or updating an assignment
  */
 export interface AssignmentInput {
+  courseId?: string
+  submissionType?: SubmissionType
   title: string
   description: string
   /** ISO 8601 string or valid date string */
   dueDate: string
   /** Valid http or https URL */
-  driveLink: string
+  oneDriveLink: string
   /** Either 'all' (expanded to all active students) or a specific non-empty list of student IDs */
   assignedTo: 'all' | string[]
 }
@@ -69,7 +129,7 @@ export interface AssignmentInput {
 export type SubmissionStatus = 'submitted' | 'not_submitted'
 
 /**
- * Student assignment submission record
+ * Student assignment submission record (used for individual assignments)
  */
 export interface Submission {
   id: string

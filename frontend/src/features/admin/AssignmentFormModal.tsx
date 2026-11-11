@@ -159,19 +159,19 @@ export function AssignmentFormModal({
           />
         </div>
 
-        {/* 4. Drive Link */}
+        {/* 4. OneDrive Link */}
         <div className="space-y-1">
           <Input
-            name="driveLink"
+            name="oneDriveLink"
             type="url"
-            label="Drive Submission Folder Link"
+            label="OneDrive Submission Folder Link"
             required
-            value={values.driveLink}
+            value={values.oneDriveLink}
             onChange={handleChange}
             onBlur={handleBlur}
-            placeholder="https://drive.google.com/drive/folders/..."
-            hint="Google Drive folder where students should upload their work."
-            error={touched.driveLink ? errors.driveLink : undefined}
+            placeholder="https://1drv.ms/f/s!..."
+            hint="OneDrive folder where students should upload their work."
+            error={touched.oneDriveLink ? errors.oneDriveLink : undefined}
             disabled={isSubmitting}
           />
         </div>

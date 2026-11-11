@@ -21,10 +21,12 @@ describe('utils/notifications', () => {
     const assignments: StudentAssignment[] = [
       {
         id: 'asg-overdue',
+        courseId: 'course-web101',
+        submissionType: 'individual',
         title: 'Overdue Project',
         description: '',
         dueDate: '2026-11-01T00:00:00.000Z', // past due
-        driveLink: '',
+        oneDriveLink: '',
         createdBy: '',
         createdAt: '2026-10-20T00:00:00.000Z',
         updatedAt: '',
@@ -34,10 +36,12 @@ describe('utils/notifications', () => {
       },
       {
         id: 'asg-due-soon',
+        courseId: 'course-web101',
+        submissionType: 'individual',
         title: 'Due Soon Quiz',
         description: '',
         dueDate: '2026-11-06T00:00:00.000Z', // in 2 days
-        driveLink: '',
+        oneDriveLink: '',
         createdBy: '',
         createdAt: '2026-11-03T00:00:00.000Z', // recent
         updatedAt: '',
@@ -47,10 +51,12 @@ describe('utils/notifications', () => {
       },
       {
         id: 'asg-done',
+        courseId: 'course-web101',
+        submissionType: 'individual',
         title: 'Finished Project',
         description: '',
         dueDate: '2026-11-01T00:00:00.000Z', // past due but submitted
-        driveLink: '',
+        oneDriveLink: '',
         createdBy: '',
         createdAt: '2026-10-20T00:00:00.000Z',
         updatedAt: '',
@@ -80,10 +86,12 @@ describe('utils/notifications', () => {
     const assignments: AdminAssignment[] = [
       {
         id: 'asg-admin-1',
+        courseId: 'course-web101',
+        submissionType: 'individual',
         title: 'Project 1',
         description: '',
         dueDate: '2026-11-01T00:00:00.000Z', // past due
-        driveLink: '',
+        oneDriveLink: '',
         createdBy: '',
         createdAt: '',
         updatedAt: '',

@@ -66,7 +66,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           aria-invalid={Boolean(error)}
           aria-describedby={describedBy || undefined}
           className={cn(
-            'w-full min-h-[40px] px-4 py-2 text-sm rounded-pill bg-surface-2 border border-line text-fg placeholder:text-muted',
+            'w-full min-h-[44px] px-4 py-2.5 text-sm rounded-pill bg-surface-2 border border-line text-fg placeholder:text-muted',
             'focus:outline-none focus:border-accent focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2',
             'motion-safe:transition-colors motion-safe:duration-150',
             leftIcon && 'pl-10',

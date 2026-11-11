@@ -44,8 +44,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   }
 
   const sizeStyles: Record<ButtonSize, string> = {
-    sm: 'text-xs px-3.5 py-1.5 min-h-[40px] gap-1.5',
-    md: 'text-sm px-5 py-2.5 min-h-[40px] gap-2',
+    sm: 'text-xs px-3.5 py-1.5 min-h-[40px] sm:min-h-[38px] gap-1.5',
+    md: 'text-sm px-5 py-2.5 min-h-[44px] gap-2',
     lg: 'text-base px-6 py-3 min-h-[44px] gap-2.5',
   }
 

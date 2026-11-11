@@ -1,5 +1,8 @@
 import { Link } from 'react-router-dom'
 import {
+  AlertTriangle,
+  CheckCircle2,
+  Clock,
   ExternalLink,
   ListChecks,
   Pencil,
@@ -103,6 +106,34 @@ export function ProfessorAssignmentCard({
               {isGroup ? 'Group' : 'Individual'}
             </Badge>
           </div>
+
+          <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
+            {isComplete ? (
+              <Badge
+                tone="success"
+                size="sm"
+                icon={<CheckCircle2 className="w-3 h-3" aria-hidden="true" />}
+                className="shadow-xs backdrop-blur-xs"
+              >
+                Complete
+              </Badge>
+            ) : urgency.isUrgent ? (
+              <Badge
+                tone={urgency.tone}
+                size="sm"
+                icon={
+                  urgency.tone === 'danger' ? (
+                    <AlertTriangle className="w-3 h-3" aria-hidden="true" />
+                  ) : (
+                    <Clock className="w-3 h-3" aria-hidden="true" />
+                  )
+                }
+                className="shadow-xs backdrop-blur-xs"
+              >
+                {urgency.badgeLabel}
+              </Badge>
+            ) : null}
+          </div>
         </div>
 
         {/* 2. Main Content Body */}
@@ -123,14 +154,44 @@ export function ProfessorAssignmentCard({
           </div>
 
           <div className="space-y-3 pt-1">
-            {/* Due Label with Urgency styling */}
+            {/* Due Label with Urgency styling (never color alone: icon + text) */}
             <div
               className={cn(
-                'rounded-md',
+                'rounded-md flex items-center justify-between gap-2',
                 urgency.isUrgent ? urgency.dueRowClasses : 'text-xs text-fg',
               )}
             >
-              <DueLabel dueDate={assignment.dueDate} />
+              <div className="flex items-center gap-2">
+                {urgency.tone === 'danger' && !isComplete && (
+                  <AlertTriangle
+                    className="w-4 h-4 text-danger shrink-0"
+                    aria-hidden="true"
+                  />
+                )}
+                {urgency.tone === 'warning' && !isComplete && (
+                  <Clock
+                    className="w-4 h-4 text-warning shrink-0"
+                    aria-hidden="true"
+                  />
+                )}
+                {isComplete && (
+                  <CheckCircle2
+                    className="w-4 h-4 text-success shrink-0"
+                    aria-hidden="true"
+                  />
+                )}
+                <DueLabel dueDate={assignment.dueDate} />
+              </div>
+              {urgency.isUrgent && !isComplete && (
+                <span className="text-[11px] font-semibold tracking-wide uppercase shrink-0">
+                  {urgency.helperText || urgency.badgeLabel}
+                </span>
+              )}
+              {isComplete && (
+                <span className="text-[11px] font-semibold tracking-wide uppercase text-success shrink-0">
+                  Complete
+                </span>
+              )}
             </div>
 
             {/* Full-width "Open OneDrive link" row */}
@@ -163,8 +224,15 @@ export function ProfessorAssignmentCard({
           {/* Progress Bar with {submitted} of {total} text and percentage */}
           <div className="space-y-1.5 pt-3 border-t border-line">
             <div className="flex items-center justify-between text-xs font-medium tabular-nums">
-              <span className="text-muted">{trackingText}</span>
-              <span className="font-semibold text-fg">{percent}%</span>
+              <span className={cn('inline-flex items-center gap-1.5', isComplete ? 'text-success font-semibold' : 'text-muted')}>
+                {isComplete && (
+                  <CheckCircle2 className="w-3.5 h-3.5 text-success shrink-0" aria-hidden="true" />
+                )}
+                <span>{trackingText}</span>
+              </span>
+              <span className={cn('font-semibold', isComplete ? 'text-success' : 'text-fg')}>
+                {percent}%
+              </span>
             </div>
             <ProgressBar
               value={tracking.submitted}

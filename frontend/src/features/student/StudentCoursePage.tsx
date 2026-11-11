@@ -533,7 +533,7 @@ export function StudentCoursePage() {
                   <select
                     value={sortOrder}
                     onChange={(e) => updateUrlParams({ sort: e.target.value })}
-                    className="h-10 px-3 rounded-md bg-surface border border-line text-xs font-medium text-fg focus:outline-none focus:ring-2 focus:ring-accent cursor-pointer min-w-[170px]"
+                    className="h-10 px-3 rounded-md bg-surface border border-line text-xs font-medium text-fg focus:outline-none focus:ring-2 focus:ring-accent cursor-pointer w-full sm:w-auto min-w-0 sm:min-w-[170px]"
                     aria-label="Sort assignments by due date"
                   >
                     <option value="due_asc">Due date: earliest first</option>

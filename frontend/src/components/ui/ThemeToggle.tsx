@@ -13,12 +13,12 @@ export function ThemeToggle() {
       onClick={toggleTheme}
       aria-label={ariaLabel}
       title={ariaLabel}
-      className="inline-flex items-center justify-center w-10 h-10 min-w-[40px] min-h-[40px] rounded-pill bg-surface-2 border border-line text-fg transition-colors hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 cursor-pointer"
+      className="inline-flex items-center justify-center w-11 h-11 min-w-[44px] min-h-[44px] rounded-pill bg-surface-2 border border-line text-fg motion-safe:transition-colors hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 cursor-pointer"
     >
       {isDark ? (
-        <Sun className="w-5 h-5 text-fg transition-transform duration-200" aria-hidden="true" />
+        <Sun className="w-5 h-5 text-fg motion-safe:transition-transform motion-safe:duration-200" aria-hidden="true" />
       ) : (
-        <Moon className="w-5 h-5 text-fg transition-transform duration-200" aria-hidden="true" />
+        <Moon className="w-5 h-5 text-fg motion-safe:transition-transform motion-safe:duration-200" aria-hidden="true" />
       )}
     </button>
   )

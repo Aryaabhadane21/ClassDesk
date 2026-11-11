@@ -90,9 +90,9 @@ export function Modal({
             type="button"
             onClick={onClose}
             aria-label="Close dialog"
-            className="inline-flex items-center justify-center w-8 h-8 rounded-pill text-muted hover:text-fg hover:bg-surface-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer motion-safe:transition-colors shrink-0"
+            className="inline-flex items-center justify-center w-11 h-11 min-w-[44px] min-h-[44px] rounded-pill text-muted hover:text-fg hover:bg-surface-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer motion-safe:transition-colors shrink-0"
           >
-            <X className="w-4 h-4" aria-hidden="true" />
+            <X className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
 

@@ -186,7 +186,7 @@ export function AppShell() {
                   type="button"
                   onClick={() => setIsDrawerOpen(false)}
                   aria-label="Close navigation"
-                  className="p-1 rounded-pill text-muted hover:text-fg hover:bg-surface-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer"
+                  className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-pill text-muted hover:text-fg hover:bg-surface-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer motion-safe:transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>

@@ -26,7 +26,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
 
   return (
     <div className={cn('relative flex items-start gap-3 py-1 cursor-pointer select-none', className)}>
-      <div className="flex items-center justify-center min-h-[40px] shrink-0">
+      <div className="flex items-center justify-center min-h-[44px] shrink-0">
         <div className="relative flex items-center justify-center">
           <input
             ref={ref}

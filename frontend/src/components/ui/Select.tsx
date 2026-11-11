@@ -64,7 +64,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
           aria-invalid={Boolean(error)}
           aria-describedby={describedBy || undefined}
           className={cn(
-            'w-full min-h-[40px] px-4 py-2 pr-10 text-sm rounded-pill bg-surface-2 border border-line text-fg appearance-none cursor-pointer',
+            'w-full min-h-[44px] px-4 py-2.5 pr-10 text-sm rounded-pill bg-surface-2 border border-line text-fg appearance-none cursor-pointer',
             'focus:outline-none focus:border-accent focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2',
             'motion-safe:transition-colors motion-safe:duration-150',
             error && 'border-danger focus:border-danger focus-visible:ring-danger',

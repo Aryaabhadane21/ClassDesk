@@ -391,7 +391,7 @@ export function ProfessorAssignmentDetailPage() {
               <div
                 role="radiogroup"
                 aria-label="Status filter"
-                className="inline-flex rounded-pill border border-line bg-surface-2 p-0.5 min-h-[44px] items-center self-start"
+                className="inline-flex rounded-pill border border-line bg-surface-2 p-0.5 min-h-[44px] items-center self-start overflow-x-auto max-w-full"
               >
                 {[
                   { label: 'All', value: 'all' as const, count: totalEntriesCount },

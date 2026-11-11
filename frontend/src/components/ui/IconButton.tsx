@@ -41,9 +41,9 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
   }
 
   const sizeStyles: Record<IconButtonSize, string> = {
-    sm: 'w-10 h-10 min-w-[40px] min-h-[40px] text-xs',
-    md: 'w-10 h-10 min-w-[40px] min-h-[40px] text-sm',
-    lg: 'w-12 h-12 min-w-[44px] min-h-[44px] text-base',
+    sm: 'w-11 h-11 min-w-[44px] min-h-[44px] text-xs',
+    md: 'w-11 h-11 min-w-[44px] min-h-[44px] text-sm',
+    lg: 'w-12 h-12 min-w-[48px] min-h-[48px] text-base',
   }
 
   return (

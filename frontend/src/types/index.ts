@@ -49,6 +49,111 @@ export interface Group {
 }
 
 /**
+ * Group with populated leader and members profiles.
+ * Members include the leader, with the leader listed first.
+ */
+export type GroupDetail = Group & {
+  leader: SafeUser
+  members: SafeUser[]
+}
+
+/**
+ * Course view for professors with aggregate metrics
+ */
+export type ProfessorCourse = Course & {
+  studentCount: number
+  assignmentCount: number
+  groupCount: number
+}
+
+/**
+ * Course view for enrolled students with professor profile, progress, and group status
+ */
+export type StudentCourse = Course & {
+  professor: SafeUser
+  assignmentCount: number
+  acknowledgedCount: number
+  myGroup: GroupDetail | null
+}
+
+/**
+ * Form input payload for creating a new course
+ */
+export interface CourseInput {
+  code: string
+  name: string
+  description: string
+  semester?: string
+}
+
+/**
+ * Acknowledgement details for an assignment
+ */
+export interface AckInfo {
+  acknowledged: boolean
+  acknowledgedAt: string | null
+  acknowledgedBy: SafeUser | null
+}
+
+/**
+ * Student view of a course assignment with acknowledgement and group state
+ */
+export interface StudentCourseAssignment {
+  assignment: Assignment
+  ack: AckInfo
+  group?: {
+    state: 'no_group' | 'member' | 'leader'
+    detail: GroupDetail | null
+    canAcknowledge: boolean
+  }
+}
+
+/**
+ * Submission tracking details for professors
+ */
+export type AssignmentTracking =
+  | {
+      kind: 'individual'
+      total: number
+      submitted: number
+      entries: {
+        student: SafeUser
+        status: SubmissionStatus
+        submittedAt: string | null
+      }[]
+    }
+  | {
+      kind: 'group'
+      total: number
+      submitted: number
+      entries: {
+        group: GroupDetail
+        status: SubmissionStatus
+        acknowledgedAt: string | null
+      }[]
+      ungroupedStudents: SafeUser[]
+    }
+
+/**
+ * Professor view of a course assignment with full tracking matrix
+ */
+export interface ProfessorCourseAssignment {
+  assignment: Assignment
+  tracking: AssignmentTracking
+}
+
+/**
+ * Form input payload for creating or editing a course assignment
+ */
+export interface CourseAssignmentInput {
+  title: string
+  description: string
+  dueDate: string
+  oneDriveLink: string
+  submissionType: SubmissionType
+}
+
+/**
  * Group acknowledgement record for group assignments.
  * Model note:
  * - Individual assignments use the existing Submission records (one per student,

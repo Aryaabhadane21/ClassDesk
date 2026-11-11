@@ -197,6 +197,22 @@ export async function listCourseAssignments(
 }
 
 /**
+ * Retrieves a single course assignment with full tracking details for the professor.
+ */
+export async function getCourseAssignment(
+  professorId: string,
+  courseId: string,
+  assignmentId: string,
+): Promise<ProfessorCourseAssignment> {
+  const list = await listCourseAssignments(professorId, courseId)
+  const item = list.find((a) => a.assignment.id === assignmentId)
+  if (!item) {
+    throw new ApiError('Assignment not found', 'NOT_FOUND')
+  }
+  return item
+}
+
+/**
  * Creates a new assignment for a course.
  * Automatically assigns to all currently enrolled students.
  * Initializes not_submitted records for individual assignments.

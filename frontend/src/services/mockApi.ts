@@ -41,6 +41,7 @@ import {
 } from '@/services/api/groups'
 import {
   listCourseAssignments,
+  getCourseAssignment,
   createCourseAssignment,
   updateCourseAssignment,
   deleteCourseAssignment,
@@ -90,6 +91,7 @@ export const mockApi = {
   leaveGroup,
   // Course assignments
   listCourseAssignments,
+  getCourseAssignment,
   createCourseAssignment,
   updateCourseAssignment,
   deleteCourseAssignment,

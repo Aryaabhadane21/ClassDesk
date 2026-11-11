@@ -1,11 +1,13 @@
+import { Link } from 'react-router-dom'
 import {
   ExternalLink,
+  ListChecks,
   Pencil,
   Trash2,
   User,
   Users,
 } from 'lucide-react'
-import { Badge, Card, Highlight, IconButton } from '@/components/ui'
+import { Badge, Button, Card, Highlight, IconButton, ProgressBar } from '@/components/ui'
 import { AssignmentCover } from '@/components/assignments/AssignmentCover'
 import { DueLabel } from '@/components/assignments/DueLabel'
 import { getAdminUrgency } from '@/utils/dueStyles'
@@ -54,6 +56,12 @@ export function ProfessorAssignmentCard({
   } else {
     trackingText = `${tracking.submitted} of ${tracking.total} groups acknowledged`
   }
+
+  const percent =
+    tracking.total > 0
+      ? Math.round((tracking.submitted / tracking.total) * 100)
+      : 0
+  const isComplete = percent === 100 && tracking.total > 0
 
   const urgency = getAdminUrgency(
     assignment.dueDate,
@@ -151,17 +159,36 @@ export function ProfessorAssignmentCard({
         </div>
 
         {/* 3. Footer */}
-        <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-0">
-          {/* 
-            SLOT: Reserved for Step 9 Progress Bar and "View Submissions" action button.
-            In Step 9, the submission review drawer trigger and visual progress bar will be inserted here.
-          */}
+        <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-0 space-y-3">
+          {/* Progress Bar with {submitted} of {total} text and percentage */}
+          <div className="space-y-1.5 pt-3 border-t border-line">
+            <div className="flex items-center justify-between text-xs font-medium tabular-nums">
+              <span className="text-muted">{trackingText}</span>
+              <span className="font-semibold text-fg">{percent}%</span>
+            </div>
+            <ProgressBar
+              value={tracking.submitted}
+              max={tracking.total || 1}
+              tone={isComplete ? 'success' : 'accent'}
+              aria-label={`Progress for ${assignment.title}`}
+            />
+          </div>
 
-          <div className="flex items-center justify-between gap-3 pt-3 border-t border-line">
-            <p className="text-xs font-medium text-muted tabular-nums">
-              {trackingText}
-            </p>
-            <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center justify-between gap-2">
+            <Link
+              to={`/admin/courses/${assignment.courseId}/assignments/${assignment.id}`}
+              className="flex-1 min-w-0"
+            >
+              <Button
+                variant="secondary"
+                size="sm"
+                leftIcon={<ListChecks className="w-3.5 h-3.5" />}
+                className="w-full text-xs font-medium justify-center min-h-[36px]"
+              >
+                View submissions
+              </Button>
+            </Link>
+            <div className="flex items-center gap-1 shrink-0">
               <IconButton
                 type="button"
                 variant="ghost"

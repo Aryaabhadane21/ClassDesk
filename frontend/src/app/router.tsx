@@ -14,6 +14,7 @@ import { StudentAssignmentsPage } from '@/features/student/StudentAssignmentsPag
 import { StudentCalendarPage } from '@/features/student/StudentCalendarPage'
 import { ProfessorDashboardPage } from '@/features/admin/ProfessorDashboardPage'
 import { ProfessorCoursePage } from '@/features/admin/ProfessorCoursePage'
+import { ProfessorAssignmentDetailPage } from '@/features/admin/ProfessorAssignmentDetailPage'
 import { AdminAssignmentsPage } from '@/features/admin/AdminAssignmentsPage'
 import { AssignmentDetailPage } from '@/features/admin/AssignmentDetailPage'
 import { AdminCalendarPage } from '@/features/admin/AdminCalendarPage'
@@ -78,6 +79,10 @@ export function AppRouter() {
         >
           <Route index element={<ProfessorDashboardPage />} />
           <Route path="courses/:courseId" element={<ProfessorCoursePage />} />
+          <Route
+            path="courses/:courseId/assignments/:assignmentId"
+            element={<ProfessorAssignmentDetailPage />}
+          />
           {/* temporary, replaced by the course assignments page in step 8 */}
           <Route path="legacy" element={<AdminAssignmentsPage />} />
           <Route path="assignments/:assignmentId" element={<AssignmentDetailPage />} />

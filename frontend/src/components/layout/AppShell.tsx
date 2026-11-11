@@ -46,15 +46,13 @@ export function AppShell() {
     if (href === '/admin') {
       return (
         location.pathname === '/admin' ||
-        location.pathname.startsWith('/admin/courses') ||
-        location.pathname.startsWith('/admin/assignments')
+        location.pathname.startsWith('/admin/courses')
       )
     }
     if (href === '/student') {
       return (
         location.pathname === '/student' ||
-        location.pathname.startsWith('/student/courses') ||
-        location.pathname.startsWith('/student/assignments')
+        location.pathname.startsWith('/student/courses')
       )
     }
     return defaultActive

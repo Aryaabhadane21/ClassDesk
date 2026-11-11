@@ -7,7 +7,6 @@ import {
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   AlertCircle,
-  ChevronDown,
   Clock,
   RotateCcw,
   Sparkles,
@@ -267,153 +266,81 @@ export function LoginPage() {
       </div>
 
       {/* ------------------------------------------------------------- */}
-      {/* DEMO ACCOUNTS BLOCK                                           */}
+      {/* DEMO ACCOUNTS BLOCK (visible across all screen sizes)          */}
       {/* ------------------------------------------------------------- */}
-      <div className="pt-6 border-t border-line text-left">
-        <div className="hidden sm:block space-y-4">
-          <div className="space-y-0.5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-fg uppercase tracking-wider">
-                <Sparkles className="w-3.5 h-3.5 text-accent" />
-                <span>Demo accounts</span>
-              </div>
+      <div className="pt-6 border-t border-line text-left space-y-4">
+        <div className="space-y-0.5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-fg uppercase tracking-wider">
+              <Sparkles className="w-3.5 h-3.5 text-accent" />
+              <span>Demo accounts</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsResetDialogOpen(true)}
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-muted hover:text-fg motion-safe:transition-colors focus:outline-none focus-visible:underline cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>Reset demo data</span>
+            </button>
+          </div>
+          <p className="text-[11px] text-muted">
+            Click an account to fill the form. Password for all:{' '}
+            <code className="font-mono text-fg bg-surface-2 px-1 py-0.5 rounded-sm">
+              demo1234
+            </code>
+          </p>
+        </div>
+
+        {/* Professors */}
+        <div className="space-y-1.5">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-muted">
+            Professors
+          </span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {professors.map((p) => (
               <button
+                key={p.id}
                 type="button"
-                onClick={() => setIsResetDialogOpen(true)}
-                className="inline-flex items-center gap-1.5 text-xs font-medium text-muted hover:text-fg motion-safe:transition-colors focus:outline-none focus-visible:underline cursor-pointer"
+                onClick={() => selectDemoAccount(p)}
+                className="flex items-center gap-2.5 p-2 rounded-md bg-surface-2 border border-line text-left hover:border-accent/40 hover:bg-surface motion-safe:transition-all cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
-                <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />
-                <span>Reset demo data</span>
+                <Avatar name={p.name} size="sm" />
+                <div className="overflow-hidden">
+                  <div className="text-xs font-medium text-fg truncate group-hover:text-accent transition-colors">
+                    {p.name}
+                  </div>
+                  <div className="text-[10px] text-muted truncate">{p.email}</div>
+                </div>
               </button>
-            </div>
-            <p className="text-[11px] text-muted">
-              Click an account to fill the form. Password for all:{' '}
-              <code className="font-mono text-fg bg-surface-2 px-1 py-0.5 rounded-sm">
-                demo1234
-              </code>
-            </p>
-          </div>
-
-          {/* Professors */}
-          <div className="space-y-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-muted">
-              Professors
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {professors.map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  onClick={() => selectDemoAccount(p)}
-                  className="flex items-center gap-2.5 p-2 rounded-md bg-surface-2 border border-line text-left hover:border-accent/40 hover:bg-surface motion-safe:transition-all cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-                >
-                  <Avatar name={p.name} size="sm" />
-                  <div className="overflow-hidden">
-                    <div className="text-xs font-medium text-fg truncate group-hover:text-accent transition-colors">
-                      {p.name}
-                    </div>
-                    <div className="text-[10px] text-muted truncate">{p.email}</div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Students */}
-          <div className="space-y-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-muted">
-              Students
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {students.map((s) => (
-                <button
-                  key={s.id}
-                  type="button"
-                  onClick={() => selectDemoAccount(s)}
-                  className="flex items-center gap-2.5 p-2 rounded-md bg-surface-2 border border-line text-left hover:border-accent/40 hover:bg-surface motion-safe:transition-all cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-                >
-                  <Avatar name={s.name} size="sm" />
-                  <div className="overflow-hidden">
-                    <div className="text-xs font-medium text-fg truncate group-hover:text-accent transition-colors">
-                      {s.name}
-                    </div>
-                    <div className="text-[10px] text-muted truncate">{s.email}</div>
-                  </div>
-                </button>
-              ))}
-            </div>
+            ))}
           </div>
         </div>
 
-        {/* Mobile Collapsible Details (<details>) */}
-        <details className="sm:hidden group rounded-lg bg-surface-2 border border-line p-3 cursor-pointer">
-          <summary className="flex items-center justify-between text-xs font-semibold text-fg select-none list-none">
-            <span className="flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-accent" />
-              <span>Demo accounts (click to view)</span>
-            </span>
-            <ChevronDown className="w-4 h-4 text-muted transition-transform group-open:rotate-180" />
-          </summary>
-
-          <div className="pt-3 space-y-3 mt-2 border-t border-line">
-            <p className="text-[11px] text-muted">
-              Click an account to fill the form. Password for all:{' '}
-              <code className="font-mono text-fg bg-surface px-1 py-0.5 rounded-sm">
-                demo1234
-              </code>
-            </p>
-
-            <div className="space-y-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-muted block">
-                Professors
-              </span>
-              {professors.map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  onClick={() => selectDemoAccount(p)}
-                  className="w-full flex items-center gap-2.5 p-2 rounded-md bg-surface border border-line text-left"
-                >
-                  <Avatar name={p.name} size="sm" />
-                  <div className="overflow-hidden">
-                    <div className="text-xs font-medium text-fg truncate">{p.name}</div>
-                    <div className="text-[10px] text-muted truncate">{p.email}</div>
-                  </div>
-                </button>
-              ))}
-
-              <span className="text-[10px] font-bold uppercase tracking-wider text-muted block pt-1">
-                Students
-              </span>
-              {students.map((s) => (
-                <button
-                  key={s.id}
-                  type="button"
-                  onClick={() => selectDemoAccount(s)}
-                  className="w-full flex items-center gap-2.5 p-2 rounded-md bg-surface border border-line text-left"
-                >
-                  <Avatar name={s.name} size="sm" />
-                  <div className="overflow-hidden">
-                    <div className="text-xs font-medium text-fg truncate">{s.name}</div>
-                    <div className="text-[10px] text-muted truncate">{s.email}</div>
-                  </div>
-                </button>
-              ))}
-            </div>
-
-            <div className="flex items-center justify-between pt-2 border-t border-line/60">
-              <span className="text-[11px] text-muted">Restore initial state</span>
+        {/* Students */}
+        <div className="space-y-1.5">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-muted">
+            Students
+          </span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {students.map((s) => (
               <button
+                key={s.id}
                 type="button"
-                onClick={() => setIsResetDialogOpen(true)}
-                className="inline-flex items-center gap-1.5 text-xs font-medium text-muted hover:text-fg motion-safe:transition-colors focus:outline-none focus-visible:underline cursor-pointer"
+                onClick={() => selectDemoAccount(s)}
+                className="flex items-center gap-2.5 p-2 rounded-md bg-surface-2 border border-line text-left hover:border-accent/40 hover:bg-surface motion-safe:transition-all cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
-                <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />
-                <span>Reset demo data</span>
+                <Avatar name={s.name} size="sm" />
+                <div className="overflow-hidden">
+                  <div className="text-xs font-medium text-fg truncate group-hover:text-accent transition-colors">
+                    {s.name}
+                  </div>
+                  <div className="text-[10px] text-muted truncate">{s.email}</div>
+                </div>
               </button>
-            </div>
+            ))}
           </div>
-        </details>
+        </div>
       </div>
 
       {/* Reset Demo Data Confirmation Dialog */}

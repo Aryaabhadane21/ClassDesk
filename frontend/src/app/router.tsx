@@ -10,13 +10,10 @@ import { LoginPage } from '@/features/auth/LoginPage'
 import { RegisterPage } from '@/features/auth/RegisterPage'
 import { StudentDashboardPage } from '@/features/student/StudentDashboardPage'
 import { StudentCoursePage } from '@/features/student/StudentCoursePage'
-import { StudentAssignmentsPage } from '@/features/student/StudentAssignmentsPage'
 import { StudentCalendarPage } from '@/features/student/StudentCalendarPage'
 import { ProfessorDashboardPage } from '@/features/admin/ProfessorDashboardPage'
 import { ProfessorCoursePage } from '@/features/admin/ProfessorCoursePage'
 import { ProfessorAssignmentDetailPage } from '@/features/admin/ProfessorAssignmentDetailPage'
-import { AdminAssignmentsPage } from '@/features/admin/AdminAssignmentsPage'
-import { AssignmentDetailPage } from '@/features/admin/AssignmentDetailPage'
 import { AdminCalendarPage } from '@/features/admin/AdminCalendarPage'
 import { NotFoundPage } from '@/features/common/NotFoundPage'
 import { UiGallery } from '@/features/dev/UiGallery'
@@ -61,8 +58,6 @@ export function AppRouter() {
         >
           <Route index element={<StudentDashboardPage />} />
           <Route path="courses/:courseId" element={<StudentCoursePage />} />
-          {/* temporary, replaced by the course assignments page in step 10 */}
-          <Route path="legacy" element={<StudentAssignmentsPage />} />
           <Route path="calendar" element={<StudentCalendarPage />} />
         </Route>
 
@@ -83,9 +78,6 @@ export function AppRouter() {
             path="courses/:courseId/assignments/:assignmentId"
             element={<ProfessorAssignmentDetailPage />}
           />
-          {/* temporary, replaced by the course assignments page in step 8 */}
-          <Route path="legacy" element={<AdminAssignmentsPage />} />
-          <Route path="assignments/:assignmentId" element={<AssignmentDetailPage />} />
           <Route path="calendar" element={<AdminCalendarPage />} />
         </Route>
 

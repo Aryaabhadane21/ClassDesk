@@ -38,6 +38,22 @@ describe('Integration: Login Flow', () => {
     expect(await screen.findByRole('alert')).toBeInTheDocument()
   })
 
+  it('renders demo accounts for both professors and students visibly', () => {
+    renderWithProviders(<LoginPage />)
+
+    expect(screen.getByText(/demo accounts/i)).toBeInTheDocument()
+    expect(screen.getByText(/^professors$/i)).toBeInTheDocument()
+    expect(screen.getByText(/^students$/i)).toBeInTheDocument()
+
+    // Professor demo buttons
+    expect(screen.getByRole('button', { name: /prof\. meera iyer/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /prof\. arjun mehta/i })).toBeInTheDocument()
+
+    // Student demo buttons
+    expect(screen.getByRole('button', { name: /aarav sharma/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /diya patel/i })).toBeInTheDocument()
+  })
+
   it('fills the form when clicking demo student account', async () => {
     const user = userEvent.setup()
     renderWithProviders(<LoginPage />)
@@ -50,6 +66,37 @@ describe('Integration: Login Flow', () => {
 
     expect(emailInput.value).toBe('aarav.sharma@classdesk.edu')
     expect(passwordInput.value).toBe('demo1234')
+  })
+
+  it('fills the form when clicking demo professor account and signs in to /admin', async () => {
+    const user = userEvent.setup()
+
+    renderWithProviders(
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/student" element={<div>Student Dashboard View</div>} />
+        <Route path="/admin" element={<div>Admin Dashboard View</div>} />
+      </Routes>,
+      {
+        initialEntries: ['/login'],
+      },
+    )
+
+    const profBtn = screen.getByRole('button', { name: /prof\. meera iyer/i })
+    await user.click(profBtn)
+
+    const emailInput = screen.getByLabelText(/email address/i) as HTMLInputElement
+    const passwordInput = screen.getByLabelText(/^password/i) as HTMLInputElement
+    expect(emailInput.value).toBe('meera.iyer@classdesk.edu')
+    expect(passwordInput.value).toBe('demo1234')
+
+    const submitBtn = screen.getByRole('button', { name: /sign in/i })
+    await user.click(submitBtn)
+
+    // Should redirect to /admin
+    await waitFor(() => {
+      expect(screen.getByText('Admin Dashboard View')).toBeInTheDocument()
+    })
   })
 
   it('successful login lands on the correct role home page', async () => {

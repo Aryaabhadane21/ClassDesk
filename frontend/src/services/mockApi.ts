@@ -47,9 +47,6 @@ import {
   deleteCourseAssignment,
   getStudentAssignments,
   getAdminAssignments,
-  createAssignment,
-  updateAssignment,
-  deleteAssignment,
 } from '@/services/api/assignments'
 import {
   getStudentCourseAssignments,
@@ -99,13 +96,9 @@ export const mockApi = {
   getStudentCourseAssignments,
   acknowledgeGroupAssignment,
   getStudentCourseProgress,
-  // Legacy assignment methods
   getStudentAssignments,
   markSubmitted,
   getAdminAssignments,
-  createAssignment,
-  updateAssignment,
-  deleteAssignment,
   // Config
   apiConfig,
   setApiConfig,

@@ -252,22 +252,6 @@ export interface Assignment {
 }
 
 /**
- * Form input payload for creating or updating an assignment
- */
-export interface AssignmentInput {
-  courseId?: string
-  submissionType?: SubmissionType
-  title: string
-  description: string
-  /** ISO 8601 string or valid date string */
-  dueDate: string
-  /** Valid http or https URL */
-  oneDriveLink: string
-  /** Either 'all' (expanded to all active students) or a specific non-empty list of student IDs */
-  assignedTo: 'all' | string[]
-}
-
-/**
  * Submission status options
  */
 export type SubmissionStatus = 'submitted' | 'not_submitted'

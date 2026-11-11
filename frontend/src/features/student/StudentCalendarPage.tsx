@@ -173,11 +173,11 @@ export function StudentCalendarPage() {
                     <div className="flex items-center justify-between pt-1 gap-2 flex-wrap">
                       <DueLabel dueDate={item.dueDate} />
                       <Link
-                        to={`/student?q=${encodeURIComponent(item.title)}`}
+                        to={`/student/courses/${item.courseId}`}
                         className="inline-block"
                       >
                         <Button variant="secondary" size="sm" className="text-xs h-7">
-                          View on dashboard
+                          View on course
                         </Button>
                       </Link>
                     </div>

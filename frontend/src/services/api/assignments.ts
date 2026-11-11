@@ -14,7 +14,6 @@ import type {
   AdminAssignment,
   Assignment,
   AssignmentAudience,
-  AssignmentInput,
   AssignmentTracking,
   CourseAssignmentInput,
   GroupDetail,
@@ -23,7 +22,6 @@ import type {
   StudentAssignment,
   Submission,
   SubmissionStatus,
-  SubmissionType,
   SubmissionWithStudent,
 } from '@/types'
 
@@ -509,99 +507,85 @@ export async function deleteCourseAssignment(
 }
 
 // ---------------------------------------------------------------------------
-// Legacy Assignment Methods (retained for current screens; legacy, replaced by the course functions in steps 6-13)
+// Cross-Course Assignment Aggregate Queries (Calendar & Notifications)
 // ---------------------------------------------------------------------------
 
 /**
- * Validate legacy assignment input fields
- */
-function validateLegacyAssignmentInput(input: AssignmentInput, allStudentIds: string[]): string[] {
-  const trimmedTitle = input.title ? input.title.trim() : ''
-  if (trimmedTitle.length < 3 || trimmedTitle.length > 80) {
-    throw new ApiError('Title must be between 3 and 80 characters', 'VALIDATION')
-  }
-
-  const trimmedDesc = input.description ? input.description.trim() : ''
-  if (!trimmedDesc) {
-    throw new ApiError('Description is required', 'VALIDATION')
-  }
-  if (trimmedDesc.length > 500) {
-    throw new ApiError('Description must not exceed 500 characters', 'VALIDATION')
-  }
-
-  const dueTimestamp = new Date(input.dueDate).getTime()
-  if (isNaN(dueTimestamp)) {
-    throw new ApiError('Due date must be a valid date', 'VALIDATION')
-  }
-
-  try {
-    const parsed = new URL(input.oneDriveLink)
-    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
-      throw new Error()
-    }
-  } catch {
-    throw new ApiError('OneDrive link must be a valid http or https URL', 'VALIDATION')
-  }
-
-  let assignedIds: string[] = []
-  if (input.assignedTo === 'all') {
-    assignedIds = [...allStudentIds]
-  } else if (Array.isArray(input.assignedTo) && input.assignedTo.length > 0) {
-    for (const id of input.assignedTo) {
-      if (!allStudentIds.includes(id)) {
-        throw new ApiError(`Invalid student ID in assignment selection: ${id}`, 'VALIDATION')
-      }
-    }
-    assignedIds = Array.from(new Set(input.assignedTo))
-  } else {
-    throw new ApiError('Assignment must be assigned to "all" or at least one student', 'VALIDATION')
-  }
-
-  return assignedIds
-}
-
-/**
- * Retrieves all assignments assigned to a specific student with their submission status.
- * legacy, replaced by the course functions in steps 6-13
+ * Retrieves all assignments for an enrolled student across their courses
+ * with their submission/acknowledgement status.
  */
 export async function getStudentAssignments(studentId: string): Promise<StudentAssignment[]> {
   await simulateNetwork()
-  const { users, assignments, submissions } = getStorageData()
+  const { users, enrollments, groups, groupAcks, assignments, submissions } = getStorageData()
 
   const student = users.find((u) => u.id === studentId)
   assertRole(student, 'student', 'Student')
 
-  const studentAssignments = assignments.filter(
-    (a) => a.assignedTo.includes(studentId) && a.submissionType === 'individual',
+  const enrolledCourseIds = new Set(
+    enrollments.filter((e) => e.studentId === studentId).map((e) => e.courseId),
   )
 
+  const userGroups = groups.filter((g) => g.memberIds.includes(studentId))
+  const userGroupMap = new Map<string, string>() // courseId -> groupId
+  for (const g of userGroups) {
+    userGroupMap.set(g.courseId, g.id)
+  }
+
+  const studentAssignments = assignments.filter((a) => {
+    if (!enrolledCourseIds.has(a.courseId)) return false
+    if (a.submissionType === 'group') return true
+    return a.assignedTo.includes(studentId)
+  })
+
   return studentAssignments.map((assignment) => {
-    const submission = submissions.find(
-      (s) => s.assignmentId === assignment.id && s.studentId === studentId,
-    )
+    let status: SubmissionStatus = 'not_submitted'
+    let submittedAt: string | null = null
+
+    if (assignment.submissionType === 'individual') {
+      const submission = submissions.find(
+        (s) => s.assignmentId === assignment.id && s.studentId === studentId,
+      )
+      if (submission) {
+        status = submission.status
+        submittedAt = submission.submittedAt
+      }
+    } else {
+      const groupId = userGroupMap.get(assignment.courseId)
+      if (groupId) {
+        const ack = groupAcks.find(
+          (ga) => ga.assignmentId === assignment.id && ga.groupId === groupId,
+        )
+        if (ack) {
+          status = 'submitted'
+          submittedAt = ack.acknowledgedAt
+        }
+      }
+    }
 
     return {
       ...assignment,
-      status: submission ? submission.status : 'not_submitted',
-      submittedAt: submission ? submission.submittedAt : null,
+      status,
+      submittedAt,
     }
   })
 }
 
 /**
- * Retrieves all assignments created by a specific admin with detailed submission lists and counts.
- * legacy, replaced by the course functions in steps 6-13
+ * Retrieves all assignments across all courses taught by an admin/professor
+ * with submission lists and counts.
  */
 export async function getAdminAssignments(adminId: string): Promise<AdminAssignment[]> {
   await simulateNetwork()
-  const { users, assignments, submissions } = getStorageData()
+  const { users, courses, assignments, submissions, groups, groupAcks } = getStorageData()
 
   const admin = users.find((u) => u.id === adminId)
   assertRole(admin, 'admin', 'Admin')
 
-  const adminAssignments = assignments.filter(
-    (a) => a.createdBy === adminId && a.submissionType === 'individual',
-  )
+  const profCourses = courses.filter((c) => c.professorId === adminId)
+  const profCourseIds = new Set(profCourses.map((c) => c.id))
+
+  const adminAssignments = assignments.filter((a) => profCourseIds.has(a.courseId))
+
   const studentsMap = new Map<string, SafeUser>()
   for (const u of users) {
     if (u.role === 'student') {
@@ -610,8 +594,21 @@ export async function getAdminAssignments(adminId: string): Promise<AdminAssignm
   }
 
   return adminAssignments.map((assignment) => {
-    const joinedSubmissions: SubmissionWithStudent[] = []
+    const isGroup = assignment.submissionType === 'group'
+    const courseGroups = groups.filter((g) => g.courseId === assignment.courseId)
+
+    if (isGroup) {
+      const acks = groupAcks.filter((ga) => ga.assignmentId === assignment.id)
+      return {
+        ...assignment,
+        submissions: [],
+        submittedCount: acks.length,
+        totalCount: courseGroups.length,
+      }
+    }
+
     let submittedCount = 0
+    const joinedSubmissions: SubmissionWithStudent[] = []
 
     for (const studentId of assignment.assignedTo) {
       const student = studentsMap.get(studentId)
@@ -620,7 +617,6 @@ export async function getAdminAssignments(adminId: string): Promise<AdminAssignm
       const sub = submissions.find(
         (s) => s.assignmentId === assignment.id && s.studentId === studentId,
       )
-
       const status = sub ? sub.status : 'not_submitted'
       const submittedAt = sub ? sub.submittedAt : null
 
@@ -645,256 +641,4 @@ export async function getAdminAssignments(adminId: string): Promise<AdminAssignm
       totalCount: assignment.assignedTo.length,
     }
   })
-}
-
-/**
- * Creates a new assignment by an admin and initializes not_submitted records for all assigned students.
- * legacy, replaced by the course functions in steps 6-13
- */
-export async function createAssignment(
-  adminId: string,
-  input: AssignmentInput,
-): Promise<AdminAssignment> {
-  await simulateNetwork()
-  const { users, courses, assignments, submissions } = getStorageData()
-
-  const admin = users.find((u) => u.id === adminId)
-  assertRole(admin, 'admin', 'Admin')
-
-  const allStudentIds = users.filter((u) => u.role === 'student').map((u) => u.id)
-  const targetStudentIds = validateLegacyAssignmentInput(input, allStudentIds)
-
-  const professorCourses = courses.filter((c) => c.professorId === adminId)
-
-  let courseId = input.courseId
-  if (!courseId) {
-    courseId = professorCourses[0]?.id || 'course-web101'
-  } else {
-    const course = professorCourses.find((c) => c.id === courseId)
-    if (!course) {
-      throw new ApiError('Course does not belong to this professor', 'VALIDATION')
-    }
-  }
-
-  const submissionType: SubmissionType = input.submissionType || 'individual'
-  if (submissionType !== 'individual' && submissionType !== 'group') {
-    throw new ApiError('Invalid submission type', 'VALIDATION')
-  }
-
-  const now = new Date().toISOString()
-  const assignmentId = `asg-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`
-
-  const audience: AssignmentAudience = Array.isArray(input.assignedTo) ? 'selected' : 'all'
-
-  const newAssignment: Assignment = {
-    id: assignmentId,
-    courseId,
-    submissionType,
-    audience,
-    title: input.title.trim(),
-    description: input.description.trim(),
-    dueDate: new Date(input.dueDate).toISOString(),
-    oneDriveLink: input.oneDriveLink.trim(),
-    createdBy: adminId,
-    assignedTo: targetStudentIds,
-    createdAt: now,
-    updatedAt: now,
-  }
-
-  const newSubmissions: Submission[] = targetStudentIds.map((studentId) => ({
-    id: `sub-${assignmentId}-${studentId}`,
-    assignmentId,
-    studentId,
-    status: 'not_submitted',
-    submittedAt: null,
-  }))
-
-  assignments.push(newAssignment)
-  const updatedSubmissions = [...submissions, ...newSubmissions]
-
-  setAssignments(assignments)
-  setSubmissions(updatedSubmissions)
-
-  const studentsMap = new Map<string, SafeUser>()
-  for (const u of users) {
-    if (u.role === 'student') {
-      studentsMap.set(u.id, toSafeUser(u))
-    }
-  }
-
-  const submissionsWithStudent: SubmissionWithStudent[] = targetStudentIds.map((studentId) => ({
-    id: `sub-${assignmentId}-${studentId}`,
-    assignmentId,
-    studentId,
-    status: 'not_submitted',
-    submittedAt: null,
-    student: studentsMap.get(studentId)!,
-  }))
-
-  return {
-    ...newAssignment,
-    submissions: submissionsWithStudent,
-    submittedCount: 0,
-    totalCount: targetStudentIds.length,
-  }
-}
-
-/**
- * Updates an assignment's details and synchronizes student submissions when assignedTo changes.
- * legacy, replaced by the course functions in steps 6-13
- */
-export async function updateAssignment(
-  adminId: string,
-  assignmentId: string,
-  input: AssignmentInput,
-): Promise<AdminAssignment> {
-  await simulateNetwork()
-  const { users, courses, assignments, submissions } = getStorageData()
-
-  const admin = users.find((u) => u.id === adminId)
-  assertRole(admin, 'admin', 'Admin')
-
-  const assignmentIndex = assignments.findIndex((a) => a.id === assignmentId)
-  if (assignmentIndex === -1) {
-    throw new ApiError('Assignment not found', 'NOT_FOUND')
-  }
-
-  const existingAssignment = assignments[assignmentIndex]
-  if (existingAssignment.createdBy !== adminId) {
-    throw new ApiError('You do not have permission to modify this assignment', 'UNAUTHORIZED')
-  }
-
-  const allStudentIds = users.filter((u) => u.role === 'student').map((u) => u.id)
-  const targetStudentIds = validateLegacyAssignmentInput(input, allStudentIds)
-
-  const previousAssigned = new Set(existingAssignment.assignedTo)
-  const nextAssigned = new Set(targetStudentIds)
-
-  const addedStudents = targetStudentIds.filter((id) => !previousAssigned.has(id))
-  const removedStudents = existingAssignment.assignedTo.filter((id) => !nextAssigned.has(id))
-
-  const filteredSubmissions = submissions.filter((sub) => {
-    if (sub.assignmentId === assignmentId && removedStudents.includes(sub.studentId)) {
-      return false
-    }
-    return true
-  })
-
-  for (const studentId of addedStudents) {
-    filteredSubmissions.push({
-      id: `sub-${assignmentId}-${studentId}`,
-      assignmentId,
-      studentId,
-      status: 'not_submitted',
-      submittedAt: null,
-    })
-  }
-
-  const professorCourses = courses.filter((c) => c.professorId === adminId)
-
-  let courseId = existingAssignment.courseId
-  if (input.courseId) {
-    const course = professorCourses.find((c) => c.id === input.courseId)
-    if (!course) {
-      throw new ApiError('Course does not belong to this professor', 'VALIDATION')
-    }
-    courseId = input.courseId
-  }
-
-  let submissionType: SubmissionType = existingAssignment.submissionType || 'individual'
-  if (input.submissionType) {
-    if (input.submissionType !== 'individual' && input.submissionType !== 'group') {
-      throw new ApiError('Invalid submission type', 'VALIDATION')
-    }
-    submissionType = input.submissionType
-  }
-
-  const audience: AssignmentAudience =
-    input.assignedTo === 'all'
-      ? 'all'
-      : Array.isArray(input.assignedTo)
-        ? 'selected'
-        : existingAssignment.audience || 'all'
-
-  const now = new Date().toISOString()
-  const updatedAssignment: Assignment = {
-    ...existingAssignment,
-    courseId,
-    submissionType,
-    audience,
-    title: input.title.trim(),
-    description: input.description.trim(),
-    dueDate: new Date(input.dueDate).toISOString(),
-    oneDriveLink: input.oneDriveLink.trim(),
-    assignedTo: targetStudentIds,
-    updatedAt: now,
-  }
-
-  assignments[assignmentIndex] = updatedAssignment
-
-  setAssignments(assignments)
-  setSubmissions(filteredSubmissions)
-
-  const studentsMap = new Map<string, SafeUser>()
-  for (const u of users) {
-    if (u.role === 'student') {
-      studentsMap.set(u.id, toSafeUser(u))
-    }
-  }
-
-  let submittedCount = 0
-  const submissionsWithStudent: SubmissionWithStudent[] = targetStudentIds.map((studentId) => {
-    const sub = filteredSubmissions.find(
-      (s) => s.assignmentId === assignmentId && s.studentId === studentId,
-    )
-    const status = sub ? sub.status : 'not_submitted'
-    const submittedAt = sub ? sub.submittedAt : null
-
-    if (status === 'submitted') {
-      submittedCount += 1
-    }
-
-    return {
-      id: sub ? sub.id : `sub-${assignmentId}-${studentId}`,
-      assignmentId,
-      studentId,
-      status,
-      submittedAt,
-      student: studentsMap.get(studentId)!,
-    }
-  })
-
-  return {
-    ...updatedAssignment,
-    submissions: submissionsWithStudent,
-    submittedCount,
-    totalCount: targetStudentIds.length,
-  }
-}
-
-/**
- * Deletes an assignment and purges all of its associated submissions.
- * legacy, replaced by the course functions in steps 6-13
- */
-export async function deleteAssignment(adminId: string, assignmentId: string): Promise<void> {
-  await simulateNetwork()
-  const { users, assignments, submissions } = getStorageData()
-
-  const admin = users.find((u) => u.id === adminId)
-  assertRole(admin, 'admin', 'Admin')
-
-  const assignment = assignments.find((a) => a.id === assignmentId)
-  if (!assignment) {
-    throw new ApiError('Assignment not found', 'NOT_FOUND')
-  }
-
-  if (assignment.createdBy !== adminId) {
-    throw new ApiError('You do not have permission to delete this assignment', 'UNAUTHORIZED')
-  }
-
-  const remainingAssignments = assignments.filter((a) => a.id !== assignmentId)
-  const remainingSubmissions = submissions.filter((s) => s.assignmentId !== assignmentId)
-
-  setAssignments(remainingAssignments)
-  setSubmissions(remainingSubmissions)
 }

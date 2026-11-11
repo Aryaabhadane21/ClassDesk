@@ -178,7 +178,7 @@ export function AdminCalendarPage() {
                     <div className="flex items-center justify-between pt-1 gap-2 flex-wrap">
                       <DueLabel dueDate={item.dueDate} />
                       <Link
-                        to={`/admin/assignments/${item.id}`}
+                        to={`/admin/courses/${item.courseId}/assignments/${item.id}`}
                         className="inline-block"
                       >
                         <Button variant="secondary" size="sm" className="text-xs h-7">

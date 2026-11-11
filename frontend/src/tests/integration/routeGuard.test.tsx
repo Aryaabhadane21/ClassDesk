@@ -68,4 +68,39 @@ describe('Integration: Route Guard Role Protection', () => {
     expect(await screen.findByText('Login Page')).toBeInTheDocument()
     expect(screen.queryByText('Student Secret Content')).not.toBeInTheDocument()
   })
+
+  it('redirects an authenticated professor away from /student to /admin', async () => {
+    // Sign in as professor
+    const token = createToken({
+      id: 'user-admin-1',
+      name: 'Prof. Meera Iyer',
+      email: 'meera.iyer@classdesk.edu',
+      role: 'admin',
+    })
+    window.localStorage.setItem(STORAGE_KEYS.TOKEN, token)
+
+    renderWithProviders(
+      <Routes>
+        <Route
+          path="/student"
+          element={
+            <RequireAuth>
+              <RequireRole role="student">
+                <div>Student Secret Content</div>
+              </RequireRole>
+            </RequireAuth>
+          }
+        />
+        <Route path="/admin" element={<div>Admin Home Page</div>} />
+        <Route path="/login" element={<div>Login Page</div>} />
+      </Routes>,
+      {
+        initialEntries: ['/student'],
+      },
+    )
+
+    // Should redirect to /admin and display Admin Home Page
+    expect(await screen.findByText('Admin Home Page')).toBeInTheDocument()
+    expect(screen.queryByText('Student Secret Content')).not.toBeInTheDocument()
+  })
 })

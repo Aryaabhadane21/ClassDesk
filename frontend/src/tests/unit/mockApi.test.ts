@@ -52,95 +52,24 @@ describe('services/mockApi', () => {
     })
   })
 
-  describe('admin assignment CRUD and access boundary', () => {
-    it('creates assignment, validates input, expands all students and creates submissions', async () => {
-      // Validation error: short title
-      await expect(
-        mockApi.createAssignment('user-admin-1', {
-          title: 'ab',
-          description: 'Valid description',
-          dueDate: new Date(Date.now() + 86400000).toISOString(),
-          oneDriveLink: 'https://1drv.ms/test',
-          assignedTo: 'all',
-        }),
-      ).rejects.toThrow(ApiError)
-
-      // Valid assignment creation
-      const created = await mockApi.createAssignment('user-admin-1', {
-        title: 'New Valid Assignment',
-        description: 'Complete all steps and deliverables.',
-        dueDate: new Date(Date.now() + 86400000 * 5).toISOString(),
-        oneDriveLink: 'https://1drv.ms/folder',
-        assignedTo: 'all',
-      })
-
-      expect(created.id).toBeTruthy()
-      expect(created.submissions.length).toBe(5) // all 5 students
-      expect(created.totalCount).toBe(5)
+  describe('cross-course assignment aggregates', () => {
+    it('retrieves student assignments across all enrolled courses', async () => {
+      const asgs = await mockApi.getStudentAssignments('user-student-1')
+      expect(asgs.length).toBeGreaterThan(0)
+      for (const a of asgs) {
+        expect(a.title).toBeTruthy()
+        expect(a.status).toMatch(/^(submitted|not_submitted)$/)
+      }
     })
 
-    it('updates assignment: handles added/removed students and preserves existing submissions', async () => {
-      const created = await mockApi.createAssignment('user-admin-1', {
-        title: 'Project for Update',
-        description: 'Initial description',
-        dueDate: new Date(Date.now() + 86400000 * 5).toISOString(),
-        oneDriveLink: 'https://1drv.ms/folder',
-        assignedTo: ['user-student-1', 'user-student-2'],
-      })
-
-      // Student 1 submits
-      await mockApi.markSubmitted('user-student-1', created.id)
-
-      // Update: add student 3
-      const updated = await mockApi.updateAssignment('user-admin-1', created.id, {
-        title: 'Project for Update (Modified)',
-        description: 'Updated description',
-        dueDate: created.dueDate,
-        oneDriveLink: created.oneDriveLink,
-        assignedTo: ['user-student-1', 'user-student-2', 'user-student-3'],
-      })
-
-      expect(updated.title).toBe('Project for Update (Modified)')
-      expect(updated.totalCount).toBe(3)
-      // Student 1 submission record should be preserved
-      const sub1 = updated.submissions.find((s) => s.studentId === 'user-student-1')
-      expect(sub1?.status).toBe('submitted')
-    })
-
-    it('deletes assignment and removes its submissions', async () => {
-      const created = await mockApi.createAssignment('user-admin-1', {
-        title: 'Project to Delete',
-        description: 'Short-lived assignment',
-        dueDate: new Date(Date.now() + 86400000 * 5).toISOString(),
-        oneDriveLink: 'https://1drv.ms/folder',
-        assignedTo: 'all',
-      })
-
-      await mockApi.deleteAssignment('user-admin-1', created.id)
-
+    it('retrieves admin assignments across all taught courses', async () => {
       const meeraAsgs = await mockApi.getAdminAssignments('user-admin-1')
-      expect(meeraAsgs.some((a) => a.id === created.id)).toBe(false)
-    })
-
-    it('refuses access when an admin tries to view/modify another admin’s assignment', async () => {
-      const arjunAsgs = await mockApi.getAdminAssignments('user-admin-2')
-      const arjunAsgId = arjunAsgs[0].id
-
-      // Prof. Meera tries to delete Prof. Arjun's assignment
-      await expect(
-        mockApi.deleteAssignment('user-admin-1', arjunAsgId),
-      ).rejects.toThrow(ApiError)
-
-      // Prof. Meera tries to update Prof. Arjun's assignment
-      await expect(
-        mockApi.updateAssignment('user-admin-1', arjunAsgId, {
-          title: 'Hacked Title',
-          description: 'Hacked',
-          dueDate: arjunAsgs[0].dueDate,
-          oneDriveLink: arjunAsgs[0].oneDriveLink,
-          assignedTo: 'all',
-        }),
-      ).rejects.toThrow(ApiError)
+      expect(meeraAsgs.length).toBeGreaterThan(0)
+      for (const a of meeraAsgs) {
+        expect(a.title).toBeTruthy()
+        expect(typeof a.submittedCount).toBe('number')
+        expect(typeof a.totalCount).toBe('number')
+      }
     })
   })
 })

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { ApiError, mockApi } from '@/services/mockApi'
-import type { StudentCourse, StudentCourseAssignment } from '@/types'
+import type { GroupDetail, StudentCourse, StudentCourseAssignment } from '@/types'
 
 export type StudentCoursePageStatus = 'loading' | 'success' | 'error' | 'not_found'
 
@@ -9,6 +9,7 @@ export function useStudentCourseAssignments(courseId: string | undefined) {
   const { user } = useAuth()
 
   const [course, setCourse] = useState<StudentCourse | null>(null)
+  const [courseGroups, setCourseGroups] = useState<GroupDetail[]>([])
   const [assignments, setAssignments] = useState<StudentCourseAssignment[]>([])
   const [status, setStatus] = useState<StudentCoursePageStatus>('loading')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -43,19 +44,21 @@ export function useStudentCourseAssignments(courseId: string | undefined) {
           return
         }
 
-        // 3. Fetch applicable assignments with acknowledgement & group info
+        // 3. Fetch all groups in this course
+        const groups = await mockApi.listCourseGroups(user.id, courseId)
+
+        // 4. Fetch applicable assignments with acknowledgement & group info
         const asgs = await mockApi.getStudentCourseAssignments(user.id, courseId)
 
         if (isMountedRef.current) {
           setCourse(matchedCourse)
+          setCourseGroups(groups)
           setAssignments(asgs)
           setStatus('success')
         }
       } catch (err: unknown) {
         if (!isMountedRef.current) return
-        if (err instanceof ApiError && err.code === 'NOT_FOUND') {
-          setStatus('not_found')
-        } else if (err instanceof ApiError && err.code === 'UNAUTHORIZED') {
+        if (err instanceof ApiError && (err.code === 'NOT_FOUND' || err.code === 'UNAUTHORIZED')) {
           setStatus('not_found')
         } else {
           setStatus('error')
@@ -111,13 +114,36 @@ export function useStudentCourseAssignments(courseId: string | undefined) {
     [user, fetchCourseData],
   )
 
+  const createGroupHandler = useCallback(
+    async (name: string): Promise<GroupDetail> => {
+      if (!user || !courseId) throw new Error('Not authenticated')
+      const created = await mockApi.createGroup(user.id, courseId, name)
+      await fetchCourseData(true)
+      return created
+    },
+    [user, courseId, fetchCourseData],
+  )
+
+  const joinGroupHandler = useCallback(
+    async (groupId: string): Promise<GroupDetail> => {
+      if (!user) throw new Error('Not authenticated')
+      const joined = await mockApi.joinGroup(user.id, groupId)
+      await fetchCourseData(true)
+      return joined
+    },
+    [user, fetchCourseData],
+  )
+
   return {
     course,
+    courseGroups,
     assignments,
     status,
     errorMessage,
     reload: fetchCourseData,
     submitIndividual,
     submitGroup,
+    createGroup: createGroupHandler,
+    joinGroup: joinGroupHandler,
   }
 }

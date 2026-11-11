@@ -23,6 +23,7 @@ export interface StudentAssignmentCardProps {
   item?: StudentCourseAssignment
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onSubmitClick?: (assignment: any, buttonEl: HTMLButtonElement) => void
+  onCreateOrJoinGroup?: () => void
   searchQuery?: string
   className?: string
   isJustSubmitted?: boolean
@@ -33,6 +34,7 @@ export function StudentAssignmentCard({
   assignment,
   item,
   onSubmitClick,
+  onCreateOrJoinGroup,
   searchQuery,
   className,
   isJustSubmitted = false,
@@ -135,7 +137,7 @@ export function StudentAssignmentCard({
               <Badge
                 tone="neutral"
                 size="sm"
-                icon={<Clock className="w-3 h-3" aria-hidden="true" />}
+                icon={<Clock className="w-3 h-3" />}
                 className="shadow-xs backdrop-blur-xs"
               >
                 Pending
@@ -264,7 +266,16 @@ export function StudentAssignmentCard({
                     <p className="text-xs text-muted leading-relaxed">
                       You are not part of any group. Create or join one to submit this assignment.
                     </p>
-                    <a href="#groups" className="block w-full">
+                    <a
+                      href="#groups"
+                      onClick={(e) => {
+                        if (onCreateOrJoinGroup) {
+                          e.preventDefault()
+                          onCreateOrJoinGroup()
+                        }
+                      }}
+                      className="block w-full"
+                    >
                       <Button
                         type="button"
                         variant="secondary"

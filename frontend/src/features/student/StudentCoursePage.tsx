@@ -7,6 +7,7 @@ import {
   BookOpen,
   ClipboardList,
   Crown,
+  Plus,
   Search,
   UserPlus,
   Users,
@@ -15,12 +16,15 @@ import { PageHeader } from '@/components/layout/PageHeader'
 import { StudentAssignmentCard } from '@/components/assignments/StudentAssignmentCard'
 import {
   Avatar,
+  Badge,
   Button,
   Card,
   ConfirmDialog,
   EmptyState,
   ErrorState,
   Eyebrow,
+  Input,
+  Modal,
   ProgressBar,
   SearchInput,
   Skeleton,
@@ -45,12 +49,15 @@ export function StudentCoursePage() {
 
   const {
     course,
+    courseGroups,
     assignments,
     status,
     errorMessage,
     reload,
     submitIndividual,
     submitGroup,
+    createGroup,
+    joinGroup,
   } = useStudentCourseAssignments(courseId)
 
   usePageTitle(course ? `${course.name} · ClassDesk` : 'Course · ClassDesk')
@@ -66,6 +73,13 @@ export function StudentCoursePage() {
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [justSubmittedId, setJustSubmittedId] = useState<string | null>(null)
   const lastTriggerRef = useRef<HTMLButtonElement | null>(null)
+
+  // Group creation modal state
+  const [isCreateGroupOpen, setIsCreateGroupOpen] = useState(false)
+  const [newGroupName, setNewGroupName] = useState('')
+  const [groupNameError, setGroupNameError] = useState<string | null>(null)
+  const [isCreatingGroup, setIsCreatingGroup] = useState(false)
+  const [joiningGroupId, setJoiningGroupId] = useState<string | null>(null)
 
   const updateUrlParams = (updates: { search?: string; filter?: string; sort?: string }) => {
     const nextParams = new URLSearchParams(searchParams)
@@ -173,6 +187,15 @@ export function StudentCoursePage() {
     updateUrlParams({ search: '', filter: 'all' })
   }
 
+  // Scroll to groups section and focus it
+  const handleScrollToGroups = () => {
+    const groupsEl = document.getElementById('groups')
+    if (groupsEl) {
+      groupsEl.scrollIntoView?.({ behavior: 'smooth' })
+      groupsEl.focus()
+    }
+  }
+
   // Submission confirmation flow
   const handleOpenConfirm = (assignment: Assignment, triggerButton: HTMLButtonElement) => {
     lastTriggerRef.current = triggerButton
@@ -225,6 +248,67 @@ export function StudentCoursePage() {
       toastError(msg, 'Submission Failed')
     } finally {
       setIsSubmitting(false)
+    }
+  }
+
+  // Group creation flow
+  const handleCreateGroupSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const trimmed = newGroupName.trim()
+
+    if (!trimmed) {
+      setGroupNameError('Group name is required')
+      return
+    }
+    if (trimmed.length < 2 || trimmed.length > 40) {
+      setGroupNameError('Group name must be between 2 and 40 characters')
+      return
+    }
+
+    const isDuplicate = courseGroups.some(
+      (g) => g.name.trim().toLowerCase() === trimmed.toLowerCase(),
+    )
+    if (isDuplicate) {
+      setGroupNameError('That group name is already taken in this course')
+      return
+    }
+
+    setIsCreatingGroup(true)
+    setGroupNameError(null)
+
+    try {
+      const created = await createGroup(trimmed)
+      toastSuccess(`Created group: ${created.name}`, 'Group Created')
+      setIsCreateGroupOpen(false)
+      setNewGroupName('')
+
+      // Focus the groups panel
+      setTimeout(() => {
+        handleScrollToGroups()
+      }, 100)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to create group.'
+      setGroupNameError(msg)
+    } finally {
+      setIsCreatingGroup(false)
+    }
+  }
+
+  // Group join flow
+  const handleJoinGroup = async (groupId: string, groupName: string) => {
+    setJoiningGroupId(groupId)
+    try {
+      await joinGroup(groupId)
+      toastSuccess(`Joined ${groupName}`, 'Group Joined')
+
+      setTimeout(() => {
+        handleScrollToGroups()
+      }, 100)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to join group.'
+      toastError(msg, 'Join Group Failed')
+    } finally {
+      setJoiningGroupId(null)
     }
   }
 
@@ -293,7 +377,7 @@ export function StudentCoursePage() {
   const isMember = Boolean(course.myGroup && !isLeader)
 
   return (
-    <div className="space-y-6 text-left">
+    <div className="space-y-8 text-left">
       {/* 1. Back Link */}
       <div>
         <Link
@@ -366,9 +450,6 @@ export function StudentCoursePage() {
           />
         </Card>
       </div>
-
-      {/* Anchor target for Step 11 group section */}
-      <div id="groups" className="sr-only" aria-hidden="true" />
 
       {/* 4. Assignments Section */}
       <section aria-labelledby="assignments-heading" className="space-y-4 pt-2">
@@ -499,11 +580,238 @@ export function StudentCoursePage() {
                     key={item.assignment.id}
                     item={item}
                     onSubmitClick={handleOpenConfirm}
+                    onCreateOrJoinGroup={handleScrollToGroups}
                     searchQuery={searchQuery}
                     isJustSubmitted={justSubmittedId === item.assignment.id}
                     onBurstComplete={() => setJustSubmittedId(null)}
                   />
                 ))}
+              </div>
+            )}
+          </div>
+        )}
+      </section>
+
+      {/* 5. GROUPS SECTION (Step 11) */}
+      <section
+        id="groups"
+        tabIndex={-1}
+        aria-labelledby="groups-heading"
+        className="space-y-4 pt-8 border-t border-line outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-lg"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <Eyebrow id="groups-heading">GROUPS</Eyebrow>
+            <h2 className="font-display text-xl font-semibold text-fg tracking-tight">
+              Study Groups
+            </h2>
+            <p className="text-xs text-muted">
+              Team up with your classmates for collaborative project deliverables.
+            </p>
+          </div>
+
+          {/* If student has no group, show "Create a group" button */}
+          {!course.myGroup && (
+            <Button
+              type="button"
+              variant="primary"
+              size="md"
+              leftIcon={<Plus className="w-4 h-4 shrink-0" />}
+              onClick={() => {
+                setIsCreateGroupOpen(true)
+                setGroupNameError(null)
+                setNewGroupName('')
+              }}
+              className="self-start sm:self-auto"
+            >
+              Create a group
+            </Button>
+          )}
+        </div>
+
+        {/* VIEW A: Student is already IN a group -> Show GroupPanel */}
+        {course.myGroup ? (
+          <Card className="p-6 bg-surface border border-line rounded-lg shadow-card space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-line pb-4">
+              <div>
+                <p className="text-xs text-muted uppercase tracking-wider font-semibold">
+                  Your Group
+                </p>
+                <h3 className="font-display text-xl font-bold text-fg tracking-tight">
+                  {course.myGroup.name}
+                </h3>
+              </div>
+              <div>
+                {isLeader ? (
+                  <Badge tone="accent" size="sm" icon={<Crown className="w-3.5 h-3.5" />}>
+                    You are the Leader
+                  </Badge>
+                ) : (
+                  <Badge tone="neutral" size="sm" icon={<Users className="w-3.5 h-3.5" />}>
+                    Member
+                  </Badge>
+                )}
+              </div>
+            </div>
+
+            {/* Leader Highlight */}
+            <div className="p-4 rounded-lg bg-surface-2 border border-line flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5">
+                <Avatar name={course.myGroup.leader.name} size="md" />
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-sm text-fg">
+                      {course.myGroup.leader.name}
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-accent">
+                      <Crown className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                      Leader
+                    </span>
+                    {course.myGroup.leaderId === user?.id && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-pill bg-accent/20 text-accent font-semibold">
+                        You
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted">{course.myGroup.leader.email}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* All Members List */}
+            <div className="space-y-3">
+              <p className="text-xs font-semibold text-muted uppercase tracking-wider">
+                Group Members ({course.myGroup.members.length})
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                {course.myGroup.members.map((member) => {
+                  const isThisLeader = member.id === course.myGroup?.leaderId
+                  const isYou = member.id === user?.id
+
+                  return (
+                    <div
+                      key={member.id}
+                      className="p-3.5 rounded-md bg-surface border border-line flex items-center justify-between gap-2 shadow-xs"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <Avatar name={member.name} size="sm" />
+                        <div className="min-w-0">
+                          <p className="font-medium text-xs text-fg truncate">
+                            {member.name}
+                          </p>
+                          <p className="text-[11px] text-muted truncate">
+                            {member.email}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        {isThisLeader && (
+                          <span
+                            title="Leader"
+                            className="inline-flex items-center text-accent"
+                          >
+                            <Crown className="w-3.5 h-3.5" aria-hidden="true" />
+                          </span>
+                        )}
+                        {isYou && (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-pill bg-accent/15 text-accent font-semibold">
+                            You
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </Card>
+        ) : (
+          /* VIEW B: Student has NO group -> Show existing groups to join or empty state */
+          <div>
+            {courseGroups.length === 0 ? (
+              <div className="py-8">
+                <EmptyState
+                  icon={<Users className="w-8 h-8 text-muted" />}
+                  title="No groups yet, be the first to create one"
+                  description="Create a group so your classmates can team up with you for course assignments."
+                  action={
+                    <Button
+                      type="button"
+                      variant="primary"
+                      onClick={() => {
+                        setIsCreateGroupOpen(true)
+                        setGroupNameError(null)
+                        setNewGroupName('')
+                      }}
+                    >
+                      Create a group
+                    </Button>
+                  }
+                />
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-xs text-muted font-medium">
+                  Available groups in this course ({courseGroups.length}):
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {courseGroups.map((group) => {
+                    const isJoining = joiningGroupId === group.id
+                    return (
+                      <Card
+                        key={group.id}
+                        className="p-5 bg-surface border border-line rounded-lg shadow-card flex flex-col justify-between space-y-4 text-left"
+                      >
+                        <div className="space-y-3">
+                          <div className="flex items-start justify-between gap-2">
+                            <h3 className="font-display text-base font-semibold text-fg tracking-tight">
+                              {group.name}
+                            </h3>
+                            <span className="inline-flex items-center gap-1 text-[11px] text-muted font-medium bg-surface-2 px-2 py-0.5 rounded-pill border border-line">
+                              <Users className="w-3 h-3" />
+                              {group.members.length} {group.members.length === 1 ? 'member' : 'members'}
+                            </span>
+                          </div>
+
+                          {/* Leader Info */}
+                          <div className="flex items-center gap-2.5 text-xs text-muted">
+                            <Avatar name={group.leader.name} size="sm" />
+                            <div className="min-w-0">
+                              <p className="text-fg font-medium truncate">
+                                Leader: {group.leader.name}
+                              </p>
+                              <p className="text-[11px] text-muted truncate">
+                                {group.leader.email}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Member Avatars preview */}
+                          <div className="flex items-center gap-1.5 pt-1">
+                            {group.members.map((m) => (
+                              <Avatar key={m.id} name={m.name} size="sm" />
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Join Group Action Button */}
+                        <div className="pt-3 border-t border-line">
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            size="sm"
+                            disabled={isJoining}
+                            onClick={() => handleJoinGroup(group.id, group.name)}
+                            className="w-full justify-center min-h-[38px]"
+                            aria-label={`Join group ${group.name}`}
+                          >
+                            {isJoining ? 'Joining...' : 'Join group'}
+                          </Button>
+                        </div>
+                      </Card>
+                    )
+                  })}
+                </div>
               </div>
             )}
           </div>
@@ -547,6 +855,58 @@ export function StudentCoursePage() {
           }
         />
       )}
+
+      {/* "Create a group" Accessible Modal */}
+      <Modal
+        isOpen={isCreateGroupOpen}
+        onClose={() => {
+          if (!isCreatingGroup) {
+            setIsCreateGroupOpen(false)
+            setGroupNameError(null)
+          }
+        }}
+        title="Create a group"
+        description={`Create a new study group for ${course.name}. You will be the founding leader.`}
+      >
+        <form onSubmit={handleCreateGroupSubmit} className="space-y-4 text-left">
+          <Input
+            label="Group Name"
+            name="groupName"
+            value={newGroupName}
+            onChange={(e) => {
+              setNewGroupName(e.target.value)
+              if (groupNameError) setGroupNameError(null)
+            }}
+            placeholder="e.g. Code Crafters"
+            error={groupNameError || undefined}
+            disabled={isCreatingGroup}
+            maxLength={40}
+            required
+            autoFocus
+          />
+
+          <div className="flex items-center justify-end gap-3 pt-2">
+            <Button
+              type="button"
+              variant="secondary"
+              disabled={isCreatingGroup}
+              onClick={() => {
+                setIsCreateGroupOpen(false)
+                setGroupNameError(null)
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={isCreatingGroup}
+            >
+              {isCreatingGroup ? 'Creating...' : 'Create group'}
+            </Button>
+          </div>
+        </form>
+      </Modal>
     </div>
   )
 }

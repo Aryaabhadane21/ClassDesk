@@ -226,7 +226,9 @@ export async function listStudentCourses(
         }
 
     const courseAssignments = assignments.filter(
-      (a) => a.courseId === course.id,
+      (a) =>
+        a.courseId === course.id &&
+        (a.submissionType === 'group' || a.assignedTo.includes(studentId)),
     )
     const assignmentCount = courseAssignments.length
 
@@ -387,8 +389,9 @@ export async function joinCourseByCode(
   setEnrollments([...enrollments, newEnrollment])
 
   // 2. Update existing course assignments and create individual submissions
+  // Joiners are dynamically added only to assignments with audience 'all'
   const updatedAssignments = assignments.map((asg) => {
-    if (asg.courseId === matchedCourse.id) {
+    if (asg.courseId === matchedCourse.id && asg.audience === 'all') {
       if (!asg.assignedTo.includes(studentId)) {
         return {
           ...asg,
@@ -405,6 +408,7 @@ export async function joinCourseByCode(
   for (const asg of updatedAssignments) {
     if (
       asg.courseId === matchedCourse.id &&
+      asg.audience === 'all' &&
       asg.submissionType === 'individual'
     ) {
       const exists = submissions.some(
@@ -442,7 +446,9 @@ export async function joinCourseByCode(
       }
 
   const courseAssignments = updatedAssignments.filter(
-    (a) => a.courseId === matchedCourse.id,
+    (a) =>
+      a.courseId === matchedCourse.id &&
+      (a.submissionType === 'group' || a.assignedTo.includes(studentId)),
   )
   const studentGroup = groups.find(
     (g) => g.courseId === matchedCourse.id && g.memberIds.includes(studentId),

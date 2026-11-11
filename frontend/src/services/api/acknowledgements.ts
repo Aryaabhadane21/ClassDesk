@@ -57,7 +57,11 @@ export async function getStudentCourseAssignments(
   const groupDetail = myGroup ? buildGroupDetail(myGroup, usersMap) : null
 
   const courseAssignments = assignments
-    .filter((a) => a.courseId === courseId)
+    .filter(
+      (a) =>
+        a.courseId === courseId &&
+        (a.submissionType === 'group' || a.assignedTo.includes(studentId)),
+    )
     .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
 
   return courseAssignments.map((assignment) => {
@@ -286,7 +290,11 @@ export async function getStudentCourseProgress(
     (g) => g.courseId === courseId && g.memberIds.includes(studentId),
   )
 
-  const courseAssignments = assignments.filter((a) => a.courseId === courseId)
+  const courseAssignments = assignments.filter(
+    (a) =>
+      a.courseId === courseId &&
+      (a.submissionType === 'group' || a.assignedTo.includes(studentId)),
+  )
   const total = courseAssignments.length
   let acknowledged = 0
 

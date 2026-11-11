@@ -217,6 +217,7 @@ describe('services/mockApi - Course, Group & Assignment Logic (Round 2)', () => 
         dueDate: new Date(Date.now() + 86400000 * 7).toISOString(),
         oneDriveLink: 'https://onedrive.live.com/test-link',
         submissionType: 'individual',
+        assignedTo: 'all',
       })
 
       expect(created.assignment.title).toBe('New Individual Project')
@@ -235,6 +236,7 @@ describe('services/mockApi - Course, Group & Assignment Logic (Round 2)', () => 
         dueDate: new Date(Date.now() + 86400000 * 14).toISOString(),
         oneDriveLink: 'https://onedrive.live.com/group-test-link',
         submissionType: 'group',
+        assignedTo: 'all',
       })
 
       expect(created.assignment.submissionType).toBe('group')
@@ -271,6 +273,7 @@ describe('services/mockApi - Course, Group & Assignment Logic (Round 2)', () => 
           dueDate: new Date(Date.now() + 86400000).toISOString(),
           oneDriveLink: 'https://onedrive.live.com/valid',
           submissionType: 'group',
+          assignedTo: 'all',
         }),
       ).rejects.toThrow("The submission type can't be changed after submissions have started")
     })
@@ -283,6 +286,7 @@ describe('services/mockApi - Course, Group & Assignment Logic (Round 2)', () => 
         dueDate: new Date(Date.now() + 86400000 * 5).toISOString(),
         oneDriveLink: 'https://onedrive.live.com/test',
         submissionType: 'individual',
+        assignedTo: 'all',
       })
 
       // Change to group
@@ -295,6 +299,7 @@ describe('services/mockApi - Course, Group & Assignment Logic (Round 2)', () => 
           dueDate: created.assignment.dueDate,
           oneDriveLink: created.assignment.oneDriveLink,
           submissionType: 'group',
+          assignedTo: 'all',
         },
       )
       expect(updated.assignment.submissionType).toBe('group')

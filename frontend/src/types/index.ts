@@ -175,6 +175,11 @@ export interface ProfessorCourseAssignment {
 }
 
 /**
+ * Audience mode for course assignments
+ */
+export type AssignmentAudience = 'all' | 'selected'
+
+/**
  * Form input payload for creating or editing a course assignment
  */
 export interface CourseAssignmentInput {
@@ -183,6 +188,7 @@ export interface CourseAssignmentInput {
   dueDate: string
   oneDriveLink: string
   submissionType: SubmissionType
+  assignedTo: 'all' | string[]
 }
 
 /**
@@ -228,6 +234,7 @@ export interface Assignment {
   id: string
   courseId: string
   submissionType: SubmissionType
+  audience: AssignmentAudience
   title: string
   description: string
   /** ISO 8601 date string for the assignment deadline */

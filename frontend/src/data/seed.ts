@@ -244,6 +244,7 @@ export function generateSeedData(): {
       id: 'asg-web-01',
       courseId: 'course-web101',
       submissionType: 'individual',
+      audience: 'all',
       title: 'Responsive Portfolio Website',
       description:
         'Develop a multi-page personal portfolio showcasing your modern frontend projects. Ensure semantic HTML5, fluid responsive layouts across mobile and desktop breakpoints, and WCAG AA accessibility standards. Provide complete CSS architecture and lighthouse audit reports.',
@@ -258,6 +259,7 @@ export function generateSeedData(): {
       id: 'asg-web-02',
       courseId: 'course-web101',
       submissionType: 'group',
+      audience: 'all',
       title: 'Team Project: Collaborative Task Board',
       description:
         'Collaborate as a team to architect an interactive Kanban task board with optimistic UI updates, drag-and-drop mechanics, and tag filtering. Ensure shared team coordination and clean Git branching workflows across components. Submit your team documentation and live OneDrive workspace.',
@@ -272,13 +274,14 @@ export function generateSeedData(): {
       id: 'asg-web-03',
       courseId: 'course-web101',
       submissionType: 'individual',
+      audience: 'selected',
       title: 'RESTful API Integration & Dashboard',
       description:
         'Connect a React dashboard to a third-party REST API with query parameter filtering, debounced search, and pagination. Handle network latency, loading skeletons, and custom retry logic for transient errors. Include interactive data visualization widgets.',
       dueDate: getRelativeDueDate(2), // Due within 2 days
       oneDriveLink: 'https://1drv.ms/f/s!Am3-web101-dashboard-turnin',
       createdBy: 'user-admin-1',
-      assignedTo: ['user-student-1', 'user-student-2', 'user-student-3', 'user-student-4', 'user-student-5'],
+      assignedTo: ['user-student-1', 'user-student-2', 'user-student-4'],
       createdAt: new Date(Date.now() - 3 * 86400000).toISOString(),
       updatedAt: now,
     },
@@ -288,6 +291,7 @@ export function generateSeedData(): {
       id: 'asg-hci-01',
       courseId: 'course-hci210',
       submissionType: 'individual',
+      audience: 'all',
       title: 'Heuristic Usability Evaluation',
       description:
         'Conduct an in-depth heuristic evaluation of an existing web service using Nielsens ten usability principles. Document severe usability friction points, assess severity ratings, and recommend actionable design remedies. Support findings with annotated screen captures.',
@@ -302,6 +306,7 @@ export function generateSeedData(): {
       id: 'asg-hci-02',
       courseId: 'course-hci210',
       submissionType: 'group',
+      audience: 'all',
       title: 'Accessibility Audit & Inclusive Design System',
       description:
         'Audit an educational portal against WCAG 2.1 AA criteria using automated screen readers and manual keyboard navigation tests. Create an inclusive design pattern token library with high contrast pairings and accessible focus indicators. Summarize team findings in a shared report.',
@@ -316,6 +321,7 @@ export function generateSeedData(): {
       id: 'asg-hci-03',
       courseId: 'course-hci210',
       submissionType: 'group',
+      audience: 'all',
       title: 'Interactive Prototype & Think-Aloud User Study',
       description:
         'Synthesize user research findings into interactive high-fidelity user workflows. Run moderated think-aloud usability sessions with representative participants, synthesize qualitative feedback into thematic affinity maps, and iterate on key friction screens.',
@@ -332,6 +338,7 @@ export function generateSeedData(): {
       id: 'asg-dsa-01',
       courseId: 'course-dsa201',
       submissionType: 'individual',
+      audience: 'all',
       title: 'Binary Search Tree & AVL Balancing',
       description:
         'Construct self-balancing AVL search trees from scratch in TypeScript with recursive node insertions and deletions. Include in-order, pre-order, and level-order traversal visitors alongside automated height balance recalculations. Measure rotational overhead against standard BSTs.',
@@ -346,6 +353,7 @@ export function generateSeedData(): {
       id: 'asg-dsa-02',
       courseId: 'course-dsa201',
       submissionType: 'group',
+      audience: 'all',
       title: 'Distributed Cache & Hash Ring System',
       description:
         'Design and simulate a consistent hashing ring supporting dynamic node joins, node failures, and key distribution with replication factor k. Benchmark load skew across vnodes and measure failover latency under synthetic traffic spikes. Submit team source code and benchmarks.',
@@ -360,13 +368,14 @@ export function generateSeedData(): {
       id: 'asg-dsa-03',
       courseId: 'course-dsa201',
       submissionType: 'individual',
+      audience: 'selected',
       title: 'Dynamic Programming Optimization',
       description:
         'Solve multidimensional knapsack and sequence alignment challenges using memoization and bottom-up tabulation. Compare execution time, call stack recursion depth, and space complexity optimizations. Provide comprehensive test suites demonstrating corner cases.',
       dueDate: getRelativeDueDate(12), // Due in 12 days
       oneDriveLink: 'https://1drv.ms/f/s!Am9-dsa201-dp-turnin',
       createdBy: 'user-admin-2',
-      assignedTo: ['user-student-1', 'user-student-3', 'user-student-4'],
+      assignedTo: ['user-student-1', 'user-student-4'],
       createdAt: now,
       updatedAt: now,
     },
@@ -376,6 +385,7 @@ export function generateSeedData(): {
       id: 'asg-osy-01',
       courseId: 'course-osy301',
       submissionType: 'individual',
+      audience: 'all',
       title: 'Multi-threaded Synchronization Engine',
       description:
         'Implement condition variables, mutex locks, and counting semaphores to coordinate concurrent producer-consumer thread pools. Prevent race conditions and priority inversions through structured lock ordering. Validate deadlock-free execution under thread contention stress tests.',
@@ -390,6 +400,7 @@ export function generateSeedData(): {
       id: 'asg-osy-02',
       courseId: 'course-osy301',
       submissionType: 'group',
+      audience: 'all',
       title: 'Virtual Memory Page Replacement Simulator',
       description:
         'Collaborate to construct an execution simulator comparing FIFO, LRU, Second-Chance, and Clock page replacement algorithms. Track TLB hit ratios, page faults, and physical frame eviction sequences across synthetic memory reference traces. Submit comparative performance graphs and team writeup.',
@@ -404,6 +415,7 @@ export function generateSeedData(): {
       id: 'asg-osy-03',
       courseId: 'course-osy301',
       submissionType: 'group',
+      audience: 'all',
       title: 'User-Space File System Implementation',
       description:
         'Implement an indexed hierarchical file system in user space supporting nested directories, inode allocation tables, and block journaling. Guarantee crash resilience through atomic log transactions and verify consistency with an automated fsck utility.',

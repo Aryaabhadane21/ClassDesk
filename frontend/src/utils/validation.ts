@@ -1,4 +1,9 @@
-import type { CourseInput, LoginInput, RegisterInput } from '@/types'
+import type {
+  CourseAssignmentInput,
+  CourseInput,
+  LoginInput,
+  RegisterInput,
+} from '@/types'
 
 export type LoginErrors = Partial<Record<keyof LoginInput, string>>
 export type RegisterErrors = Partial<Record<keyof RegisterInput, string>>
@@ -180,6 +185,108 @@ export interface AssignmentFormData {
 export interface ValidationResult {
   isValid: boolean
   errors: Record<string, string>
+}
+
+// ---------------------------------------------------------------------------
+// Course Assignment Validation (Round 2 Step 8)
+// ---------------------------------------------------------------------------
+
+export type CourseAssignmentErrors = Partial<
+  Record<
+    | 'title'
+    | 'description'
+    | 'dueDate'
+    | 'oneDriveLink'
+    | 'submissionType'
+    | 'assignedTo',
+    string
+  >
+>
+
+export interface ValidateCourseAssignmentOptions {
+  enrolledStudentIds: string[]
+}
+
+/**
+ * Validates course assignment payload fields according to course & group rules.
+ * Pure function reused by both API and UI forms.
+ */
+export function validateCourseAssignment(
+  input: Partial<CourseAssignmentInput>,
+  options: ValidateCourseAssignmentOptions,
+): CourseAssignmentErrors {
+  const errors: CourseAssignmentErrors = {}
+
+  // 1. Title validation (3-80 chars)
+  const trimmedTitle = (input.title || '').trim()
+  if (!trimmedTitle) {
+    errors.title = 'Title is required'
+  } else if (trimmedTitle.length < 3 || trimmedTitle.length > 80) {
+    errors.title = 'Title must be between 3 and 80 characters'
+  }
+
+  // 2. Description validation (required, max 500 chars)
+  const trimmedDesc = (input.description || '').trim()
+  if (!trimmedDesc) {
+    errors.description = 'Description is required'
+  } else if (trimmedDesc.length > 500) {
+    errors.description = 'Description must not exceed 500 characters'
+  }
+
+  // 3. Due date validation (required, valid date/time)
+  if (!input.dueDate) {
+    errors.dueDate = 'Due date is required'
+  } else {
+    const time = new Date(input.dueDate).getTime()
+    if (isNaN(time)) {
+      errors.dueDate = 'Due date must be a valid date and time'
+    }
+  }
+
+  // 4. OneDrive link validation (required, valid http/https URL)
+  const trimmedLink = (input.oneDriveLink || '').trim()
+  if (!trimmedLink) {
+    errors.oneDriveLink = 'OneDrive link is required'
+  } else {
+    try {
+      const parsed = new URL(trimmedLink)
+      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+        errors.oneDriveLink = 'OneDrive link must be a valid http or https URL'
+      }
+    } catch {
+      errors.oneDriveLink = 'OneDrive link must be a valid http or https URL'
+    }
+  }
+
+  // 5. Submission type validation
+  const subType = input.submissionType
+  if (!subType || (subType !== 'individual' && subType !== 'group')) {
+    errors.submissionType = 'Submission type must be individual or group'
+  } else if (subType === 'group') {
+    // Group assignments go to all groups; rejecting student selection list
+    if (Array.isArray(input.assignedTo)) {
+      errors.assignedTo = 'Group assignments go to every group in the course'
+    }
+  } else if (subType === 'individual') {
+    // Individual assignment audience validation
+    if (input.assignedTo === 'all') {
+      // Allowed even with 0 enrolled students
+    } else if (Array.isArray(input.assignedTo)) {
+      if (input.assignedTo.length === 0) {
+        errors.assignedTo = 'Select at least one student'
+      } else {
+        const enrolledSet = new Set(options.enrolledStudentIds)
+        const hasUnenrolled = input.assignedTo.some((id: string) => !enrolledSet.has(id))
+        if (hasUnenrolled) {
+          errors.assignedTo = 'Some selected students are not enrolled in this course'
+        }
+      }
+    } else {
+      errors.assignedTo = 'Select at least one student'
+    }
+  }
+
+  return errors
 }
 
 /**

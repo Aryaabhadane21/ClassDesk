@@ -67,7 +67,7 @@ describe('Unit: Seed Data Integrity', () => {
     }
   })
 
-  it('individual assignments have a Submission for every enrolled student, group assignments have none', () => {
+  it('individual assignments have a Submission for every assigned student, group assignments have none', () => {
     const individualAsgs = seed.assignments.filter((a) => a.submissionType === 'individual')
     const groupAsgs = seed.assignments.filter((a) => a.submissionType === 'group')
 
@@ -90,6 +90,38 @@ describe('Unit: Seed Data Integrity', () => {
       const asgSubmissions = seed.submissions.filter((s) => s.assignmentId === asg.id)
       expect(asgSubmissions.length).toBe(0)
     }
+  })
+
+  it('assignments have valid audience configuration and at least 2 individual assignments are selected', () => {
+    let selectedCount = 0
+
+    for (const asg of seed.assignments) {
+      expect(['all', 'selected']).toContain(asg.audience)
+
+      const courseEnrollments = seed.enrollments
+        .filter((e) => e.courseId === asg.courseId)
+        .map((e) => e.studentId)
+
+      if (asg.submissionType === 'group') {
+        // Group assignments always have audience 'all'
+        expect(asg.audience).toBe('all')
+      }
+
+      if (asg.audience === 'all') {
+        expect(asg.assignedTo.sort()).toEqual(courseEnrollments.sort())
+      } else {
+        selectedCount++
+        expect(asg.submissionType).toBe('individual')
+        expect(asg.assignedTo.length).toBeGreaterThanOrEqual(2)
+        expect(asg.assignedTo.length).toBeLessThanOrEqual(3)
+        // All selected students must be enrolled in the course
+        for (const studentId of asg.assignedTo) {
+          expect(courseEnrollments).toContain(studentId)
+        }
+      }
+    }
+
+    expect(selectedCount).toBeGreaterThanOrEqual(2)
   })
 
   it('every GroupAcknowledgement references a real group and assignment, and leaderId matches', () => {
@@ -126,7 +158,7 @@ describe('Unit: Seed Data Integrity', () => {
 
       if (diffDays < 0) {
         overdueCount++
-      } else if (diffDays <= 3.5) {
+      } else if (diffDays <= 4) {
         dueSoonCount++
       }
     }

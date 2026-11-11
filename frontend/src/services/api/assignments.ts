@@ -9,9 +9,11 @@ import {
   toSafeUser,
 } from '@/services/api/core'
 import { buildGroupDetail } from '@/services/api/courses'
+import { hasErrors, validateCourseAssignment } from '@/utils/validation'
 import type {
   AdminAssignment,
   Assignment,
+  AssignmentAudience,
   AssignmentInput,
   AssignmentTracking,
   CourseAssignmentInput,
@@ -26,38 +28,23 @@ import type {
 } from '@/types'
 
 /**
- * Validates course assignment input fields
+ * Validates course assignment payload fields according to course & group rules.
  */
-function validateCourseAssignmentInput(input: CourseAssignmentInput): void {
-  const trimmedTitle = input.title ? input.title.trim() : ''
-  if (trimmedTitle.length < 3 || trimmedTitle.length > 80) {
-    throw new ApiError('Title must be between 3 and 80 characters', 'VALIDATION')
-  }
-
-  const trimmedDesc = input.description ? input.description.trim() : ''
-  if (!trimmedDesc) {
-    throw new ApiError('Description is required', 'VALIDATION')
-  }
-  if (trimmedDesc.length > 500) {
-    throw new ApiError('Description must not exceed 500 characters', 'VALIDATION')
-  }
-
-  const dueTimestamp = new Date(input.dueDate).getTime()
-  if (isNaN(dueTimestamp)) {
-    throw new ApiError('Due date must be a valid date', 'VALIDATION')
-  }
-
-  try {
-    const parsed = new URL(input.oneDriveLink)
-    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
-      throw new Error()
-    }
-  } catch {
-    throw new ApiError('OneDrive link must be a valid http or https URL', 'VALIDATION')
-  }
-
-  if (input.submissionType !== 'individual' && input.submissionType !== 'group') {
-    throw new ApiError('Invalid submission type', 'VALIDATION')
+function validateCourseAssignmentPayload(
+  input: CourseAssignmentInput,
+  enrolledStudentIds: string[],
+): void {
+  const errors = validateCourseAssignment(input, { enrolledStudentIds })
+  if (hasErrors(errors)) {
+    const firstErrorMessage =
+      errors.title ||
+      errors.description ||
+      errors.dueDate ||
+      errors.oneDriveLink ||
+      errors.submissionType ||
+      errors.assignedTo ||
+      'Invalid assignment input'
+    throw new ApiError(firstErrorMessage, 'VALIDATION', errors as Record<string, string>)
   }
 }
 
@@ -72,7 +59,10 @@ function computeAssignmentTracking(
   groupAcks: { assignmentId: string; groupId: string; acknowledgedAt: string; leaderId: string }[],
 ): AssignmentTracking {
   if (assignment.submissionType === 'individual') {
-    const entries = enrolledStudents.map((student) => {
+    const assignedIdsSet = new Set(assignment.assignedTo)
+    const targetStudents = enrolledStudents.filter((s) => assignedIdsSet.has(s.id))
+
+    const entries = targetStudents.map((student) => {
       const sub = submissions.find(
         (s) => s.assignmentId === assignment.id && s.studentId === student.id,
       )
@@ -96,7 +86,7 @@ function computeAssignmentTracking(
 
     return {
       kind: 'individual',
-      total: enrolledStudents.length,
+      total: targetStudents.length,
       submitted,
       entries,
     }
@@ -231,20 +221,36 @@ export async function createCourseAssignment(
     throw new ApiError('You do not have access to this course', 'UNAUTHORIZED')
   }
 
-  validateCourseAssignmentInput(input)
+  const enrolledStudentIds = enrollments
+    .filter((e) => e.courseId === courseId)
+    .map((e) => e.studentId)
+
+  validateCourseAssignmentPayload(input, enrolledStudentIds)
 
   const usersMap = new Map<string, SafeUser>()
   for (const u of users) {
     usersMap.set(u.id, toSafeUser(u))
   }
 
-  const enrolledStudentIds = enrollments
-    .filter((e) => e.courseId === courseId)
-    .map((e) => e.studentId)
-
   const enrolledStudents = enrolledStudentIds
     .map((id) => usersMap.get(id))
     .filter((u): u is SafeUser => Boolean(u))
+
+  let audience: AssignmentAudience = 'all'
+  let targetAssignedTo: string[] = []
+
+  if (input.submissionType === 'group') {
+    audience = 'all'
+    targetAssignedTo = [...enrolledStudentIds]
+  } else {
+    if (input.assignedTo === 'all') {
+      audience = 'all'
+      targetAssignedTo = [...enrolledStudentIds]
+    } else {
+      audience = 'selected'
+      targetAssignedTo = Array.from(new Set(input.assignedTo))
+    }
+  }
 
   const now = new Date().toISOString()
   const assignmentId = `asg-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`
@@ -253,12 +259,13 @@ export async function createCourseAssignment(
     id: assignmentId,
     courseId,
     submissionType: input.submissionType,
+    audience,
     title: input.title.trim(),
     description: input.description.trim(),
     dueDate: new Date(input.dueDate).toISOString(),
     oneDriveLink: input.oneDriveLink.trim(),
     createdBy: professorId,
-    assignedTo: enrolledStudentIds,
+    assignedTo: targetAssignedTo,
     createdAt: now,
     updatedAt: now,
   }
@@ -267,7 +274,7 @@ export async function createCourseAssignment(
   let updatedSubmissions = submissions
 
   if (input.submissionType === 'individual') {
-    const newSubmissions: Submission[] = enrolledStudentIds.map((studentId) => ({
+    const newSubmissions: Submission[] = targetAssignedTo.map((studentId) => ({
       id: `sub-${assignmentId}-${studentId}`,
       assignmentId,
       studentId,
@@ -322,9 +329,29 @@ export async function updateCourseAssignment(
     throw new ApiError('You do not have permission to modify this assignment', 'UNAUTHORIZED')
   }
 
-  validateCourseAssignmentInput(input)
+  const enrolledStudentIds = enrollments
+    .filter((e) => e.courseId === existingAssignment.courseId)
+    .map((e) => e.studentId)
+
+  validateCourseAssignmentPayload(input, enrolledStudentIds)
 
   let updatedSubmissions = [...submissions]
+
+  let targetAudience: AssignmentAudience = 'all'
+  let targetAssignedTo: string[] = []
+
+  if (input.submissionType === 'group') {
+    targetAudience = 'all'
+    targetAssignedTo = [...enrolledStudentIds]
+  } else {
+    if (input.assignedTo === 'all') {
+      targetAudience = 'all'
+      targetAssignedTo = [...enrolledStudentIds]
+    } else {
+      targetAudience = 'selected'
+      targetAssignedTo = Array.from(new Set(input.assignedTo))
+    }
+  }
 
   // Check if submissionType is changing
   if (input.submissionType !== existingAssignment.submissionType) {
@@ -344,15 +371,11 @@ export async function updateCourseAssignment(
     }
 
     if (input.submissionType === 'group') {
-      // Switching from individual to group: purge empty individual submissions
+      // Switching from individual to group: purge individual submissions
       updatedSubmissions = updatedSubmissions.filter((s) => s.assignmentId !== assignmentId)
     } else {
-      // Switching from group to individual: generate not_submitted submissions
-      const enrolledStudentIds = enrollments
-        .filter((e) => e.courseId === existingAssignment.courseId)
-        .map((e) => e.studentId)
-
-      for (const studentId of enrolledStudentIds) {
+      // Switching from group to individual: generate not_submitted submissions for targetAssignedTo
+      for (const studentId of targetAssignedTo) {
         updatedSubmissions.push({
           id: `sub-${assignmentId}-${studentId}`,
           assignmentId,
@@ -361,6 +384,31 @@ export async function updateCourseAssignment(
           submittedAt: null,
         })
       }
+    }
+  } else if (input.submissionType === 'individual') {
+    // Type remains individual: sync submissions with targetAssignedTo changes
+    const previousAssigned = new Set(existingAssignment.assignedTo)
+    const nextAssigned = new Set(targetAssignedTo)
+
+    const addedStudents = targetAssignedTo.filter((id) => !previousAssigned.has(id))
+
+    // Remove submissions for unselected/removed students (even submitted ones)
+    updatedSubmissions = updatedSubmissions.filter((s) => {
+      if (s.assignmentId === assignmentId && !nextAssigned.has(s.studentId)) {
+        return false
+      }
+      return true
+    })
+
+    // Create submissions for newly added students
+    for (const studentId of addedStudents) {
+      updatedSubmissions.push({
+        id: `sub-${assignmentId}-${studentId}`,
+        assignmentId,
+        studentId,
+        status: 'not_submitted',
+        submittedAt: null,
+      })
     }
   }
 
@@ -374,10 +422,6 @@ export async function updateCourseAssignment(
     usersMap.set(u.id, toSafeUser(u))
   }
 
-  const enrolledStudentIds = enrollments
-    .filter((e) => e.courseId === existingAssignment.courseId)
-    .map((e) => e.studentId)
-
   const enrolledStudents = enrolledStudentIds
     .map((id) => usersMap.get(id))
     .filter((u): u is SafeUser => Boolean(u))
@@ -386,11 +430,12 @@ export async function updateCourseAssignment(
   const updatedAssignment: Assignment = {
     ...existingAssignment,
     submissionType: input.submissionType,
+    audience: targetAudience,
     title: input.title.trim(),
     description: input.description.trim(),
     dueDate: new Date(input.dueDate).toISOString(),
     oneDriveLink: input.oneDriveLink.trim(),
-    assignedTo: enrolledStudentIds,
+    assignedTo: targetAssignedTo,
     updatedAt: now,
   }
 
@@ -623,10 +668,13 @@ export async function createAssignment(
   const now = new Date().toISOString()
   const assignmentId = `asg-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`
 
+  const audience: AssignmentAudience = Array.isArray(input.assignedTo) ? 'selected' : 'all'
+
   const newAssignment: Assignment = {
     id: assignmentId,
     courseId,
     submissionType,
+    audience,
     title: input.title.trim(),
     description: input.description.trim(),
     dueDate: new Date(input.dueDate).toISOString(),
@@ -745,11 +793,19 @@ export async function updateAssignment(
     submissionType = input.submissionType
   }
 
+  const audience: AssignmentAudience =
+    input.assignedTo === 'all'
+      ? 'all'
+      : Array.isArray(input.assignedTo)
+        ? 'selected'
+        : existingAssignment.audience || 'all'
+
   const now = new Date().toISOString()
   const updatedAssignment: Assignment = {
     ...existingAssignment,
     courseId,
     submissionType,
+    audience,
     title: input.title.trim(),
     description: input.description.trim(),
     dueDate: new Date(input.dueDate).toISOString(),

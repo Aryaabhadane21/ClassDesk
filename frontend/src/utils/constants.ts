@@ -1,7 +1,7 @@
 /**
  * Current schema version for stored client-side collections.
  */
-export const SCHEMA_VERSION = 2
+export const SCHEMA_VERSION = 3
 
 /**
  * Current active semester for ClassDesk.

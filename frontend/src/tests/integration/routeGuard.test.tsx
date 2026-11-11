@@ -103,4 +103,78 @@ describe('Integration: Route Guard Role Protection', () => {
     expect(await screen.findByText('Admin Home Page')).toBeInTheDocument()
     expect(screen.queryByText('Student Secret Content')).not.toBeInTheDocument()
   })
+
+  it('redirects an unauthenticated user attempting to visit /admin to /login', async () => {
+    // Clear session
+    window.localStorage.removeItem(STORAGE_KEYS.TOKEN)
+
+    renderWithProviders(
+      <Routes>
+        <Route
+          path="/admin"
+          element={
+            <RequireAuth>
+              <RequireRole role="admin">
+                <div>Admin Secret Content</div>
+              </RequireRole>
+            </RequireAuth>
+          }
+        />
+        <Route path="/login" element={<div>Login Page</div>} />
+      </Routes>,
+      {
+        initialEntries: ['/admin'],
+      },
+    )
+
+    expect(await screen.findByText('Login Page')).toBeInTheDocument()
+    expect(screen.queryByText('Admin Secret Content')).not.toBeInTheDocument()
+  })
+
+  it('logging out from AppShell clears session and redirects to /login', async () => {
+    const token = createToken({
+      id: 'user-admin-1',
+      name: 'Prof. Meera Iyer',
+      email: 'meera.iyer@classdesk.edu',
+      role: 'admin',
+    })
+    window.localStorage.setItem(STORAGE_KEYS.TOKEN, token)
+
+    const { AppShell } = await import('@/components/layout/AppShell')
+    const userEvent = (await import('@testing-library/user-event')).default
+    const user = userEvent.setup()
+
+    renderWithProviders(
+      <Routes>
+        <Route
+          path="/admin"
+          element={
+            <RequireAuth>
+              <RequireRole role="admin">
+                <AppShell />
+              </RequireRole>
+            </RequireAuth>
+          }
+        >
+          <Route index element={<div>Admin Dashboard</div>} />
+        </Route>
+        <Route path="/login" element={<div>Login Page</div>} />
+      </Routes>,
+      {
+        initialEntries: ['/admin'],
+      },
+    )
+
+    expect(await screen.findByText('Admin Dashboard')).toBeInTheDocument()
+
+    // Find and click the Log out button in the sidebar
+    const logoutBtn = screen.getByRole('button', { name: /log out/i })
+    await user.click(logoutBtn)
+
+    // Token must be removed from localStorage
+    expect(window.localStorage.getItem(STORAGE_KEYS.TOKEN)).toBeNull()
+
+    // Redirected to Login Page
+    expect(await screen.findByText('Login Page')).toBeInTheDocument()
+  })
 })

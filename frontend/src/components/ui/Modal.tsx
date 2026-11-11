@@ -67,7 +67,7 @@ export function Modal({
         aria-labelledby={titleId}
         aria-describedby={descId}
         className={cn(
-          'relative w-full max-h-[90vh] overflow-y-auto bg-surface border border-line shadow-pop text-fg z-10',
+          'relative w-full max-h-[90vh] overflow-y-auto bg-surface border border-line text-fg z-10',
           'rounded-lg max-w-lg p-6 space-y-4 animate-modal-enter',
           className,
         )}
@@ -90,7 +90,7 @@ export function Modal({
             type="button"
             onClick={onClose}
             aria-label="Close dialog"
-            className="inline-flex items-center justify-center w-11 h-11 min-w-[44px] min-h-[44px] rounded-pill text-muted hover:text-fg hover:bg-surface-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer motion-safe:transition-colors shrink-0"
+            className="inline-flex items-center justify-center w-10 h-10 min-w-[40px] min-h-[40px] rounded-md text-muted hover:text-fg hover:bg-surface-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer transition-colors shrink-0"
           >
             <X className="w-5 h-5" aria-hidden="true" />
           </button>

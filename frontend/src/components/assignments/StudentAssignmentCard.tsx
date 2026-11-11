@@ -9,7 +9,6 @@ import {
   Users,
 } from 'lucide-react'
 import { Badge, Button, Card, Highlight, SuccessBurst } from '@/components/ui'
-import { AssignmentCover } from '@/components/assignments/AssignmentCover'
 import { DueLabel } from '@/components/assignments/DueLabel'
 import { formatSubmissionDate } from '@/utils/dates'
 import { getStudentUrgency } from '@/utils/dueStyles'
@@ -73,8 +72,8 @@ export function StudentAssignmentCard({
   return (
     <Card
       className={cn(
-        'relative @container flex flex-col justify-between overflow-hidden text-left bg-surface border border-line shadow-card rounded-lg',
-        'motion-safe:transition-all motion-safe:duration-200',
+        'relative @container flex flex-col justify-between overflow-hidden text-left bg-surface border border-line rounded-lg',
+        'transition-colors duration-150 hover:border-fg/30',
         urgency.isUrgent && urgency.cardBorderClasses,
         className,
       )}
@@ -88,103 +87,94 @@ export function StudentAssignmentCard({
         aria-labelledby={titleId}
         className="flex flex-col h-full outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
       >
-        {/* 1. Cover with AssignmentCover and floating Status + Type Badges */}
-        <div className="relative h-[120px] w-full overflow-hidden shrink-0 border-b border-line">
-          <AssignmentCover seed={actualAssignment.id} variant="cover" className="h-full w-full" />
-          <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
-            {/* Submission Type Badge */}
-            <Badge
-              tone={isGroup ? 'accent' : 'neutral'}
-              size="sm"
-              icon={
-                isGroup ? (
-                  <Users className="w-3 h-3" aria-hidden="true" />
-                ) : (
-                  <User className="w-3 h-3" aria-hidden="true" />
-                )
-              }
-              className="shadow-xs backdrop-blur-xs"
-            >
-              {isGroup ? 'Group' : 'Individual'}
-            </Badge>
-
-            {/* Acknowledgement Status Badge with icon + text */}
-            {isSubmitted ? (
-              <Badge
-                tone="success"
-                size="sm"
-                icon={<CheckCircle2 className="w-3 h-3" aria-hidden="true" />}
-                className="shadow-xs backdrop-blur-xs"
-              >
-                {isGroup ? 'Acknowledged' : 'Submitted'}
-              </Badge>
-            ) : urgency.isUrgent ? (
-              <Badge
-                tone={urgency.tone}
-                size="sm"
-                icon={
-                  urgency.tone === 'danger' ? (
-                    <AlertTriangle className="w-3 h-3" aria-hidden="true" />
-                  ) : (
-                    <Clock className="w-3 h-3" aria-hidden="true" />
-                  )
-                }
-                className="shadow-xs backdrop-blur-xs"
-              >
-                {urgency.badgeLabel}
-              </Badge>
-            ) : (
-              <Badge
-                tone="neutral"
-                size="sm"
-                icon={<Clock className="w-3 h-3" />}
-                className="shadow-xs backdrop-blur-xs"
-              >
-                Pending
-              </Badge>
-            )}
-          </div>
-        </div>
+        {/* Thin top colored border strip */}
+        <div
+          className={cn(
+            'h-1 w-full shrink-0',
+            urgency.tone === 'danger' && !isSubmitted
+              ? 'bg-danger'
+              : urgency.tone === 'warning' && !isSubmitted
+                ? 'bg-warning'
+                : isSubmitted
+                  ? 'bg-success'
+                  : 'bg-accent/40',
+          )}
+          aria-hidden="true"
+        />
 
         {/* 2. Content */}
         <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-          <div className="space-y-1.5">
-            <h3
-              id={titleId}
-              className="font-display text-lg font-semibold text-fg tracking-tight line-clamp-2 leading-snug"
-              title={actualAssignment.title}
-            >
-              <Highlight text={actualAssignment.title} query={searchQuery} />
-            </h3>
-            <p className="font-body text-xs text-muted leading-relaxed line-clamp-3">
-              <Highlight text={actualAssignment.description} query={searchQuery} />
-            </p>
+          <div className="space-y-3">
+            {/* Header row with Type & Status Badges */}
+            <div className="flex items-center justify-between gap-2">
+              <Badge
+                tone={isGroup ? 'accent' : 'neutral'}
+                size="sm"
+                icon={
+                  isGroup ? (
+                    <Users className="w-3 h-3" aria-hidden="true" />
+                  ) : (
+                    <User className="w-3 h-3" aria-hidden="true" />
+                  )
+                }
+              >
+                {isGroup ? 'Group' : 'Individual'}
+              </Badge>
+
+              {isSubmitted ? (
+                <Badge
+                  tone="success"
+                  size="sm"
+                  icon={<CheckCircle2 className="w-3 h-3" aria-hidden="true" />}
+                  className="bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-200 dark:border-emerald-700 font-semibold"
+                >
+                  {isGroup ? 'Acknowledged' : 'Submitted'}
+                </Badge>
+              ) : (
+                <Badge tone="neutral" size="sm" icon={<Clock className="w-3 h-3" />}>
+                  Pending
+                </Badge>
+              )}
+            </div>
+
+            <div className="space-y-1.5">
+              <h3
+                id={titleId}
+                className="font-display text-lg font-semibold text-fg tracking-tight line-clamp-2 leading-snug"
+                title={actualAssignment.title}
+              >
+                <Highlight text={actualAssignment.title} query={searchQuery} />
+              </h3>
+              <p className="font-body text-xs text-muted leading-relaxed line-clamp-3">
+                <Highlight text={actualAssignment.description} query={searchQuery} />
+              </p>
+            </div>
           </div>
 
           <div className="space-y-3.5 flex-1 flex flex-col justify-end">
             {/* Divider & Due Date Info with urgency styling (never color alone: icon + text) */}
             <div
               className={cn(
-                'pt-3 border-t border-line flex items-center justify-between gap-2',
+                'pt-3 border-t border-line flex items-center justify-between gap-2 overflow-hidden whitespace-nowrap',
                 urgency.isUrgent && urgency.dueRowClasses,
               )}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 min-w-0 truncate">
                 {urgency.tone === 'danger' && !isSubmitted && (
                   <AlertTriangle
-                    className="w-4 h-4 text-danger shrink-0"
+                    className="w-3.5 h-3.5 text-danger shrink-0"
                     aria-hidden="true"
                   />
                 )}
                 {urgency.tone === 'warning' && !isSubmitted && (
                   <Clock
-                    className="w-4 h-4 text-warning shrink-0"
+                    className="w-3.5 h-3.5 text-warning shrink-0"
                     aria-hidden="true"
                   />
                 )}
                 {isSubmitted && (
                   <CheckCircle2
-                    className="w-4 h-4 text-success shrink-0"
+                    className="w-3.5 h-3.5 text-success shrink-0"
                     aria-hidden="true"
                   />
                 )}

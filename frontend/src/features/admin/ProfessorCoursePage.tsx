@@ -5,11 +5,9 @@ import {
   ArrowLeft,
   BookOpen,
   ClipboardList,
-  FolderGit2,
   Info,
   Plus,
   Search,
-  Users,
 } from 'lucide-react'
 import { PageHeader } from '@/components/layout/PageHeader'
 import {
@@ -19,7 +17,8 @@ import {
   ErrorState,
   Eyebrow,
   Skeleton,
-  StatCard,
+  StatStrip,
+  StatStripSkeleton,
   useToast,
 } from '@/components/ui'
 import { JoinCodeChip } from '@/components/courses'
@@ -253,23 +252,7 @@ export function ProfessorCoursePage() {
         </div>
 
         {/* Overview Skeleton */}
-        <div className="space-y-3">
-          <Skeleton className="h-4 w-24" />
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div
-                key={i}
-                className="p-4 sm:p-5 flex items-center gap-3.5 bg-surface border border-line rounded-lg"
-              >
-                <Skeleton className="w-10 h-10 sm:w-11 sm:h-11 rounded-pill shrink-0" />
-                <div className="space-y-2 flex-1 min-w-0">
-                  <Skeleton className="h-7 w-12" />
-                  <Skeleton className="h-3.5 w-24" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <StatStripSkeleton />
 
         {/* Assignments Section Skeleton */}
         <div className="space-y-4">
@@ -359,31 +342,19 @@ export function ProfessorCoursePage() {
       </div>
 
       {/* OVERVIEW SECTION */}
-      <section aria-labelledby="overview-heading" className="space-y-3">
-        <Eyebrow id="overview-heading">Overview</Eyebrow>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard
-            label="Students"
-            value={students.length}
-            icon={<Users className="w-5 h-5" />}
-          />
-          <StatCard
-            label="Groups"
-            value={groups.length}
-            icon={<FolderGit2 className="w-5 h-5" />}
-          />
-          <StatCard
-            label="Assignments"
-            value={assignments.length}
-            icon={<ClipboardList className="w-5 h-5" />}
-          />
-          <StatCard
-            label="Overdue"
-            value={assignmentStats.overdueCount}
-            tone={assignmentStats.overdueCount > 0 ? 'danger' : 'default'}
-            icon={<AlertCircle className="w-5 h-5" />}
-          />
-        </div>
+      <section aria-label="Course statistics">
+        <StatStrip
+          items={[
+            { label: 'Students', value: students.length },
+            { label: 'Groups', value: groups.length },
+            { label: 'Assignments', value: assignments.length },
+            {
+              label: 'Overdue',
+              value: assignmentStats.overdueCount,
+              isOverdue: true,
+            },
+          ]}
+        />
       </section>
 
       {/* ASSIGNMENTS SECTION */}

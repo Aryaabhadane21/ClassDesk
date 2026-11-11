@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react'
-import { AssignmentCover } from '@/components/assignments/AssignmentCover'
 import { cn } from '@/utils/cn'
 
 export interface EmptyStateProps {
@@ -13,7 +12,6 @@ export interface EmptyStateProps {
 
 export function EmptyState({
   icon,
-  seed = 'classdesk-empty-state',
   title,
   description,
   action,
@@ -22,27 +20,17 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-center p-8 text-center rounded-lg border border-dashed border-line bg-surface/50 max-w-md mx-auto',
+        'flex flex-col items-center justify-center p-8 sm:p-10 text-center rounded-lg border border-line bg-surface max-w-md mx-auto',
         className,
       )}
     >
-      <div className="relative mb-4" aria-hidden="true">
-        {icon ? (
-          <div className="w-12 h-12 rounded-pill bg-surface-2 border border-line flex items-center justify-center text-muted">
-            {icon}
-          </div>
-        ) : (
-          <div className="w-16 h-16 rounded-xl border border-line shadow-xs overflow-hidden bg-surface-2">
-            <AssignmentCover
-              seed={seed}
-              variant="thumbnail"
-              className="w-full h-full object-cover"
-            />
-          </div>
-        )}
-      </div>
+      {icon && (
+        <div className="mb-3 text-muted" aria-hidden="true">
+          {icon}
+        </div>
+      )}
 
-      <h3 className="font-display text-lg font-semibold text-fg tracking-tight mb-1">
+      <h3 className="font-display text-base sm:text-lg font-semibold text-fg tracking-tight mb-1">
         {title}
       </h3>
       <p className="text-xs text-muted leading-relaxed max-w-xs mb-5">

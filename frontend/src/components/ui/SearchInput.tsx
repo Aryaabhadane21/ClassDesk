@@ -99,13 +99,13 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
             placeholder={placeholder}
             aria-label={effectiveAriaLabel}
             className={cn(
-              'w-full h-[44px] min-h-[44px] pl-10 pr-12 rounded-pill bg-surface border border-line text-fg text-xs font-body',
+              'w-full h-[44px] min-h-[44px] pl-10 pr-10 rounded-md bg-surface border border-line text-fg text-xs font-body',
               'placeholder:text-muted focus:outline-none focus:border-accent focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1',
-              'motion-safe:transition-all',
+              'transition-colors duration-150',
             )}
           />
 
-          {value ? (
+          {value && (
             <button
               type="button"
               onClick={() => {
@@ -113,19 +113,10 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
                 internalRef.current?.focus()
               }}
               aria-label="Clear search"
-              className="absolute right-2.5 w-8 h-8 rounded-pill flex items-center justify-center text-muted hover:text-fg hover:bg-surface-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer motion-safe:transition-colors"
+              className="absolute right-2.5 w-7 h-7 rounded-md flex items-center justify-center text-muted hover:text-fg hover:bg-surface-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer transition-colors"
             >
               <X className="w-4 h-4" aria-hidden="true" />
             </button>
-          ) : (
-            <div
-              className="absolute right-3 hidden sm:flex items-center pointer-events-none select-none"
-              aria-hidden="true"
-            >
-              <kbd className="inline-flex items-center justify-center h-5 min-w-[20px] px-1 text-[11px] font-mono text-muted bg-surface-2 border border-line rounded-sm">
-                /
-              </kbd>
-            </div>
           )}
         </div>
       </div>

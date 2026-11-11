@@ -7,7 +7,6 @@ import { NotificationProvider } from '@/hooks/useNotifications'
 import { useAuth } from '@/context/AuthContext'
 import { getHomePath } from '@/utils/routes'
 import { getNavItemsForRole } from '@/components/layout/navConfig'
-import { getGreetingName } from '@/utils/names'
 import { roleLabel } from '@/utils/roles'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
 import { cn } from '@/utils/cn'
@@ -40,7 +39,6 @@ export function AppShell() {
 
   const navItems = getNavItemsForRole(user.role)
   const homePath = getHomePath(user.role)
-  const greetingName = getGreetingName(user.name)
 
   const isNavActive = (href: string, defaultActive: boolean) => {
     if (href === '/admin') {
@@ -100,12 +98,12 @@ export function AppShell() {
                   className={({ isActive }) => {
                     const active = isNavActive(item.href, isActive)
                     return cn(
-                      'flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium cursor-pointer',
+                      'flex items-center gap-3 px-3.5 py-2.5 rounded-md text-sm font-medium cursor-pointer',
                       'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2',
-                      'motion-safe:transition-all motion-safe:duration-150',
+                      'transition-colors duration-150',
                       active
-                        ? 'bg-primary text-primary-fg shadow-card'
-                        : 'text-muted hover:text-fg hover:bg-surface-2 border border-transparent hover:border-line',
+                        ? 'bg-surface-2 text-fg border-l-[3px] border-l-accent border-y-transparent border-r-transparent font-semibold'
+                        : 'text-muted hover:text-fg hover:bg-surface-2/60 border-l-[3px] border-l-transparent',
                     )
                   }}
                 >
@@ -115,10 +113,8 @@ export function AppShell() {
                       <>
                         <span
                           className={cn(
-                            'w-7 h-7 rounded-md flex items-center justify-center shrink-0 motion-safe:transition-colors',
-                            active
-                              ? 'bg-accent/20 text-accent'
-                              : 'bg-surface-2 text-muted group-hover:text-fg',
+                            'w-5 h-5 flex items-center justify-center shrink-0 transition-colors',
+                            active ? 'text-accent' : 'text-muted group-hover:text-fg',
                           )}
                           aria-hidden="true"
                         >
@@ -175,7 +171,7 @@ export function AppShell() {
             aria-modal="true"
             aria-label="Navigation drawer"
             tabIndex={-1}
-            className="relative w-[280px] max-w-[85vw] h-full bg-surface border-r border-line rounded-r-lg p-6 flex flex-col justify-between shadow-pop z-10 focus:outline-none"
+            className="relative w-[280px] max-w-[85vw] h-full bg-surface border-r border-line p-6 flex flex-col justify-between z-10 focus:outline-none"
           >
             <div className="space-y-6">
               <div className="flex items-center justify-between">
@@ -184,13 +180,13 @@ export function AppShell() {
                   type="button"
                   onClick={() => setIsDrawerOpen(false)}
                   aria-label="Close navigation"
-                  className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-pill text-muted hover:text-fg hover:bg-surface-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer motion-safe:transition-colors"
+                  className="w-10 h-10 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-md text-muted hover:text-fg hover:bg-surface-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <nav className="space-y-2" aria-label="Mobile Navigation">
+              <nav className="space-y-1.5" aria-label="Mobile Navigation">
                 {navItems.map((item) => {
                   const Icon = item.icon
                   return (
@@ -202,11 +198,12 @@ export function AppShell() {
                       className={({ isActive }) => {
                         const active = isNavActive(item.href, isActive)
                         return cn(
-                          'flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium cursor-pointer',
+                          'flex items-center gap-3 px-3.5 py-2.5 rounded-md text-sm font-medium cursor-pointer',
                           'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent',
+                          'transition-colors duration-150',
                           active
-                            ? 'bg-primary text-primary-fg shadow-card'
-                            : 'text-muted hover:text-fg hover:bg-surface-2 border border-transparent hover:border-line',
+                            ? 'bg-surface-2 text-fg border-l-[3px] border-l-accent border-y-transparent border-r-transparent font-semibold'
+                            : 'text-muted hover:text-fg hover:bg-surface-2/60 border-l-[3px] border-l-transparent',
                         )
                       }}
                     >
@@ -216,8 +213,8 @@ export function AppShell() {
                           <>
                             <span
                               className={cn(
-                                'w-7 h-7 rounded-md flex items-center justify-center shrink-0',
-                                active ? 'bg-accent/20 text-accent' : 'bg-surface-2 text-muted',
+                                'w-5 h-5 flex items-center justify-center shrink-0 transition-colors',
+                                active ? 'text-accent' : 'text-muted',
                               )}
                               aria-hidden="true"
                             >
@@ -237,7 +234,7 @@ export function AppShell() {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-4 py-2.5 rounded-md text-sm font-medium text-muted hover:text-danger hover:bg-danger-soft/40 cursor-pointer"
+                className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-md text-sm font-medium text-muted hover:text-danger hover:bg-danger-soft/40 cursor-pointer transition-colors"
               >
                 <LogOut className="w-4 h-4" />
                 <span>Log out</span>
@@ -251,16 +248,8 @@ export function AppShell() {
       {/* 4. MAIN LAYOUT AREA (Top bar + scrollable content)            */}
       {/* ------------------------------------------------------------- */}
       <div className="lg:pl-[270px] flex flex-col min-h-screen relative overflow-x-hidden">
-        {/* Soft radial glow at top of content area */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute top-0 left-0 right-0 h-96 -z-10 overflow-hidden select-none"
-        >
-          <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-pill bg-peach/10 dark:bg-accent/8 blur-3xl pointer-events-none" />
-        </div>
-
         {/* Sticky Top Bar */}
-        <header className="sticky top-0 z-20 bg-app/80 backdrop-blur-md border-b border-line px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
+        <header className="sticky top-0 z-20 bg-app/90 backdrop-blur-md border-b border-line px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {/* Hamburger button (Mobile only) */}
             <IconButton
@@ -273,10 +262,6 @@ export function AppShell() {
             >
               <Menu className="w-4 h-4" />
             </IconButton>
-
-            <span className="font-display font-semibold text-lg text-fg hidden sm:inline-block">
-              ClassDesk
-            </span>
           </div>
 
           {/* Right Top Bar Area */}
@@ -290,7 +275,7 @@ export function AppShell() {
             <div className="flex items-center gap-2.5">
               <Avatar name={user.name} size="sm" />
               <div className="hidden sm:flex flex-col text-left">
-                <span className="text-xs font-semibold text-fg">Hello, {greetingName}</span>
+                <span className="text-xs font-semibold text-fg">{user.name}</span>
                 <span className="text-[10px] text-muted leading-none">
                   {roleLabel(user.role)}
                 </span>

@@ -127,9 +127,7 @@ export function JoinCourseModal({
       {joinedCourse ? (
         /* Success View */
         <div className="text-center py-4 space-y-5">
-          <div className="mx-auto w-14 h-14 rounded-pill bg-success-soft text-success flex items-center justify-center border border-success/30 shadow-xs">
-            <CheckCircle2 className="w-8 h-8" aria-hidden="true" />
-          </div>
+          <CheckCircle2 className="w-10 h-10 text-success mx-auto" aria-hidden="true" />
 
           <div className="space-y-1.5">
             <h2

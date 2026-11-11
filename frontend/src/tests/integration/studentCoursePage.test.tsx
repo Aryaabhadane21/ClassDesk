@@ -365,7 +365,7 @@ describe('Integration: Student Course Page & Assignments', () => {
     const mainNav = screen.getByRole('navigation', { name: 'Main' })
     const coursesNavLink = within(mainNav).getByRole('link', { name: 'Courses' })
     expect(coursesNavLink).toBeInTheDocument()
-    expect(coursesNavLink.className).toContain('bg-primary')
+    expect(coursesNavLink.className).toContain('border-l-accent')
   })
 
   it('redirects an authenticated professor away from /student to /admin', async () => {

@@ -11,7 +11,6 @@ import {
   Users,
 } from 'lucide-react'
 import { Badge, Button, Card, Highlight, IconButton, ProgressBar } from '@/components/ui'
-import { AssignmentCover } from '@/components/assignments/AssignmentCover'
 import { DueLabel } from '@/components/assignments/DueLabel'
 import { getAdminUrgency } from '@/utils/dueStyles'
 import { cn } from '@/utils/cn'
@@ -75,8 +74,8 @@ export function ProfessorAssignmentCard({
   return (
     <Card
       className={cn(
-        '@container flex flex-col justify-between overflow-hidden text-left bg-surface border border-line shadow-card rounded-lg',
-        'motion-safe:transition-all motion-safe:duration-200',
+        '@container flex flex-col justify-between overflow-hidden text-left bg-surface border border-line rounded-lg',
+        'transition-colors duration-150 hover:border-fg/30',
         urgency.isUrgent && urgency.cardBorderClasses,
         className,
       )}
@@ -87,96 +86,106 @@ export function ProfessorAssignmentCard({
         aria-labelledby={titleId}
         className="flex flex-col h-full outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 rounded-lg"
       >
-        {/* 1. Cover with AssignmentCover and type badge */}
-        <div className="relative h-[120px] w-full overflow-hidden shrink-0 border-b border-line">
-          <AssignmentCover seed={assignment.id} variant="cover" className="h-full w-full" />
-          <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5">
-            <Badge
-              tone="neutral"
-              size="sm"
-              className="bg-surface/90 backdrop-blur-xs border border-line text-fg font-medium shadow-xs"
-              icon={
-                isGroup ? (
-                  <Users className="w-3 h-3 text-muted" aria-hidden="true" />
-                ) : (
-                  <User className="w-3 h-3 text-muted" aria-hidden="true" />
-                )
-              }
-            >
-              {isGroup ? 'Group' : 'Individual'}
-            </Badge>
-          </div>
-
-          <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
-            {isComplete ? (
-              <Badge
-                tone="success"
-                size="sm"
-                icon={<CheckCircle2 className="w-3 h-3" aria-hidden="true" />}
-                className="shadow-xs backdrop-blur-xs"
-              >
-                Complete
-              </Badge>
-            ) : urgency.isUrgent ? (
-              <Badge
-                tone={urgency.tone}
-                size="sm"
-                icon={
-                  urgency.tone === 'danger' ? (
-                    <AlertTriangle className="w-3 h-3" aria-hidden="true" />
-                  ) : (
-                    <Clock className="w-3 h-3" aria-hidden="true" />
-                  )
-                }
-                className="shadow-xs backdrop-blur-xs"
-              >
-                {urgency.badgeLabel}
-              </Badge>
-            ) : null}
-          </div>
-        </div>
+        {/* Thin top colored border strip */}
+        <div
+          className={cn(
+            'h-1 w-full shrink-0',
+            urgency.tone === 'danger' && !isComplete
+              ? 'bg-danger'
+              : urgency.tone === 'warning' && !isComplete
+                ? 'bg-warning'
+                : isComplete
+                  ? 'bg-success'
+                  : 'bg-accent/40',
+          )}
+          aria-hidden="true"
+        />
 
         {/* 2. Main Content Body */}
         <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-4">
-          <div className="space-y-2.5">
-            {/* Title */}
-            <h3
-              id={titleId}
-              className="font-display font-semibold text-base sm:text-lg text-fg leading-snug line-clamp-2"
-            >
-              <Highlight text={assignment.title} query={searchQuery} />
-            </h3>
+          <div className="space-y-3">
+            {/* Header row with Type & Status Badges */}
+            <div className="flex items-center justify-between gap-2">
+              <Badge
+                tone="neutral"
+                size="sm"
+                icon={
+                  isGroup ? (
+                    <Users className="w-3 h-3 text-muted" aria-hidden="true" />
+                  ) : (
+                    <User className="w-3 h-3 text-muted" aria-hidden="true" />
+                  )
+                }
+              >
+                {isGroup ? 'Group' : 'Individual'}
+              </Badge>
 
-            {/* Description */}
-            <p className="text-xs sm:text-sm text-muted line-clamp-3 leading-relaxed">
-              <Highlight text={assignment.description} query={searchQuery} />
-            </p>
+              {isComplete ? (
+                <Badge
+                  tone="success"
+                  size="sm"
+                  icon={<CheckCircle2 className="w-3 h-3" aria-hidden="true" />}
+                  className="bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-200 dark:border-emerald-700 font-semibold"
+                >
+                  Complete
+                </Badge>
+              ) : urgency.isUrgent ? (
+                <Badge
+                  tone={urgency.tone}
+                  size="sm"
+                  icon={
+                    urgency.tone === 'danger' ? (
+                      <AlertTriangle className="w-3 h-3" aria-hidden="true" />
+                    ) : (
+                      <Clock className="w-3 h-3" aria-hidden="true" />
+                    )
+                  }
+                >
+                  {urgency.badgeLabel}
+                </Badge>
+              ) : null}
+            </div>
+
+            <div className="space-y-2">
+              {/* Title */}
+              <h3
+                id={titleId}
+                className="font-display font-semibold text-base sm:text-lg text-fg leading-snug line-clamp-2"
+              >
+                <Highlight text={assignment.title} query={searchQuery} />
+              </h3>
+
+              {/* Description */}
+              <p className="text-xs sm:text-sm text-muted line-clamp-3 leading-relaxed">
+                <Highlight text={assignment.description} query={searchQuery} />
+              </p>
+            </div>
           </div>
 
           <div className="space-y-3 pt-1">
             {/* Due Label with Urgency styling (never color alone: icon + text) */}
             <div
               className={cn(
-                'rounded-md flex items-center justify-between gap-2',
+                'rounded-md flex items-center justify-between gap-2 overflow-hidden whitespace-nowrap',
                 urgency.isUrgent ? urgency.dueRowClasses : 'text-xs text-fg',
               )}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 min-w-0 truncate">
                 {urgency.tone === 'danger' && !isComplete && (
                   <AlertTriangle
-                    className="w-4 h-4 text-danger shrink-0"
+                    className="w-3.5 h-3.5 text-danger shrink-0"
                     aria-hidden="true"
                   />
                 )}
                 {urgency.tone === 'warning' && !isComplete && (
                   <Clock
-                    className="w-4 h-4 text-warning shrink-0"
+                    className="w-3.5 h-3.5 text-warning shrink-0"
                     aria-hidden="true"
                   />
                 )}
                 {isComplete && (
                   <CheckCircle2
-                    className="w-4 h-4 text-success shrink-0"
+                    className="w-3.5 h-3.5 text-success shrink-0"
                     aria-hidden="true"
                   />
                 )}

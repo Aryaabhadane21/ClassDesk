@@ -44,19 +44,19 @@ export function StudentCourseCard({
           {/* Group Status Chip */}
           <div className="relative z-10 select-none">
             {isLeader && course.myGroup && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-pill bg-accent-soft text-accent text-xs font-medium border border-accent/20">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-accent-soft text-accent text-xs font-medium border border-accent/20">
                 <Crown className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                 <span>{course.myGroup.name} · Leader</span>
               </span>
             )}
             {isMember && course.myGroup && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-pill bg-surface-2 text-fg text-xs font-medium border border-line">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-surface-2 text-fg text-xs font-medium border border-line">
                 <Users className="w-3.5 h-3.5 text-muted shrink-0" aria-hidden="true" />
                 <span>Member of {course.myGroup.name}</span>
               </span>
             )}
             {!course.myGroup && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-pill bg-surface-2 text-muted text-xs font-medium border border-line">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-surface-2 text-muted text-xs font-medium border border-line">
                 <UserPlus className="w-3.5 h-3.5 text-muted shrink-0" aria-hidden="true" />
                 <span>No group yet</span>
               </span>

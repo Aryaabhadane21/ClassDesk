@@ -3,7 +3,6 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   AlertCircle,
   ArrowLeft,
-  BarChart2,
   BookOpen,
   CheckCircle2,
   Clock,
@@ -26,7 +25,8 @@ import {
   ProgressBar,
   SearchInput,
   Skeleton,
-  StatCard,
+  StatStrip,
+  StatStripSkeleton,
 } from '@/components/ui'
 import { DueLabel } from '@/components/assignments/DueLabel'
 import { useProfessorAssignmentDetail } from '@/features/admin/useProfessorAssignmentDetail'
@@ -146,20 +146,7 @@ export function ProfessorAssignmentDetailPage() {
           <Skeleton className="h-5 w-full max-w-xl" />
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div
-              key={i}
-              className="p-4 sm:p-5 flex items-center gap-3.5 bg-surface border border-line rounded-lg"
-            >
-              <Skeleton className="w-10 h-10 rounded-pill shrink-0" />
-              <div className="space-y-2 flex-1 min-w-0">
-                <Skeleton className="h-7 w-12" />
-                <Skeleton className="h-3.5 w-20" />
-              </div>
-            </div>
-          ))}
-        </div>
+        <StatStripSkeleton />
 
         <Skeleton className="h-16 w-full rounded-lg" />
         <Skeleton className="h-64 w-full rounded-lg" />
@@ -291,34 +278,30 @@ export function ProfessorAssignmentDetailPage() {
         </div>
       </div>
 
-      {/* 3. Summary StatCards (Submitted, Pending, Total, Completion %) */}
-      <section aria-labelledby="summary-heading" className="space-y-4">
-        <Eyebrow id="summary-heading">Summary</Eyebrow>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard
-            label={isGroup ? 'Acknowledged' : 'Submitted'}
-            value={tracking.submitted}
-            tone={isComplete ? 'success' : 'default'}
-            icon={<CheckCircle2 className="w-5 h-5" />}
-          />
-          <StatCard
-            label="Pending"
-            value={pendingCount}
-            tone={pendingCount > 0 && isOverdue ? 'danger' : 'default'}
-            icon={<Clock className="w-5 h-5" />}
-          />
-          <StatCard
-            label={isGroup ? 'Total groups' : 'Total assigned'}
-            value={tracking.total}
-            icon={isGroup ? <FolderGit2 className="w-5 h-5" /> : <Users className="w-5 h-5" />}
-          />
-          <StatCard
-            label="Completion"
-            value={`${percent}%`}
-            tone={isComplete ? 'success' : 'default'}
-            icon={<BarChart2 className="w-5 h-5" />}
-          />
-        </div>
+      {/* 3. Summary StatStrip (Submitted, Pending, Total, Completion %) */}
+      <section className="space-y-4">
+        <StatStrip
+          ariaLabel="Summary"
+          items={[
+            {
+              label: isGroup ? 'Acknowledged' : 'Submitted',
+              value: tracking.submitted,
+            },
+            {
+              label: 'Pending',
+              value: pendingCount,
+              isOverdue: isOverdue && pendingCount > 0,
+            },
+            {
+              label: isGroup ? 'Total groups' : 'Total assigned',
+              value: tracking.total,
+            },
+            {
+              label: 'Completion',
+              value: `${percent}%`,
+            },
+          ]}
+        />
 
         {/* Progress Bar Card */}
         <Card className="p-4 sm:p-5 bg-surface border border-line rounded-lg shadow-card space-y-2">
@@ -391,7 +374,7 @@ export function ProfessorAssignmentDetailPage() {
               <div
                 role="radiogroup"
                 aria-label="Status filter"
-                className="inline-flex rounded-pill border border-line bg-surface-2 p-0.5 min-h-[44px] items-center self-start overflow-x-auto max-w-full"
+                className="inline-flex rounded-md border border-line bg-surface-2 p-0.5 min-h-[40px] items-center self-start overflow-x-auto max-w-full"
               >
                 {[
                   { label: 'All', value: 'all' as const, count: totalEntriesCount },
@@ -410,22 +393,14 @@ export function ProfessorAssignmentDetailPage() {
                     aria-label={`${tab.label} (${tab.count})`}
                     onClick={() => setFilterTab(tab.value)}
                     className={cn(
-                      'h-[38px] px-3.5 rounded-pill flex items-center gap-2 text-xs font-medium cursor-pointer select-none whitespace-nowrap motion-safe:transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:z-10',
+                      'h-[34px] px-3.5 rounded-md flex items-center text-xs font-medium cursor-pointer select-none whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:z-10',
                       filterTab === tab.value
-                        ? 'bg-primary text-primary-fg shadow-xs font-semibold'
+                        ? 'bg-primary text-primary-fg font-semibold'
                         : 'text-muted hover:text-fg hover:bg-surface/60',
                     )}
                   >
-                    <span>{tab.label}</span>
-                    <span
-                      className={cn(
-                        'text-[10px] px-1.5 py-0.2 rounded-pill font-mono',
-                        filterTab === tab.value
-                          ? 'bg-primary-fg/20 text-primary-fg'
-                          : 'bg-surface text-muted border border-line',
-                      )}
-                    >
-                      {tab.count}
+                    <span>
+                      {tab.label} ({tab.count})
                     </span>
                   </button>
                 ))}

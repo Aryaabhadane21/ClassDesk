@@ -32,10 +32,10 @@ export function NotificationBell() {
         aria-expanded={isOpen}
         aria-controls={panelId}
         className={cn(
-          'relative w-11 h-11 min-w-[44px] min-h-[44px] rounded-pill flex items-center justify-center text-muted hover:text-fg hover:bg-surface-2',
+          'relative w-10 h-10 min-w-[40px] min-h-[40px] rounded-md flex items-center justify-center text-muted hover:text-fg hover:bg-surface-2',
           'border border-transparent hover:border-line cursor-pointer',
           'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2',
-          'motion-safe:transition-all motion-safe:duration-150',
+          'transition-colors duration-150',
           isOpen && 'bg-surface-2 text-fg border-line',
         )}
       >

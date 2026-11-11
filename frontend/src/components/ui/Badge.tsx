@@ -31,7 +31,7 @@ export function Badge({
       dot: 'bg-accent',
     },
     success: {
-      bg: 'bg-success-soft text-success border border-transparent',
+      bg: 'bg-success-soft text-success border border-success/30 dark:bg-emerald-950 dark:text-emerald-200 dark:border-emerald-700/70',
       dot: 'bg-success',
     },
     warning: {

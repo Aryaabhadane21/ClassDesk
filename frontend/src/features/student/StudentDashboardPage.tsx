@@ -1,10 +1,6 @@
 import { useMemo, useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import {
-  AlertTriangle,
-  BookOpen,
-  CheckCircle2,
-  ClipboardList,
   Plus,
   Search,
 } from 'lucide-react'
@@ -16,7 +12,8 @@ import {
   Eyebrow,
   SearchInput,
   Skeleton,
-  StatCard,
+  StatStrip,
+  StatStripSkeleton,
 } from '@/components/ui'
 import {
   JoinCourseModal,
@@ -105,50 +102,20 @@ export function StudentDashboardPage() {
       />
 
       {/* ------------------------------------------------------------- */}
-      {/* 1. OVERVIEW METRICS ROW                                       */}
+      {/* 1. SINGLE-ROW STAT STRIP                                      */}
       {/* ------------------------------------------------------------- */}
-      <section aria-labelledby="student-courses-overview" className="space-y-3">
-        <Eyebrow id="student-courses-overview">Overview</Eyebrow>
-
+      <section aria-label="Course statistics">
         {status === 'loading' ? (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" aria-busy="true">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div
-                key={i}
-                className="p-4 sm:p-5 flex items-center gap-3.5 bg-surface border border-line rounded-lg"
-              >
-                <Skeleton className="w-10 h-10 sm:w-11 sm:h-11 rounded-pill shrink-0" />
-                <div className="space-y-2 flex-1 min-w-0">
-                  <Skeleton className="h-7 w-12" />
-                  <Skeleton className="h-3.5 w-24" />
-                </div>
-              </div>
-            ))}
-          </div>
+          <StatStripSkeleton />
         ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatCard
-              label="Courses"
-              value={stats.courseCount}
-              icon={<BookOpen className="w-5 h-5" />}
-            />
-            <StatCard
-              label="Assignments"
-              value={stats.assignmentCount}
-              icon={<ClipboardList className="w-5 h-5" />}
-            />
-            <StatCard
-              label="Completed"
-              value={stats.completedCount}
-              icon={<CheckCircle2 className="w-5 h-5" />}
-            />
-            <StatCard
-              label="Overdue"
-              value={stats.overdueCount}
-              icon={<AlertTriangle className="w-5 h-5" />}
-              tone={stats.overdueCount > 0 ? 'danger' : 'default'}
-            />
-          </div>
+          <StatStrip
+            items={[
+              { label: 'Courses', value: stats.courseCount },
+              { label: 'Assignments', value: stats.assignmentCount },
+              { label: 'Completed', value: stats.completedCount },
+              { label: 'Overdue', value: stats.overdueCount, isOverdue: true },
+            ]}
+          />
         )}
       </section>
 

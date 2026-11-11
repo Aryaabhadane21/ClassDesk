@@ -402,7 +402,7 @@ export function StudentCoursePage() {
       {/* 3. Professor Profile, Group Status, and Course ProgressBar */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Professor & Group Status */}
-        <Card className="lg:col-span-2 p-5 bg-surface border border-line rounded-lg shadow-card flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <Card className="lg:col-span-2 p-5 bg-surface border border-line rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
             <Avatar name={course.professor.name} size="md" />
             <div className="space-y-0.5">
@@ -414,19 +414,19 @@ export function StudentCoursePage() {
           {/* Group status chip */}
           <div className="select-none self-start sm:self-center">
             {isLeader && course.myGroup && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-pill bg-accent-soft text-accent text-xs font-medium border border-accent/20">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-accent-soft text-accent text-xs font-medium border border-accent/20">
                 <Crown className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                 <span>{course.myGroup.name} · Leader</span>
               </span>
             )}
             {isMember && course.myGroup && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-pill bg-surface-2 text-fg text-xs font-medium border border-line">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-surface-2 text-fg text-xs font-medium border border-line">
                 <Users className="w-3.5 h-3.5 text-muted shrink-0" aria-hidden="true" />
                 <span>Member of {course.myGroup.name}</span>
               </span>
             )}
             {!course.myGroup && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-pill bg-surface-2 text-muted text-xs font-medium border border-line">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-surface-2 text-muted text-xs font-medium border border-line">
                 <UserPlus className="w-3.5 h-3.5 text-muted shrink-0" aria-hidden="true" />
                 <span>No group yet</span>
               </span>
@@ -435,7 +435,7 @@ export function StudentCoursePage() {
         </Card>
 
         {/* Course ProgressBar ("2 of 3 done") */}
-        <Card className="p-5 bg-surface border border-line rounded-lg shadow-card flex flex-col justify-center space-y-2">
+        <Card className="p-5 bg-surface border border-line rounded-lg flex flex-col justify-center space-y-2">
           <div className="flex items-center justify-between text-xs font-medium tabular-nums">
             <span className="text-muted">
               {doneCount} of {totalCount} done
@@ -480,7 +480,7 @@ export function StudentCoursePage() {
               <div
                 role="radiogroup"
                 aria-label="Filter assignments by status"
-                className="inline-flex rounded-pill border border-line bg-surface-2 p-0.5 min-h-[44px] items-center self-start overflow-x-auto max-w-full"
+                className="inline-flex rounded-md border border-line bg-surface-2 p-0.5 min-h-[40px] items-center self-start overflow-x-auto max-w-full"
               >
                 {[
                   { label: 'All', value: 'all' as const, count: totalCount },
@@ -496,22 +496,14 @@ export function StudentCoursePage() {
                     aria-label={`${tab.label} (${tab.count})`}
                     onClick={() => updateUrlParams({ filter: tab.value })}
                     className={cn(
-                      'h-[38px] px-3.5 rounded-pill flex items-center gap-2 text-xs font-medium cursor-pointer select-none whitespace-nowrap motion-safe:transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:z-10',
+                      'h-[34px] px-3.5 rounded-md flex items-center text-xs font-medium cursor-pointer select-none whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:z-10',
                       statusFilter === tab.value
-                        ? 'bg-primary text-primary-fg shadow-xs font-semibold'
+                        ? 'bg-primary text-primary-fg font-semibold'
                         : 'text-muted hover:text-fg hover:bg-surface/60',
                     )}
                   >
-                    <span>{tab.label}</span>
-                    <span
-                      className={cn(
-                        'text-[10px] px-1.5 py-0.2 rounded-pill font-mono',
-                        statusFilter === tab.value
-                          ? 'bg-primary-fg/20 text-primary-fg'
-                          : 'bg-surface text-muted border border-line',
-                      )}
-                    >
-                      {tab.count}
+                    <span>
+                      {tab.label} ({tab.count})
                     </span>
                   </button>
                 ))}
@@ -714,7 +706,7 @@ export function StudentCoursePage() {
                           </span>
                         )}
                         {isYou && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded-pill bg-accent/15 text-accent font-semibold">
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-sm bg-accent/15 text-accent font-semibold">
                             You
                           </span>
                         )}
@@ -760,14 +752,14 @@ export function StudentCoursePage() {
                     return (
                       <Card
                         key={group.id}
-                        className="p-5 bg-surface border border-line rounded-lg shadow-card flex flex-col justify-between space-y-4 text-left"
+                        className="p-5 bg-surface border border-line rounded-lg flex flex-col justify-between space-y-4 text-left"
                       >
                         <div className="space-y-3">
                           <div className="flex items-start justify-between gap-2">
                             <h3 className="font-display text-base font-semibold text-fg tracking-tight">
                               {group.name}
                             </h3>
-                            <span className="inline-flex items-center gap-1 text-[11px] text-muted font-medium bg-surface-2 px-2 py-0.5 rounded-pill border border-line">
+                            <span className="inline-flex items-center gap-1 text-[11px] text-muted font-medium bg-surface-2 px-2 py-0.5 rounded-md border border-line">
                               <Users className="w-3 h-3" />
                               {group.members.length} {group.members.length === 1 ? 'member' : 'members'}
                             </span>

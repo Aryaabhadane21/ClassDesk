@@ -54,7 +54,7 @@ describe('Integration: Professor Course Page', () => {
     expect(screen.getByText('Students')).toBeInTheDocument()
     expect(screen.getByText('Groups')).toBeInTheDocument()
     expect(screen.getAllByText('Assignments').length).toBeGreaterThanOrEqual(1)
-    expect(screen.getByText('Overdue')).toBeInTheDocument()
+    expect(screen.getAllByText('Overdue').length).toBeGreaterThanOrEqual(1)
 
     // Seeded assignments for WEB101:
     // asg-web-01: Individual, Overdue, All 5 students, 5 of 5 submitted

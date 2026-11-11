@@ -29,15 +29,15 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
 ) {
   const variantStyles: Record<IconButtonVariant, string> = {
     primary:
-      'bg-primary text-primary-fg hover:opacity-90 active:opacity-95 shadow-card hover:shadow-pop',
+      'bg-primary text-primary-fg hover:opacity-90 active:opacity-95',
     secondary:
-      'bg-surface-2 border border-line text-fg hover:bg-surface active:bg-surface-2',
+      'bg-surface-2 border border-line text-fg hover:bg-surface hover:border-fg/30 active:bg-surface-2',
     ghost:
       'bg-transparent text-fg hover:bg-surface-2 active:bg-surface-2/80',
     accent:
-      'bg-accent text-accent-fg hover:opacity-90 active:opacity-95 shadow-card hover:shadow-pop',
+      'bg-accent text-accent-fg hover:opacity-90 active:opacity-95',
     danger:
-      'bg-danger text-danger-fg hover:opacity-90 active:opacity-95 shadow-card hover:shadow-pop',
+      'bg-danger text-danger-fg hover:opacity-90 active:opacity-95',
   }
 
   const sizeStyles: Record<IconButtonSize, string> = {
@@ -54,9 +54,9 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
       title={ariaLabel}
       disabled={disabled}
       className={cn(
-        'inline-flex items-center justify-center rounded-pill cursor-pointer select-none',
+        'inline-flex items-center justify-center rounded-md cursor-pointer select-none',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2',
-        'motion-safe:transition-all motion-safe:duration-150',
+        'transition-colors duration-150',
         variantStyles[variant],
         sizeStyles[size],
         disabled && 'opacity-50 cursor-not-allowed pointer-events-none shadow-none',

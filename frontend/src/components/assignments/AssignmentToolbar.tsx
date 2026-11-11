@@ -129,7 +129,7 @@ export function AssignmentToolbar({
           <div
             role="radiogroup"
             aria-label={statusLabel}
-            className="inline-flex rounded-pill border border-line bg-surface-2 p-0.5 min-h-[44px] items-center"
+            className="inline-flex rounded-md border border-line bg-surface-2 p-0.5 min-h-[40px] items-center"
           >
             {statusOptions.map((opt, idx) => {
               const isSelected = opt.value === statusValue
@@ -150,26 +150,17 @@ export function AssignmentToolbar({
                   onClick={() => onStatusChange(opt.value)}
                   onKeyDown={(e) => handleSegmentKeyDown(e, idx)}
                   className={cn(
-                    'h-[38px] px-3.5 rounded-pill flex items-center gap-2 text-xs font-medium cursor-pointer select-none whitespace-nowrap motion-safe:transition-all',
+                    'h-[34px] px-3.5 rounded-md flex items-center text-xs font-medium cursor-pointer select-none whitespace-nowrap transition-colors',
                     'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:z-10',
                     isSelected
-                      ? 'bg-primary text-primary-fg shadow-xs font-semibold'
+                      ? 'bg-primary text-primary-fg font-semibold'
                       : 'text-muted hover:text-fg hover:bg-surface/60',
                   )}
                 >
-                  <span>{opt.label}</span>
-                  {typeof count === 'number' && (
-                    <span
-                      className={cn(
-                        'text-[10px] px-1.5 py-0.2 rounded-pill font-mono',
-                        isSelected
-                          ? 'bg-primary-fg/20 text-primary-fg'
-                          : 'bg-surface text-muted border border-line',
-                      )}
-                    >
-                      {count}
-                    </span>
-                  )}
+                  <span>
+                    {opt.label}
+                    {typeof count === 'number' ? ` (${count})` : ''}
+                  </span>
                 </button>
               )
             })}
@@ -208,7 +199,7 @@ export function AssignmentToolbar({
           <div className="flex items-center gap-1.5 flex-wrap">
             {/* Search query chip */}
             {searchQuery.trim() && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill bg-surface-2 border border-line text-fg text-xs font-medium">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-surface-2 border border-line text-fg text-xs font-medium">
                 <span>
                   Search: <span className="font-semibold">&ldquo;{searchQuery.trim()}&rdquo;</span>
                 </span>
@@ -216,7 +207,7 @@ export function AssignmentToolbar({
                   type="button"
                   onClick={() => onSearchChange('')}
                   aria-label="Remove filter: Search query"
-                  className="rounded-pill text-muted hover:text-fg cursor-pointer p-0.5"
+                  className="rounded-md text-muted hover:text-fg cursor-pointer p-0.5 transition-colors"
                 >
                   <X className="w-3.5 h-3.5" aria-hidden="true" />
                 </button>
@@ -225,7 +216,7 @@ export function AssignmentToolbar({
 
             {/* Status filter chip */}
             {activeStatusOption && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill bg-surface-2 border border-line text-fg text-xs font-medium">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-surface-2 border border-line text-fg text-xs font-medium">
                 <span>
                   Status: <span className="font-semibold">{activeStatusOption.label}</span>
                 </span>
@@ -233,7 +224,7 @@ export function AssignmentToolbar({
                   type="button"
                   onClick={() => onStatusChange('all')}
                   aria-label="Remove filter: Status"
-                  className="rounded-pill text-muted hover:text-fg cursor-pointer p-0.5"
+                  className="rounded-md text-muted hover:text-fg cursor-pointer p-0.5 transition-colors"
                 >
                   <X className="w-3.5 h-3.5" aria-hidden="true" />
                 </button>
@@ -242,7 +233,7 @@ export function AssignmentToolbar({
 
             {/* Due date filter chip */}
             {activeDueOption && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill bg-surface-2 border border-line text-fg text-xs font-medium">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-surface-2 border border-line text-fg text-xs font-medium">
                 <span>
                   Due: <span className="font-semibold">{activeDueOption.label}</span>
                 </span>
@@ -250,7 +241,7 @@ export function AssignmentToolbar({
                   type="button"
                   onClick={() => onDueChange('all')}
                   aria-label="Remove filter: Due date"
-                  className="rounded-pill text-muted hover:text-fg cursor-pointer p-0.5"
+                  className="rounded-md text-muted hover:text-fg cursor-pointer p-0.5 transition-colors"
                 >
                   <X className="w-3.5 h-3.5" aria-hidden="true" />
                 </button>
@@ -262,7 +253,7 @@ export function AssignmentToolbar({
               variant="ghost"
               size="sm"
               onClick={onClearFilters}
-              className="text-xs text-muted hover:text-fg h-[28px] px-2.5 rounded-pill"
+              className="text-xs text-muted hover:text-fg h-[28px] px-2.5 rounded-md"
             >
               Clear all
             </Button>

@@ -92,6 +92,7 @@ export function ensureSeeded(): void {
       STORAGE_KEYS.GROUPS,
       STORAGE_KEYS.GROUP_ACKS,
       STORAGE_KEYS.SESSION,
+      STORAGE_KEYS.TOKEN,
       STORAGE_KEYS.NOTIFICATION_READS,
     ]
 

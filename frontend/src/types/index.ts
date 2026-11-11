@@ -4,6 +4,36 @@
 export type Role = 'student' | 'admin'
 
 /**
+ * JWT token payload format for authentication sessions
+ */
+export interface TokenPayload {
+  sub: string // user id
+  role: Role
+  name: string
+  iat: number // seconds since epoch
+  exp: number // seconds since epoch
+}
+
+/**
+ * Registration form input payload
+ */
+export interface RegisterInput {
+  name: string
+  email: string
+  password: string
+  role: Role
+  confirmPassword?: string
+}
+
+/**
+ * Login form input payload
+ */
+export interface LoginInput {
+  email: string
+  password: string
+}
+
+/**
  * Supported visual themes
  */
 export type Theme = 'light' | 'dark'

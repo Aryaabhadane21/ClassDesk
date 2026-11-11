@@ -4,16 +4,20 @@ import userEvent from '@testing-library/user-event'
 import { renderWithProviders } from '@/tests/renderWithProviders'
 import { AdminAssignmentsPage } from '@/features/admin/AdminAssignmentsPage'
 import { STORAGE_KEYS } from '@/utils/constants'
+import { createToken } from '@/services/auth/token'
 
 describe('Integration: Admin Create Flow', () => {
   it('opens modal, validates required fields, and creates a new assignment', async () => {
     const user = userEvent.setup()
 
     // Sign in as Prof. Meera Iyer
-    window.localStorage.setItem(
-      STORAGE_KEYS.SESSION,
-      JSON.stringify('user-admin-1'),
-    )
+    const token = createToken({
+      id: 'user-admin-1',
+      name: 'Prof. Meera Iyer',
+      email: 'meera.iyer@classdesk.edu',
+      role: 'admin',
+    })
+    window.localStorage.setItem(STORAGE_KEYS.TOKEN, token)
 
     renderWithProviders(<AdminAssignmentsPage />, {
       initialEntries: ['/admin'],

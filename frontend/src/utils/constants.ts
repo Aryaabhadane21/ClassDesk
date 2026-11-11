@@ -16,7 +16,9 @@ export const STORAGE_KEYS = {
   GROUPS: 'classdesk:groups',
   GROUP_ACKS: 'classdesk:groupAcks',
   SCHEMA_VERSION: 'classdesk:schemaVersion',
+  TOKEN: 'classdesk:token',
   SESSION: 'classdesk:session',
+  OLD_SESSION: 'classdesk:session',
   THEME: 'classdesk:theme',
   NOTIFICATION_READS: 'classdesk:notificationReads',
 } as const

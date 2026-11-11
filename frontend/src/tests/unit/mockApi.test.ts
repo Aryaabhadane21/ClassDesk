@@ -5,10 +5,11 @@ import { DEMO_PASSWORD } from '@/data/seed'
 describe('services/mockApi', () => {
   describe('login', () => {
     it('succeeds with case-insensitive email and never returns password', async () => {
-      const user = await mockApi.login('MEERA.IYER@CLASSDESK.EDU', DEMO_PASSWORD)
+      const { user, token } = await mockApi.login('MEERA.IYER@CLASSDESK.EDU', DEMO_PASSWORD)
       expect(user).toBeDefined()
       expect(user.id).toBe('user-admin-1')
       expect(user.role).toBe('admin')
+      expect(token).toBeTruthy()
       expect((user as unknown as { password?: string }).password).toBeUndefined()
     })
 

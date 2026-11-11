@@ -27,11 +27,13 @@ export type ApiErrorCode = 'NETWORK' | 'VALIDATION' | 'UNAUTHORIZED' | 'NOT_FOUN
  */
 export class ApiError extends Error {
   code: ApiErrorCode
+  fieldErrors?: Record<string, string>
 
-  constructor(message: string, code: ApiErrorCode) {
+  constructor(message: string, code: ApiErrorCode, fieldErrors?: Record<string, string>) {
     super(message)
     this.name = 'ApiError'
     this.code = code
+    this.fieldErrors = fieldErrors
     Object.setPrototypeOf(this, ApiError.prototype)
   }
 }

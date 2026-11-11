@@ -4,16 +4,20 @@ import userEvent from '@testing-library/user-event'
 import { renderWithProviders } from '@/tests/renderWithProviders'
 import { StudentDashboardPage } from '@/features/student/StudentDashboardPage'
 import { STORAGE_KEYS } from '@/utils/constants'
+import { createToken } from '@/services/auth/token'
 
 describe('Integration: Student Submission Flow', () => {
   it('walks through the two-step confirmation flow and updates counts in place', async () => {
     const user = userEvent.setup()
 
     // Sign in as Aarav Sharma
-    window.localStorage.setItem(
-      STORAGE_KEYS.SESSION,
-      JSON.stringify('user-student-1'),
-    )
+    const token = createToken({
+      id: 'user-student-1',
+      name: 'Aarav Sharma',
+      email: 'aarav.sharma@classdesk.edu',
+      role: 'student',
+    })
+    window.localStorage.setItem(STORAGE_KEYS.TOKEN, token)
 
     renderWithProviders(<StudentDashboardPage />, {
       initialEntries: ['/student'],

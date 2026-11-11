@@ -9,6 +9,8 @@ export * from '@/services/api/courses'
 export * from '@/services/api/groups'
 export * from '@/services/api/assignments'
 export * from '@/services/api/acknowledgements'
+export * from '@/services/auth/token'
+export * from '@/utils/validation'
 
 import {
   apiConfig,
@@ -16,6 +18,8 @@ import {
 } from '@/services/api/core'
 import {
   login,
+  register,
+  getSessionUser,
   getUserById,
   listStudents,
 } from '@/services/api/auth'
@@ -52,12 +56,24 @@ import {
   acknowledgeGroupAssignment,
   getStudentCourseProgress,
 } from '@/services/api/acknowledgements'
+import {
+  createToken,
+  verifyToken,
+  decodeToken,
+  TOKEN_LIFETIME_SECONDS,
+} from '@/services/auth/token'
 
 export const mockApi = {
-  // Auth
+  // Auth & Token
   login,
+  register,
+  getSessionUser,
   getUserById,
   listStudents,
+  createToken,
+  verifyToken,
+  decodeToken,
+  TOKEN_LIFETIME_SECONDS,
   // Courses
   buildGroupDetail,
   listProfessorCourses,

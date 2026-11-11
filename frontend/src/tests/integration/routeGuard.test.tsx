@@ -4,14 +4,18 @@ import { Route, Routes } from 'react-router-dom'
 import { renderWithProviders } from '@/tests/renderWithProviders'
 import { RequireAuth, RequireRole } from '@/app/guards'
 import { STORAGE_KEYS } from '@/utils/constants'
+import { createToken } from '@/services/auth/token'
 
 describe('Integration: Route Guard Role Protection', () => {
   it('redirects an authenticated student away from /admin to /student', async () => {
     // Sign in as student
-    window.localStorage.setItem(
-      STORAGE_KEYS.SESSION,
-      JSON.stringify('user-student-1'),
-    )
+    const token = createToken({
+      id: 'user-student-1',
+      name: 'Aarav Sharma',
+      email: 'aarav.sharma@classdesk.edu',
+      role: 'student',
+    })
+    window.localStorage.setItem(STORAGE_KEYS.TOKEN, token)
 
     renderWithProviders(
       <Routes>
@@ -40,7 +44,7 @@ describe('Integration: Route Guard Role Protection', () => {
 
   it('redirects an unauthenticated user attempting to visit /student to /login', async () => {
     // Clear session
-    window.localStorage.removeItem(STORAGE_KEYS.SESSION)
+    window.localStorage.removeItem(STORAGE_KEYS.TOKEN)
 
     renderWithProviders(
       <Routes>
